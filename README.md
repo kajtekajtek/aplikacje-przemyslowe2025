@@ -1,0 +1,1 @@
+# aplikacje-przemyslowe2025
