@@ -1,5 +1,7 @@
 package com.techcorp;
 
+import java.util.Objects;
+
 public class Employee 
 {
     private String surname;
@@ -26,5 +28,27 @@ public class Employee
     public String getEmailAddress() { return this.emailAddress; }
     public Role   getRole()         { return this.role; }
     public int    getSalary()       { return this.salary; }
+
+    @Override
+    public String toString() {
+        return getFullName() 
+             + " " 
+             + getRole().toString() 
+             + " " 
+             + getEmailAddress();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || this.getClass() != obj.getClass()) return false;
+
+        Employee employee = (Employee) obj;
+
+        return Objects.equals(emailAddress, employee.emailAddress);
+    }
+
+    @Override
+    public int hashCode() { return Objects.hash(emailAddress); }
 
 }
