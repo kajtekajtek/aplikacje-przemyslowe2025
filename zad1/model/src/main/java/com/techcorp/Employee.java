@@ -38,6 +38,8 @@ public class Employee
     public Role   getRole()         { return this.role; }
     public int    getSalary()       { return this.salary; }
 
+    public void setSalary(int salary) { this.salary = salary; }
+
     @Override
     public String toString() {
         return getFullName() 
