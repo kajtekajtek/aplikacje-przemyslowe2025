@@ -21,7 +21,16 @@ public class Employee
         this.role         = role;
         this.salary       = salary;
     }
-    
+
+    public static Employee createEmployee(String surname, 
+                                          String name, 
+                                          String emailAddress, 
+                                          Role   role) {
+        return new Employee(
+            surname, name, emailAddress, role, role.getBaseSalary()
+        );
+}
+
     public String getFullName()     { return this.name + " " + this.surname; }
     public String getName()         { return this.name; }
     public String getSurname()      { return this.surname; }
