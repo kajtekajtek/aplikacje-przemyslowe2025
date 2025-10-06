@@ -7,17 +7,20 @@ public class Employee
     private String surname;
     private String name;
     private String emailAddress;
+    private String companyName;
     private Role   role;
     private int    salary;
     
     public Employee(String surname, 
                     String name, 
                     String emailAddress, 
+                    String companyName,
                     Role   role,
                     int    salary) {
         this.surname      = surname;
         this.name         = name;
         this.emailAddress = emailAddress;
+        this.companyName  = companyName;
         this.role         = role;
         this.salary       = salary;
     }
@@ -25,9 +28,10 @@ public class Employee
     public static Employee createEmployee(String surname, 
                                           String name, 
                                           String emailAddress, 
+                                          String companyName,
                                           Role   role) {
         return new Employee(
-            surname, name, emailAddress, role, role.getBaseSalary()
+            surname, name, emailAddress, companyName, role, role.getBaseSalary()
         );
 }
 
@@ -35,6 +39,7 @@ public class Employee
     public String getName()         { return this.name; }
     public String getSurname()      { return this.surname; }
     public String getEmailAddress() { return this.emailAddress; }
+    public String getCompanyName() { return this.companyName; }
     public Role   getRole()         { return this.role; }
     public int    getSalary()       { return this.salary; }
 
