@@ -90,10 +90,13 @@ public class EmployeeTest
     @Test
     public void testHashCode()
     {
-        Employee employee = new Employee(
+        Employee employee1 = new Employee(
             SURNAME, NAME, EMAIL, COMPANY_NAME, ROLE, SALARY
         );
-        assertEquals(EMAIL.hashCode(), employee.hashCode());
+        Employee employee2 = new Employee(
+            SURNAME, NAME, EMAIL, COMPANY_NAME, ROLE, SALARY
+        );
+        assertEquals(employee1.hashCode(), employee2.hashCode());
     }
 
     private void assertEmployeeDetails(Employee employee, 
