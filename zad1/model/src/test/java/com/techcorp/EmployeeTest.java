@@ -19,12 +19,7 @@ public class EmployeeTest
             SURNAME, NAME, EMAIL, COMPANY_NAME, ROLE, SALARY
         );
                     
-        assertEquals(SURNAME, employee.getSurname());
-        assertEquals(NAME, employee.getName());
-        assertEquals(EMAIL, employee.getEmailAddress());
-        assertEquals(COMPANY_NAME, employee.getCompanyName());
-        assertEquals(ROLE, employee.getRole());
-        assertEquals(SALARY, employee.getSalary());
+        assertEmployeeDetails(employee, SURNAME, NAME, EMAIL, COMPANY_NAME, ROLE, SALARY);
     }
 
     @Test
@@ -34,12 +29,7 @@ public class EmployeeTest
             SURNAME, NAME, EMAIL, COMPANY_NAME, ROLE
         );
 
-        assertEquals(SURNAME, employee.getSurname());
-        assertEquals(NAME, employee.getName());
-        assertEquals(EMAIL, employee.getEmailAddress());
-        assertEquals(ROLE, employee.getRole());
-        assertEquals(COMPANY_NAME, employee.getCompanyName());
-        assertEquals(ROLE.getBaseSalary(), employee.getSalary());
+        assertEmployeeDetails(employee, SURNAME, NAME, EMAIL, COMPANY_NAME, ROLE, ROLE.getBaseSalary());
     }
 
     @Test
@@ -104,6 +94,21 @@ public class EmployeeTest
             SURNAME, NAME, EMAIL, COMPANY_NAME, ROLE, SALARY
         );
         assertEquals(EMAIL.hashCode(), employee.hashCode());
+    }
+
+    private void assertEmployeeDetails(Employee employee, 
+                                       String   surname, 
+                                       String   name, 
+                                       String   email, 
+                                       String   companyName, 
+                                       Role     role, 
+                                       int      salary) {
+        assertEquals(surname, employee.getSurname());
+        assertEquals(name, employee.getName());
+        assertEquals(email, employee.getEmailAddress());
+        assertEquals(companyName, employee.getCompanyName());
+        assertEquals(role, employee.getRole());
+        assertEquals(salary, employee.getSalary());
     }
 
 }
