@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public class App {
     private static EmployeeService employeeService;
-    private static Scanner scanner;
+    private static Scanner         scanner;
 
     public static void main(String[] args) {
         employeeService = new EmployeeService();
@@ -174,9 +174,12 @@ public class App {
             
             System.out.print("Enter salary (or press Enter for base salary): ");
             String salaryInput = scanner.nextLine().trim();
-            int salary = salaryInput.isEmpty() ? role.getBaseSalary() : Integer.parseInt(salaryInput);
-            
+
+            int salary = salaryInput.isEmpty() 
+                ? role.getBaseSalary() 
+                : Integer.parseInt(salaryInput);
             Employee employee = new Employee(surname, name, email, company, role, salary);
+            
             employeeService.addEmployee(employee);
             
             System.out.println("\nEmployee added successfully!");
@@ -349,10 +352,6 @@ public class App {
             Long count = countByRole.getOrDefault(role, 0L);
             System.out.printf("%-15s %d%n", role, count);
         }
-        
-        System.out.println("─────────────────────────────");
-        long total = countByRole.values().stream().mapToLong(Long::longValue).sum();
-        System.out.printf("%-15s %d%n", "TOTAL", total);
     }
     
     private static void showEmployeeWithHighestSalary() {
