@@ -1,3 +1,3 @@
 #!/bin/bash
 
-java -cp "model/target/classes:service/target/classes" App.java
+java -jar app/target/app-1.0-SNAPSHOT.jar
