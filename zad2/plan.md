@@ -67,7 +67,19 @@ Create `ApiService.java`:
 
 ## 7. Extend EmployeeService
 
-Add two methods to `EmployeeService.java`:
+Update existing methods in `EmployeeService.java`:
+
+- Modify `addEmployee(Employee employee)` to:
+  - Check for null argument and handle appropriately
+  - Return `int` (1 for success, 0 for failure/duplicate)
+  - Update App.java accordingly
+  
+- Modify `removeEmployee(Employee employee)` to:
+  - Check for null argument and handle appropriately
+  - Return `int` (1 if removed, 0 if not found/null)
+  - Update App.java accordingly
+
+Add new methods to `EmployeeService.java`:
 
 - `validateSalaryConsistency()`: Stream API to filter employees where `salary < role.getBaseSalary()`
 - `getCompanyStatistics()`: Use `Collectors.groupingBy(Employee::getCompanyName)` with downstream collectors for count, average salary, and max salary employee
@@ -109,6 +121,7 @@ Update `/home/kajtek/Code/aplikacje-przemyslowe2025/README.md` with:
 - [ ] Create ImportSummary and CompanyStatistics model classes
 - [ ] Create exception package with InvalidDataException and ApiException
 - [ ] Add Gson dependency to service/pom.xml
+- [ ] Update addEmployee and removeEmployee methods with null handling and int return values
 - [ ] Implement ImportService with CSV parsing and validation
 - [ ] Implement ApiService with HTTP client and JSON parsing
 - [ ] Add validateSalaryConsistency and getCompanyStatistics methods
