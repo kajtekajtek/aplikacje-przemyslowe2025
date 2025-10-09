@@ -117,7 +117,7 @@ Update `/home/kajtek/Code/aplikacje-przemyslowe2025/README.md` with:
 
 ### To-dos
 
-- [ ] Rename name/surname to firstName/lastName in Employee.java and update all references
+- [x] Rename name/surname to firstName/lastName in Employee.java and update all references
 - [ ] Create ImportSummary and CompanyStatistics model classes
 - [ ] Create exception package with InvalidDataException and ApiException
 - [ ] Add Gson dependency to service/pom.xml
