@@ -4,42 +4,42 @@ import java.util.Objects;
 
 public class Employee 
 {
-    private String surname;
-    private String name;
+    private String lastName;
+    private String firstName;
     private String emailAddress;
     private String companyName;
     private Role   role;
     private int    salary;
     
-    public Employee(String surname, 
-                    String name, 
+    public Employee(String lastName, 
+                    String firstName, 
                     String emailAddress, 
                     String companyName,
                     Role   role,
                     int    salary) {
-        this.surname      = surname;
-        this.name         = name;
+        this.lastName     = lastName;
+        this.firstName    = firstName;
         this.emailAddress = emailAddress;
         this.companyName  = companyName;
         this.role         = role;
         this.salary       = salary;
     }
 
-    public static Employee createEmployee(String surname, 
-                                          String name, 
+    public static Employee createEmployee(String lastName, 
+                                          String firstName, 
                                           String emailAddress, 
                                           String companyName,
                                           Role   role) {
         return new Employee(
-            surname, name, emailAddress, companyName, role, role.getBaseSalary()
+            lastName, firstName, emailAddress, companyName, role, role.getBaseSalary()
         );
 }
 
-    public String getFullName()     { return this.name + " " + this.surname; }
-    public String getName()         { return this.name; }
-    public String getSurname()      { return this.surname; }
+    public String getFullName()     { return this.firstName + " " + this.lastName; }
+    public String getLastName()     { return this.lastName; }
+    public String getFirstName()    { return this.firstName; }
     public String getEmailAddress() { return this.emailAddress; }
-    public String getCompanyName() { return this.companyName; }
+    public String getCompanyName()  { return this.companyName; }
     public Role   getRole()         { return this.role; }
     public int    getSalary()       { return this.salary; }
 
