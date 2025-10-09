@@ -39,7 +39,7 @@ public class EmployeeService
     }
     public List<Employee> getEmployeesAlphabetically() {
         return this.employees.stream()
-            .sorted(Comparator.comparing(Employee::getSurname))
+            .sorted(Comparator.comparing(Employee::getLastName))
             .collect(Collectors.toList());
     }
     
