@@ -12,29 +12,29 @@ public class EmployeeServiceTest
 {
     private EmployeeService employeeService;
     
-    private final String SURNAME_1      = "Baggins";
-    private final String NAME_1         = "Frodo";
+    private final String LAST_NAME_1      = "Baggins";
+    private final String FIRST_NAME_1         = "Frodo";
     private final String EMAIL_1        = "frodo.baggins@techcorp.com";
     private final String COMPANY_NAME_1 = "TechCorp";
     private final Role   ROLE_1         = Role.ENGINEER;
     private final int    SALARY_1       = 8500;
     
-    private final String SURNAME_2      = "Gamgee";
-    private final String NAME_2         = "Sam";
+    private final String LAST_NAME_2      = "Gamgee";
+    private final String FIRST_NAME_2         = "Sam";
     private final String EMAIL_2        = "sam.gamgee@techcorp.com";
     private final String COMPANY_NAME_2 = "TechCorp";
     private final Role   ROLE_2         = Role.INTERN;
     private final int    SALARY_2       = 3500;
     
-    private final String SURNAME_3      = "Eustace";
-    private final String NAME_3         = "Scrubb";
+    private final String LAST_NAME_3      = "Eustace";
+    private final String FIRST_NAME_3         = "Scrubb";
     private final String EMAIL_3        = "scrubb.eustace@innovate.com";
     private final String COMPANY_NAME_3 = "Innovate";
     private final Role   ROLE_3         = Role.MANAGER;
     private final int    SALARY_3       = 13000;
     
-    private final String SURNAME_4      = "Took";
-    private final String NAME_4         = "Pippin";
+    private final String LAST_NAME_4      = "Took";
+    private final String FIRST_NAME_4         = "Pippin";
     private final String EMAIL_4        = "pippin.took@techcorp.com";
     private final String COMPANY_NAME_4 = "TechCorp";
     private final Role   ROLE_4         = Role.CEO;
@@ -57,7 +57,7 @@ public class EmployeeServiceTest
     public void testAddEmployee()
     {
         Employee employee = new Employee(
-            SURNAME_1, NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
         );
         
         employeeService.addEmployee(employee);
@@ -70,10 +70,10 @@ public class EmployeeServiceTest
     public void testAddMultipleEmployees()
     {
         Employee employee1 = new Employee(
-            SURNAME_1, NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
         );
         Employee employee2 = new Employee(
-            SURNAME_2, NAME_2, EMAIL_2, COMPANY_NAME_2, ROLE_2, SALARY_2
+            LAST_NAME_2, FIRST_NAME_2, EMAIL_2, COMPANY_NAME_2, ROLE_2, SALARY_2
         );
         
         employeeService.addEmployee(employee1);
@@ -88,10 +88,10 @@ public class EmployeeServiceTest
     public void testAddEmployeeWithDuplicateEmail()
     {
         Employee employee1 = new Employee(
-            SURNAME_1, NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
         );
         Employee employee2 = new Employee(
-            SURNAME_2, NAME_2, EMAIL_1, COMPANY_NAME_2, ROLE_2, SALARY_2
+            LAST_NAME_2, FIRST_NAME_2, EMAIL_1, COMPANY_NAME_2, ROLE_2, SALARY_2
         );
         
         employeeService.addEmployee(employee1);
@@ -109,10 +109,10 @@ public class EmployeeServiceTest
     public void testAddEmployeeWithDuplicateEmailCaseInsensitive()
     {
         Employee employee1 = new Employee(
-            SURNAME_1, NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
         );
         Employee employee2 = new Employee(
-            SURNAME_2, NAME_2, EMAIL_1.toUpperCase(), COMPANY_NAME_2, ROLE_2, SALARY_2
+            LAST_NAME_2, FIRST_NAME_2, EMAIL_1.toUpperCase(), COMPANY_NAME_2, ROLE_2, SALARY_2
         );
         
         employeeService.addEmployee(employee1);
@@ -129,7 +129,7 @@ public class EmployeeServiceTest
     public void testRemoveEmployee()
     {
         Employee employee = new Employee(
-            SURNAME_1, NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
         );
         
         employeeService.addEmployee(employee);
@@ -143,10 +143,10 @@ public class EmployeeServiceTest
     public void testRemoveEmployeeFromMultiple()
     {
         Employee employee1 = new Employee(
-            SURNAME_1, NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
         );
         Employee employee2 = new Employee(
-            SURNAME_2, NAME_2, EMAIL_2, COMPANY_NAME_2, ROLE_2, SALARY_2
+            LAST_NAME_2, FIRST_NAME_2, EMAIL_2, COMPANY_NAME_2, ROLE_2, SALARY_2
         );
         
         employeeService.addEmployee(employee1);
@@ -163,10 +163,10 @@ public class EmployeeServiceTest
     public void testGetEmployees()
     {
         Employee employee1 = new Employee(
-            SURNAME_1, NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
         );
         Employee employee2 = new Employee(
-            SURNAME_2, NAME_2, EMAIL_2, COMPANY_NAME_2, ROLE_2, SALARY_2
+            LAST_NAME_2, FIRST_NAME_2, EMAIL_2, COMPANY_NAME_2, ROLE_2, SALARY_2
         );
         
         employeeService.addEmployee(employee1);
@@ -183,13 +183,13 @@ public class EmployeeServiceTest
     public void testGetEmployeesByCompanyName()
     {
         Employee employee1 = new Employee(
-            SURNAME_1, NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
         );
         Employee employee2 = new Employee(
-            SURNAME_2, NAME_2, EMAIL_2, COMPANY_NAME_2, ROLE_2, SALARY_2
+            LAST_NAME_2, FIRST_NAME_2, EMAIL_2, COMPANY_NAME_2, ROLE_2, SALARY_2
         );
         Employee employee3 = new Employee(
-            SURNAME_3, NAME_3, EMAIL_3, COMPANY_NAME_3, ROLE_3, SALARY_3
+            LAST_NAME_3, FIRST_NAME_3, EMAIL_3, COMPANY_NAME_3, ROLE_3, SALARY_3
         );
         
         employeeService.addEmployee(employee1);
@@ -208,7 +208,7 @@ public class EmployeeServiceTest
     public void testGetEmployeesByCompanyNameCaseInsensitive()
     {
         Employee employee = new Employee(
-            SURNAME_1, NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
         );
         
         employeeService.addEmployee(employee);
@@ -223,7 +223,7 @@ public class EmployeeServiceTest
     public void testGetEmployeesByCompanyNameNoMatches()
     {
         Employee employee = new Employee(
-            SURNAME_1, NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
         );
         
         employeeService.addEmployee(employee);
@@ -237,13 +237,13 @@ public class EmployeeServiceTest
     public void testGetEmployeesByRole()
     {
         Employee employee1 = new Employee(
-            SURNAME_1, NAME_1, EMAIL_1, COMPANY_NAME_1, Role.ENGINEER, SALARY_1
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, Role.ENGINEER, SALARY_1
         );
         Employee employee2 = new Employee(
-            SURNAME_2, NAME_2, EMAIL_2, COMPANY_NAME_2, Role.INTERN, SALARY_2
+            LAST_NAME_2, FIRST_NAME_2, EMAIL_2, COMPANY_NAME_2, Role.INTERN, SALARY_2
         );
         Employee employee3 = new Employee(
-            SURNAME_3, NAME_3, EMAIL_3, COMPANY_NAME_3, Role.ENGINEER, SALARY_3
+            LAST_NAME_3, FIRST_NAME_3, EMAIL_3, COMPANY_NAME_3, Role.ENGINEER, SALARY_3
         );
         
         employeeService.addEmployee(employee1);
@@ -288,9 +288,9 @@ public class EmployeeServiceTest
         List<Employee> sortedEmployees = employeeService.getEmployeesAlphabetically();
         
         assertEquals(3, sortedEmployees.size());
-        assertEquals("Adams", sortedEmployees.get(0).getSurname());
-        assertEquals("Brown", sortedEmployees.get(1).getSurname());
-        assertEquals("Smith", sortedEmployees.get(2).getSurname());
+        assertEquals("Adams", sortedEmployees.get(0).getLastName());
+        assertEquals("Brown", sortedEmployees.get(1).getLastName());
+        assertEquals("Smith", sortedEmployees.get(2).getLastName());
     }
 
     @Test
@@ -305,16 +305,16 @@ public class EmployeeServiceTest
     public void testGetEmployeeCountByRole()
     {
         Employee employee1 = new Employee(
-            SURNAME_1, NAME_1, EMAIL_1, COMPANY_NAME_1, Role.ENGINEER, SALARY_1
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, Role.ENGINEER, SALARY_1
         );
         Employee employee2 = new Employee(
-            SURNAME_2, NAME_2, EMAIL_2, COMPANY_NAME_2, Role.INTERN, SALARY_2
+            LAST_NAME_2, FIRST_NAME_2, EMAIL_2, COMPANY_NAME_2, Role.INTERN, SALARY_2
         );
         Employee employee3 = new Employee(
-            SURNAME_3, NAME_3, EMAIL_3, COMPANY_NAME_3, Role.ENGINEER, SALARY_3
+            LAST_NAME_3, FIRST_NAME_3, EMAIL_3, COMPANY_NAME_3, Role.ENGINEER, SALARY_3
         );
         Employee employee4 = new Employee(
-            SURNAME_4, NAME_4, EMAIL_4, COMPANY_NAME_4, Role.ENGINEER, SALARY_4
+            LAST_NAME_4, FIRST_NAME_4, EMAIL_4, COMPANY_NAME_4, Role.ENGINEER, SALARY_4
         );
         
         employeeService.addEmployee(employee1);
@@ -341,13 +341,13 @@ public class EmployeeServiceTest
     public void testGetEmployeeWithHighestSalary()
     {
         Employee employee1 = new Employee(
-            SURNAME_1, NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, 8500
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, 8500
         );
         Employee employee2 = new Employee(
-            SURNAME_2, NAME_2, EMAIL_2, COMPANY_NAME_2, ROLE_2, 3500
+            LAST_NAME_2, FIRST_NAME_2, EMAIL_2, COMPANY_NAME_2, ROLE_2, 3500
         );
         Employee employee3 = new Employee(
-            SURNAME_3, NAME_3, EMAIL_3, COMPANY_NAME_3, ROLE_3, 15000
+            LAST_NAME_3, FIRST_NAME_3, EMAIL_3, COMPANY_NAME_3, ROLE_3, 15000
         );
         
         employeeService.addEmployee(employee1);
@@ -373,7 +373,7 @@ public class EmployeeServiceTest
     public void testGetEmployeeWithHighestSalarySingleEmployee()
     {
         Employee employee = new Employee(
-            SURNAME_1, NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
         );
         
         employeeService.addEmployee(employee);
@@ -388,13 +388,13 @@ public class EmployeeServiceTest
     public void testGetAverageSalary()
     {
         Employee employee1 = new Employee(
-            SURNAME_1, NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, 8000
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, 8000
         );
         Employee employee2 = new Employee(
-            SURNAME_2, NAME_2, EMAIL_2, COMPANY_NAME_2, ROLE_2, 4000
+            LAST_NAME_2, FIRST_NAME_2, EMAIL_2, COMPANY_NAME_2, ROLE_2, 4000
         );
         Employee employee3 = new Employee(
-            SURNAME_3, NAME_3, EMAIL_3, COMPANY_NAME_3, ROLE_3, 12000
+            LAST_NAME_3, FIRST_NAME_3, EMAIL_3, COMPANY_NAME_3, ROLE_3, 12000
         );
         
         employeeService.addEmployee(employee1);
@@ -410,7 +410,7 @@ public class EmployeeServiceTest
     public void testGetAverageSalarySingleEmployee()
     {
         Employee employee = new Employee(
-            SURNAME_1, NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
         );
         
         employeeService.addEmployee(employee);
@@ -432,7 +432,7 @@ public class EmployeeServiceTest
     public void testPrintEmployees()
     {
         Employee employee = new Employee(
-            SURNAME_1, NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
         );
         
         employeeService.addEmployee(employee);
@@ -444,7 +444,7 @@ public class EmployeeServiceTest
     public void testGetEmployeesReturnsActualList()
     {
         Employee employee = new Employee(
-            SURNAME_1, NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
         );
         
         employeeService.addEmployee(employee);

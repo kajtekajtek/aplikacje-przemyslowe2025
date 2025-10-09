@@ -100,14 +100,14 @@ public class EmployeeTest
     }
 
     private void assertEmployeeDetails(Employee employee, 
-                                       String   surname, 
-                                       String   name, 
+                                       String   lastName, 
+                                       String   firstName, 
                                        String   email, 
                                        String   companyName, 
                                        Role     role, 
                                        int      salary) {
-        assertEquals(surname, employee.getSurname());
-        assertEquals(name, employee.getName());
+        assertEquals(lastName, employee.getLastName());
+        assertEquals(firstName, employee.getFirstName());
         assertEquals(email, employee.getEmailAddress());
         assertEquals(companyName, employee.getCompanyName());
         assertEquals(role, employee.getRole());
