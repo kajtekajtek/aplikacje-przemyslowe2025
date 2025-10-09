@@ -139,11 +139,11 @@ public class App {
         System.out.println("=== Add New Employee ===\n");
         
         try {
-            System.out.print("Enter surname: ");
-            String surname = scanner.nextLine().trim();
+            System.out.print("Enter last name: ");
+            String lastName = scanner.nextLine().trim();
             
             System.out.print("Enter first name: ");
-            String name = scanner.nextLine().trim();
+            String firstName = scanner.nextLine().trim();
             
             System.out.print("Enter email address: ");
             String email = scanner.nextLine().trim();
@@ -178,8 +178,11 @@ public class App {
             int salary = salaryInput.isEmpty() 
                 ? role.getBaseSalary() 
                 : Integer.parseInt(salaryInput);
-            Employee employee = new Employee(surname, name, email, company, role, salary);
             
+            Employee employee = new Employee(
+                lastName, firstName, email, company, role, salary
+            );
+
             employeeService.addEmployee(employee);
             
             System.out.println("\nEmployee added successfully!");
@@ -308,7 +311,7 @@ public class App {
     }
     
     private static void listEmployeesAlphabetically() {
-        System.out.println("=== Employees (Alphabetically by Surname) ===\n");
+        System.out.println("=== Employees (Alphabetically by Last Name) ===\n");
         
         List<Employee> employees = employeeService.getEmployeesAlphabetically();
         
