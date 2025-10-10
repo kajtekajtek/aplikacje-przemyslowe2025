@@ -13,7 +13,7 @@ Update all references in `Employee.java`, `EmployeeService.java`, and `App.java`
 
 **In `/home/kajtek/Code/aplikacje-przemyslowe2025/zad2/model/src/main/java/com/techcorp/`:**
 
-- `ImportSummary.java`: Contains `int successCount`, `List<String> errors`, constructor, getters
+- `ImportSummary.java`: Contains `int successCount`, `Map<Integer, String> errors`, constructor, getters
 - `CompanyStatistics.java`: Contains `long employeeCount`, `double averageSalary`, `String highestPaidEmployee`, constructor, getters, and `toString()`
 
 ## 3. Create Exception Classes
