@@ -14,15 +14,17 @@ public class ImportSummaryTest
     public void testConstructor()
     {
         ImportSummary importSummary = new ImportSummary();
-        assertNotNull(importSummary.getSummary());
-        assertEquals(0, importSummary.getSummary().size());
+
+        assertNotNull(importSummary);
+        assertEquals(0, importSummary.getSuccessCount());
+        assertEquals(0, importSummary.getErrors().size());
     }
 
     @Test
     public void testAddSuccessfullImport()
     {
         ImportSummary importSummary = new ImportSummary();
-        importSummary.addSuccessfullImport(new Employee("John", "Doe", "john.doe@example.com", "TechCorp", Role.ENGINEER, 10000));
+        importSummary.addSuccessfullImport();
         assertEquals(1, importSummary.getSuccessCount());
     }
 
