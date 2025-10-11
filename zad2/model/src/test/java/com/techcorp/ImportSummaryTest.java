@@ -2,14 +2,11 @@ package com.techcorp;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import com.techcorp.exception.InvalidDataException;
+import java.io.FileNotFoundException;
 
 public class ImportSummaryTest
 {
-    /* 
-    Obiekt ImportSummary zawiera listę zaimportowanych pracowników oraz
-    listę błędów zawierających informację o błędnych wierszach i opis błędu
-    */
-
     @Test
     public void testConstructor()
     {
@@ -29,13 +26,29 @@ public class ImportSummaryTest
     }
 
     @Test
-    public void testAddError()
+    public void testAddInvalidDataExceptionError()
     {
         ImportSummary importSummary = new ImportSummary();
-        importSummary.addError(1, "Error message");
-        assertEquals(1, importSummary.getErrors().size());
-        assertEquals("Error message", importSummary.getErrors().get(1));
-    }
-    
-}
+        InvalidDataException exception = new InvalidDataException(1, "Error message");
 
+        importSummary.addError(1, exception);
+
+        assertEquals(1, importSummary.getErrors().size());
+        assertEquals(InvalidDataException.class, importSummary.getErrors().get(1).getClass());
+        assertEquals(1, ((InvalidDataException) importSummary.getErrors().get(1)).getLine());
+        assertEquals("Error message", importSummary.getErrors().get(1).getMessage());
+    }
+
+    @Test
+    public void testAddFileNotFoundExceptionError()
+    {
+        ImportSummary importSummary = new ImportSummary();
+        FileNotFoundException exception = new FileNotFoundException("Error message");
+
+        importSummary.addError(1, exception);
+
+        assertEquals(1, importSummary.getErrors().size());
+        assertEquals(FileNotFoundException.class, importSummary.getErrors().get(1).getClass());
+        assertEquals("Error message", importSummary.getErrors().get(1).getMessage());
+    }
+}

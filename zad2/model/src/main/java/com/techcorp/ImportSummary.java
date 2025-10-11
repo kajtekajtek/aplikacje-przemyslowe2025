@@ -6,7 +6,7 @@ import java.util.HashMap;
 public class ImportSummary
 {
     private int successCount;
-    private Map<Integer, String> errors;
+    private Map<Integer, Exception> errors;
 
     public ImportSummary() {
         this.successCount = 0;
@@ -17,7 +17,7 @@ public class ImportSummary
         this.successCount++;
     }
 
-    public void addError(int line, String error) {
+    public void addError(int line, Exception error) {
         this.errors.put(line, error);
     }
     
@@ -25,7 +25,7 @@ public class ImportSummary
         return this.successCount;
     }
 
-    public Map<Integer, String> getErrors() {
+    public Map<Integer, Exception> getErrors() {
         return this.errors;
     }
 }
