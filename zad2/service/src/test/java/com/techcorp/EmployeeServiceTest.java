@@ -12,29 +12,29 @@ public class EmployeeServiceTest
 {
     private EmployeeService employeeService;
     
-    private final String LAST_NAME_1      = "Baggins";
-    private final String FIRST_NAME_1         = "Frodo";
+    private final String LAST_NAME_1    = "Baggins";
+    private final String FIRST_NAME_1   = "Frodo";
     private final String EMAIL_1        = "frodo.baggins@techcorp.com";
     private final String COMPANY_NAME_1 = "TechCorp";
     private final Role   ROLE_1         = Role.ENGINEER;
     private final int    SALARY_1       = 8500;
     
-    private final String LAST_NAME_2      = "Gamgee";
-    private final String FIRST_NAME_2         = "Sam";
+    private final String LAST_NAME_2    = "Gamgee";
+    private final String FIRST_NAME_2   = "Sam";
     private final String EMAIL_2        = "sam.gamgee@techcorp.com";
     private final String COMPANY_NAME_2 = "TechCorp";
     private final Role   ROLE_2         = Role.INTERN;
     private final int    SALARY_2       = 3500;
     
-    private final String LAST_NAME_3      = "Eustace";
-    private final String FIRST_NAME_3         = "Scrubb";
+    private final String LAST_NAME_3    = "Eustace";
+    private final String FIRST_NAME_3   = "Scrubb";
     private final String EMAIL_3        = "scrubb.eustace@innovate.com";
     private final String COMPANY_NAME_3 = "Innovate";
     private final Role   ROLE_3         = Role.MANAGER;
     private final int    SALARY_3       = 13000;
     
-    private final String LAST_NAME_4      = "Took";
-    private final String FIRST_NAME_4         = "Pippin";
+    private final String LAST_NAME_4    = "Took";
+    private final String FIRST_NAME_4   = "Pippin";
     private final String EMAIL_4        = "pippin.took@techcorp.com";
     private final String COMPANY_NAME_4 = "TechCorp";
     private final Role   ROLE_4         = Role.CEO;
