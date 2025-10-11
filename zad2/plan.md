@@ -118,8 +118,8 @@ Update `/home/kajtek/Code/aplikacje-przemyslowe2025/README.md` with:
 ### To-dos
 
 - [x] Rename name/surname to firstName/lastName in Employee.java and update all references
-- [ ] Create ImportSummary and CompanyStatistics model classes
-- [ ] Create exception package with InvalidDataException and ApiException
+- [x] Create ImportSummary and CompanyStatistics model classes
+- [x] Create exception package with InvalidDataException and ApiException
 - [ ] Add Gson dependency to service/pom.xml
 - [ ] Update addEmployee and removeEmployee methods with null handling and int return values
 - [ ] Implement ImportService with CSV parsing and validation
