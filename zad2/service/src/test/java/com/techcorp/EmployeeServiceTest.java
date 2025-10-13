@@ -60,10 +60,23 @@ public class EmployeeServiceTest
             LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
         );
         
-        employeeService.addEmployee(employee);
+        int result = employeeService.addEmployee(employee);
         
+        assertEquals(1, result);
         assertEquals(1, employeeService.getEmployees().size());
         assertTrue(employeeService.getEmployees().contains(employee));
+    }
+
+    @Test
+    public void testAddEmployeeNull()
+    {
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> employeeService.addEmployee(null)
+        );
+        
+        assertTrue(exception.getMessage().contains("cannot be null"));
+        assertEquals(0, employeeService.getEmployees().size());
     }
 
     @Test
@@ -135,8 +148,40 @@ public class EmployeeServiceTest
         employeeService.addEmployee(employee);
         assertEquals(1, employeeService.getEmployees().size());
         
-        employeeService.removeEmployee(employee);
+        int result = employeeService.removeEmployee(employee);
+        
+        assertEquals(1, result);
         assertEquals(0, employeeService.getEmployees().size());
+    }
+
+    @Test
+    public void testRemoveEmployeeNull()
+    {
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> employeeService.removeEmployee(null)
+        );
+        
+        assertTrue(exception.getMessage().contains("cannot be null"));
+    }
+
+    @Test
+    public void testRemoveEmployeeNotFound()
+    {
+        Employee employee1 = new Employee(
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
+        );
+        Employee employee2 = new Employee(
+            LAST_NAME_2, FIRST_NAME_2, EMAIL_2, COMPANY_NAME_2, ROLE_2, SALARY_2
+        );
+        
+        employeeService.addEmployee(employee1);
+        
+        int result = employeeService.removeEmployee(employee2);
+        
+        assertEquals(0, result);
+        assertEquals(1, employeeService.getEmployees().size());
+        assertTrue(employeeService.getEmployees().contains(employee1));
     }
 
     @Test
