@@ -122,7 +122,7 @@ Update `/home/kajtek/Code/aplikacje-przemyslowe2025/README.md` with:
 - [x] Create exception package with InvalidDataException and ApiException
 - [x] Add Gson dependency to service/pom.xml
 - [x] Update addEmployee and removeEmployee methods with null handling and int return values
-- [ ] Implement ImportService with CSV parsing and validation
+- [x] Implement ImportService with CSV parsing and validation
 - [ ] Implement ApiService with HTTP client and JSON parsing
 - [ ] Add validateSalaryConsistency and getCompanyStatistics methods
 - [ ] Add menu options for CSV import, API fetch, and new analytics
