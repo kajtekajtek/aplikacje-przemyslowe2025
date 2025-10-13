@@ -14,6 +14,10 @@ public class EmployeeService
     public EmployeeService() { this.employees = new ArrayList<>(); }
     
     public void addEmployee(Employee employee) {
+        if (employee == null) {
+            throw new IllegalArgumentException("Employee cannot be null.");
+        }
+
         boolean emailExists = this.employees.stream()
             .anyMatch(e -> e.getEmailAddress()
                             .equalsIgnoreCase(employee.getEmailAddress())
@@ -25,7 +29,13 @@ public class EmployeeService
 
         this.employees.add(employee);
     }
-    public void removeEmployee(Employee employee) { this.employees.remove(employee); }
+
+    public void removeEmployee(Employee employee) { 
+        if (employee == null) {
+            throw new IllegalArgumentException("Employee cannot be null.");
+        }
+        this.employees.remove(employee);
+    }
 
     public List<Employee> getEmployees() { return this.employees; }
     public List<Employee> getEmployeesByCompanyName(String companyName) {
