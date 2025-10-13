@@ -13,7 +13,7 @@ public class EmployeeService
 
     public EmployeeService() { this.employees = new ArrayList<>(); }
     
-    public void addEmployee(Employee employee) {
+    public int addEmployee(Employee employee) {
         if (employee == null) {
             throw new IllegalArgumentException("Employee cannot be null.");
         }
@@ -27,14 +27,14 @@ public class EmployeeService
             throw new IllegalArgumentException("Employee with email " + employee.getEmailAddress() + " already exists.");
         }
 
-        this.employees.add(employee);
+        return this.employees.add(employee) ? 1 : 0;
     }
 
-    public void removeEmployee(Employee employee) { 
+    public int removeEmployee(Employee employee) { 
         if (employee == null) {
             throw new IllegalArgumentException("Employee cannot be null.");
         }
-        this.employees.remove(employee);
+        return this.employees.remove(employee) ? 1 : 0;
     }
 
     public List<Employee> getEmployees() { return this.employees; }
