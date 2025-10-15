@@ -56,7 +56,6 @@ Create `ImportService.java`:
 
 Create `ApiService.java`:
 
-- Constructor accepts `EmployeeService`
 - `fetchEmployeesFromApi(String apiUrl)` method:
   - Use `HttpClient` (Java 11+) to GET from API
   - Parse JSON response with Gson (`JsonArray`)
@@ -123,7 +122,7 @@ Update `/home/kajtek/Code/aplikacje-przemyslowe2025/README.md` with:
 - [x] Add Gson dependency to service/pom.xml
 - [x] Update addEmployee and removeEmployee methods with null handling and int return values
 - [x] Implement ImportService with CSV parsing and validation
-- [ ] Implement ApiService with HTTP client and JSON parsing
+- [x] Implement ApiService with HTTP client and JSON parsing
 - [ ] Add validateSalaryConsistency and getCompanyStatistics methods
 - [ ] Add menu options for CSV import, API fetch, and new analytics
 - [ ] Create employees.csv with sample data including test cases
