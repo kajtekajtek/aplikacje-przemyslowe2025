@@ -123,7 +123,7 @@ Update `/home/kajtek/Code/aplikacje-przemyslowe2025/README.md` with:
 - [x] Update addEmployee and removeEmployee methods with null handling and int return values
 - [x] Implement ImportService with CSV parsing and validation
 - [x] Implement ApiService with HTTP client and JSON parsing
-- [ ] Add validateSalaryConsistency and getCompanyStatistics methods
+- [x] Add validateSalaryConsistency and getCompanyStatistics methods
 - [ ] Add menu options for CSV import, API fetch, and new analytics
 - [ ] Create employees.csv with sample data including test cases
 - [ ] Document Task 2 implementation in README.md

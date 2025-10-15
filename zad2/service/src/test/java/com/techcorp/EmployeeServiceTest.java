@@ -534,5 +534,246 @@ public class EmployeeServiceTest
         assertEquals(1, byRole.get(Role.ENGINEER).size());
         assertEquals(1, byRole.get(Role.INTERN).size());
     }
+
+    @Test
+    public void testValidateSalaryConsistency_NoInconsistencies()
+    {
+        Employee employee1 = new Employee(
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, Role.ENGINEER, 8000
+        );
+        Employee employee2 = new Employee(
+            LAST_NAME_2, FIRST_NAME_2, EMAIL_2, COMPANY_NAME_2, Role.INTERN, 3000
+        );
+        
+        employeeService.addEmployee(employee1);
+        employeeService.addEmployee(employee2);
+        
+        List<Employee> inconsistentEmployees = employeeService.validateSalaryConsistency();
+        
+        assertEquals(0, inconsistentEmployees.size());
+    }
+
+    @Test
+    public void testValidateSalaryConsistency_WithInconsistencies()
+    {
+        Employee employee1 = new Employee(
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, Role.ENGINEER, 5000
+        );
+        Employee employee2 = new Employee(
+            LAST_NAME_2, FIRST_NAME_2, EMAIL_2, COMPANY_NAME_2, Role.INTERN, 3500
+        );
+        Employee employee3 = new Employee(
+            LAST_NAME_3, FIRST_NAME_3, EMAIL_3, COMPANY_NAME_3, Role.MANAGER, 10000
+        );
+        
+        employeeService.addEmployee(employee1);
+        employeeService.addEmployee(employee2);
+        employeeService.addEmployee(employee3);
+        
+        List<Employee> inconsistentEmployees = employeeService.validateSalaryConsistency();
+        
+        assertEquals(2, inconsistentEmployees.size());
+        assertTrue(inconsistentEmployees.contains(employee1));
+        assertTrue(inconsistentEmployees.contains(employee3));
+        assertFalse(inconsistentEmployees.contains(employee2));
+    }
+
+    @Test
+    public void testValidateSalaryConsistency_Empty()
+    {
+        List<Employee> inconsistentEmployees = employeeService.validateSalaryConsistency();
+        
+        assertEquals(0, inconsistentEmployees.size());
+    }
+
+    @Test
+    public void testValidateSalaryConsistency_AllInconsistent()
+    {
+        Employee employee1 = new Employee(
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, Role.ENGINEER, 1000
+        );
+        Employee employee2 = new Employee(
+            LAST_NAME_2, FIRST_NAME_2, EMAIL_2, COMPANY_NAME_2, Role.INTERN, 100
+        );
+        
+        employeeService.addEmployee(employee1);
+        employeeService.addEmployee(employee2);
+        
+        List<Employee> inconsistentEmployees = employeeService.validateSalaryConsistency();
+        
+        assertEquals(2, inconsistentEmployees.size());
+        assertTrue(inconsistentEmployees.contains(employee1));
+        assertTrue(inconsistentEmployees.contains(employee2));
+    }
+
+    @Test
+    public void testValidateSalaryConsistency_BoundaryCases()
+    {
+        Employee employee1 = new Employee(
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, Role.ENGINEER, 7999
+        );
+        Employee employee2 = new Employee(
+            LAST_NAME_2, FIRST_NAME_2, EMAIL_2, COMPANY_NAME_2, Role.ENGINEER, 8000
+        );
+        Employee employee3 = new Employee(
+            LAST_NAME_3, FIRST_NAME_3, EMAIL_3, COMPANY_NAME_3, Role.ENGINEER, 8001
+        );
+        
+        employeeService.addEmployee(employee1);
+        employeeService.addEmployee(employee2);
+        employeeService.addEmployee(employee3);
+        
+        List<Employee> inconsistentEmployees = employeeService.validateSalaryConsistency();
+        
+        assertEquals(1, inconsistentEmployees.size());
+        assertTrue(inconsistentEmployees.contains(employee1));
+        assertFalse(inconsistentEmployees.contains(employee2));
+        assertFalse(inconsistentEmployees.contains(employee3));
+    }
+
+    @Test
+    public void testGetCompanyStatistics_SingleCompany()
+    {
+        Employee employee1 = new Employee(
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, "TechCorp", Role.ENGINEER, 8000
+        );
+        Employee employee2 = new Employee(
+            LAST_NAME_2, FIRST_NAME_2, EMAIL_2, "TechCorp", Role.MANAGER, 12000
+        );
+        Employee employee3 = new Employee(
+            LAST_NAME_3, FIRST_NAME_3, EMAIL_3, "TechCorp", Role.INTERN, 4000
+        );
+        
+        employeeService.addEmployee(employee1);
+        employeeService.addEmployee(employee2);
+        employeeService.addEmployee(employee3);
+        
+        Map<String, CompanyStatistics> stats = employeeService.getCompanyStatistics();
+        
+        assertEquals(1, stats.size());
+        assertTrue(stats.containsKey("TechCorp"));
+        
+        CompanyStatistics techCorpStats = stats.get("TechCorp");
+        assertEquals(3, techCorpStats.getEmployeesCount());
+        assertEquals(8000.0, techCorpStats.getAverageSalary(), 0.01);
+        assertEquals("Sam Gamgee", techCorpStats.getHighestPaidEmployeeName());
+    }
+
+    @Test
+    public void testGetCompanyStatistics_MultipleCompanies()
+    {
+        Employee employee1 = new Employee(
+            "Smith", "John", "john@techcorp.com", "TechCorp", Role.ENGINEER, 9000
+        );
+        Employee employee2 = new Employee(
+            "Doe", "Jane", "jane@techcorp.com", "TechCorp", Role.MANAGER, 15000
+        );
+        Employee employee3 = new Employee(
+            "Brown", "Bob", "bob@innovate.com", "Innovate", Role.INTERN, 3500
+        );
+        Employee employee4 = new Employee(
+            "White", "Alice", "alice@innovate.com", "Innovate", Role.ENGINEER, 10000
+        );
+        
+        employeeService.addEmployee(employee1);
+        employeeService.addEmployee(employee2);
+        employeeService.addEmployee(employee3);
+        employeeService.addEmployee(employee4);
+        
+        Map<String, CompanyStatistics> stats = employeeService.getCompanyStatistics();
+        
+        assertEquals(2, stats.size());
+        assertTrue(stats.containsKey("TechCorp"));
+        assertTrue(stats.containsKey("Innovate"));
+        
+        CompanyStatistics techCorpStats = stats.get("TechCorp");
+        assertEquals(2, techCorpStats.getEmployeesCount());
+        assertEquals(12000.0, techCorpStats.getAverageSalary(), 0.01);
+        assertEquals("Jane Doe", techCorpStats.getHighestPaidEmployeeName());
+        
+        CompanyStatistics innovateStats = stats.get("Innovate");
+        assertEquals(2, innovateStats.getEmployeesCount());
+        assertEquals(6750.0, innovateStats.getAverageSalary(), 0.01);
+        assertEquals("Alice White", innovateStats.getHighestPaidEmployeeName());
+    }
+
+    @Test
+    public void testGetCompanyStatistics_Empty()
+    {
+        Map<String, CompanyStatistics> stats = employeeService.getCompanyStatistics();
+        
+        assertEquals(0, stats.size());
+    }
+
+    @Test
+    public void testGetCompanyStatistics_SingleEmployee()
+    {
+        Employee employee = new Employee(
+            LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, Role.ENGINEER, 8500
+        );
+        
+        employeeService.addEmployee(employee);
+        
+        Map<String, CompanyStatistics> stats = employeeService.getCompanyStatistics();
+        
+        assertEquals(1, stats.size());
+        CompanyStatistics companyStats = stats.get(COMPANY_NAME_1);
+        
+        assertEquals(1, companyStats.getEmployeesCount());
+        assertEquals(8500.0, companyStats.getAverageSalary(), 0.01);
+        assertEquals("Frodo Baggins", companyStats.getHighestPaidEmployeeName());
+    }
+
+    @Test
+    public void testGetCompanyStatistics_SameSalary()
+    {
+        Employee employee1 = new Employee(
+            "Smith", "John", "john@techcorp.com", "TechCorp", Role.ENGINEER, 8000
+        );
+        Employee employee2 = new Employee(
+            "Doe", "Jane", "jane@techcorp.com", "TechCorp", Role.ENGINEER, 8000
+        );
+        
+        employeeService.addEmployee(employee1);
+        employeeService.addEmployee(employee2);
+        
+        Map<String, CompanyStatistics> stats = employeeService.getCompanyStatistics();
+        
+        CompanyStatistics techCorpStats = stats.get("TechCorp");
+        assertEquals(2, techCorpStats.getEmployeesCount());
+        assertEquals(8000.0, techCorpStats.getAverageSalary(), 0.01);
+        assertTrue(
+            techCorpStats.getHighestPaidEmployeeName().equals("John Smith") ||
+            techCorpStats.getHighestPaidEmployeeName().equals("Jane Doe")
+        );
+    }
+
+    @Test
+    public void testGetCompanyStatistics_ThreeCompanies()
+    {
+        Employee ceo = new Employee(
+            "Gates", "Bill", "bill@microsoft.com", "Microsoft", Role.CEO, 30000
+        );
+        Employee vp = new Employee(
+            "Jobs", "Steve", "steve@apple.com", "Apple", Role.VP, 20000
+        );
+        Employee engineer = new Employee(
+            "Torvalds", "Linus", "linus@linux.com", "Linux", Role.ENGINEER, 9000
+        );
+        
+        employeeService.addEmployee(ceo);
+        employeeService.addEmployee(vp);
+        employeeService.addEmployee(engineer);
+        
+        Map<String, CompanyStatistics> stats = employeeService.getCompanyStatistics();
+        
+        assertEquals(3, stats.size());
+        assertEquals(1, stats.get("Microsoft").getEmployeesCount());
+        assertEquals(1, stats.get("Apple").getEmployeesCount());
+        assertEquals(1, stats.get("Linux").getEmployeesCount());
+        assertEquals(30000.0, stats.get("Microsoft").getAverageSalary(), 0.01);
+        assertEquals(20000.0, stats.get("Apple").getAverageSalary(), 0.01);
+        assertEquals(9000.0, stats.get("Linux").getAverageSalary(), 0.01);
+    }
 }
 

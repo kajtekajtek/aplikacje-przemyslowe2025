@@ -76,4 +76,32 @@ public class EmployeeService
         this.employees.forEach(System.out::println);
     }
 
+    public List<Employee> validateSalaryConsistency() {
+        return this.employees.stream()
+            .filter(e -> e.getSalary() < e.getRole().getBaseSalary())
+            .collect(Collectors.toList());
+    }
+
+    public Map<String, CompanyStatistics> getCompanyStatistics() {
+        return this.employees.stream()
+            .collect(Collectors.groupingBy(
+                Employee::getCompanyName,
+                Collectors.collectingAndThen(
+                    Collectors.toList(),
+                    employeeList -> {
+                        long count = employeeList.size();
+                        double avgSalary = employeeList.stream()
+                            .mapToDouble(Employee::getSalary)
+                            .average()
+                            .orElse(0.0);
+                        String highestPaidName = employeeList.stream()
+                            .max(Comparator.comparing(Employee::getSalary))
+                            .map(Employee::getFullName)
+                            .orElse("N/A");
+                        return new CompanyStatistics(count, avgSalary, highestPaidName);
+                    }
+                )
+            ));
+    }
+
 }
