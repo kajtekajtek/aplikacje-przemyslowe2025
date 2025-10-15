@@ -4,13 +4,19 @@ import java.util.Scanner;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.net.http.HttpClient;
+import com.techcorp.exception.ApiException;
 
 public class App {
     private static EmployeeService employeeService;
+    private static ImportService   importService;
+    private static ApiService      apiService;
     private static Scanner         scanner;
 
     public static void main(String[] args) {
         employeeService = new EmployeeService();
+        importService   = new ImportService(employeeService);
+        apiService      = new ApiService(HttpClient.newHttpClient());
         scanner         = new Scanner(System.in);
         
         initializeSampleData();
@@ -55,6 +61,18 @@ public class App {
                     break;
                 case 10:
                     showStatistics();
+                    break;
+                case 11:
+                    importFromCSV();
+                    break;
+                case 12:
+                    fetchFromAPI();
+                    break;
+                case 13:
+                    showSalaryValidationIssues();
+                    break;
+                case 14:
+                    showCompanyStatistics();
                     break;
                 case 0:
                     System.out.println("Thank you for using Employee Management System!");
@@ -121,6 +139,10 @@ public class App {
         System.out.println("8.  Show Employee with Highest Salary");
         System.out.println("9.  Show Average Salary");
         System.out.println("10. Show Complete Statistics");
+        System.out.println("11. Import Employees from CSV");
+        System.out.println("12. Fetch Employees from API");
+        System.out.println("13. Validate Salary Consistency");
+        System.out.println("14. Show Company Statistics");
         System.out.println("0.  Exit");
         System.out.println("==============================================");
         System.out.print("Enter your choice: ");
@@ -442,5 +464,153 @@ public class App {
         });
         
         System.out.println("\n═════════════════════════════════════════════════\n");
+    }
+    
+    private static void importFromCSV() {
+        System.out.println("=== Import Employees from CSV ===\n");
+        
+        System.out.print("Enter CSV file path (or press Enter for 'employees.csv'): ");
+        String filePath = scanner.nextLine().trim();
+        
+        if (filePath.isEmpty()) {
+            filePath = "employees.csv";
+        }
+        
+        try {
+            System.out.println("\nImporting from: " + filePath);
+            ImportSummary summary = importService.importFromCsv(filePath);
+            
+            System.out.println("\n┌─────────────────────────────────────────────────┐");
+            System.out.println("│              IMPORT SUMMARY                     │");
+            System.out.println("└─────────────────────────────────────────────────┘");
+            System.out.println("Successfully imported: " + summary.getSuccessCount() + " employees");
+            
+            Map<Integer, Exception> errors = summary.getErrors();
+            if (!errors.isEmpty()) {
+                System.out.println("\nErrors encountered: " + errors.size());
+                System.out.println("─────────────────────────────────────────────────");
+                errors.forEach((lineNumber, error) -> {
+                    System.out.println("Line " + lineNumber + ": " + error.getMessage());
+                });
+            } else {
+                System.out.println("\nNo errors encountered during import.");
+            }
+            
+            System.out.println("═════════════════════════════════════════════════");
+            
+        } catch (Exception e) {
+            System.out.println("\nError importing from CSV: " + e.getMessage());
+        }
+    }
+    
+    private static void fetchFromAPI() {
+        System.out.println("=== Fetch Employees from API ===\n");
+        
+        System.out.print("Enter API URL (or press Enter for default): ");
+        String apiUrl = scanner.nextLine().trim();
+        
+        if (apiUrl.isEmpty()) {
+            apiUrl = "https://jsonplaceholder.typicode.com/users";
+        }
+        
+        try {
+            System.out.println("\nFetching from: " + apiUrl);
+            System.out.println("Please wait...\n");
+            
+            List<Employee> fetchedEmployees = apiService.fetchEmployeesFromApi(apiUrl);
+            
+            System.out.println("┌─────────────────────────────────────────────────┐");
+            System.out.println("│              API FETCH SUMMARY                  │");
+            System.out.println("└─────────────────────────────────────────────────┘");
+            System.out.println("Fetched " + fetchedEmployees.size() + " employees from API");
+            
+            if (!fetchedEmployees.isEmpty()) {
+                System.out.println("\nDo you want to add these employees? (y/n): ");
+                String confirm = scanner.nextLine().trim().toLowerCase();
+                
+                if (confirm.equals("y") || confirm.equals("yes")) {
+                    int addedCount = 0;
+                    int skippedCount = 0;
+                    
+                    for (Employee emp : fetchedEmployees) {
+                        try {
+                            employeeService.addEmployee(emp);
+                            addedCount++;
+                        } catch (IllegalArgumentException e) {
+                            skippedCount++;
+                        }
+                    }
+                    
+                    System.out.println("\n✓ Added: " + addedCount + " employees");
+                    if (skippedCount > 0) {
+                        System.out.println("✗ Skipped: " + skippedCount + " (duplicates)");
+                    }
+                } else {
+                    System.out.println("\nImport cancelled.");
+                }
+            }
+            
+            System.out.println("═════════════════════════════════════════════════");
+            
+        } catch (ApiException e) {
+            System.out.println("\nAPI Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("\nUnexpected error: " + e.getMessage());
+        }
+    }
+    
+    private static void showSalaryValidationIssues() {
+        System.out.println("=== Salary Consistency Validation ===\n");
+        
+        List<Employee> inconsistentEmployees = employeeService.validateSalaryConsistency();
+        
+        if (inconsistentEmployees.isEmpty()) {
+            System.out.println("✓ All employee salaries are consistent with their role's base salary.");
+            System.out.println("  No issues found.\n");
+        } else {
+            System.out.println("⚠ Found " + inconsistentEmployees.size() + " employee(s) with salary below base:");
+            System.out.println("─────────────────────────────────────────────────────────────────────────");
+            System.out.printf("%-20s %-15s %-12s %-12s %-12s%n", 
+                "Name", "Role", "Current", "Base", "Difference");
+            System.out.println("─────────────────────────────────────────────────────────────────────────");
+            
+            for (Employee emp : inconsistentEmployees) {
+                int difference = emp.getRole().getBaseSalary() - emp.getSalary();
+                System.out.printf("%-20s %-15s $%,10d $%,10d $%,10d%n",
+                    emp.getFullName(),
+                    emp.getRole(),
+                    emp.getSalary(),
+                    emp.getRole().getBaseSalary(),
+                    difference
+                );
+            }
+            
+            System.out.println("\n⚠ These employees are being paid below the minimum for their role.");
+        }
+    }
+    
+    private static void showCompanyStatistics() {
+        System.out.println("=== Company Statistics ===\n");
+        
+        Map<String, CompanyStatistics> stats = employeeService.getCompanyStatistics();
+        
+        if (stats.isEmpty()) {
+            System.out.println("No employees found.");
+            return;
+        }
+        
+        System.out.println("Statistics for " + stats.size() + " compan" + (stats.size() == 1 ? "y" : "ies") + ":\n");
+        
+        stats.forEach((companyName, companyStats) -> {
+            System.out.println("┌─────────────────────────────────────────────────────────────────┐");
+            System.out.println("│  " + String.format("%-60s", companyName) + "  │");
+            System.out.println("└─────────────────────────────────────────────────────────────────┘");
+            System.out.println("  Total Employees:       " + companyStats.getEmployeesCount());
+            System.out.println("  Average Salary:        $" + String.format("%,.2f", companyStats.getAverageSalary()));
+            System.out.println("  Highest Paid Employee: " + companyStats.getHighestPaidEmployeeName());
+            System.out.println();
+        });
+        
+        System.out.println("═════════════════════════════════════════════════════════════════");
     }
 }

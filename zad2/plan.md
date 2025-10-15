@@ -124,6 +124,6 @@ Update `/home/kajtek/Code/aplikacje-przemyslowe2025/README.md` with:
 - [x] Implement ImportService with CSV parsing and validation
 - [x] Implement ApiService with HTTP client and JSON parsing
 - [x] Add validateSalaryConsistency and getCompanyStatistics methods
-- [ ] Add menu options for CSV import, API fetch, and new analytics
-- [ ] Create employees.csv with sample data including test cases
-- [ ] Document Task 2 implementation in README.md
+- [x] Add menu options for CSV import, API fetch, and new analytics
+- [x] Create employees.csv with sample data including test cases
+- [x] Document Task 2 implementation in README.md
