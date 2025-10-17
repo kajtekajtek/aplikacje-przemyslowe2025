@@ -1,52 +1,8 @@
 # Zadanie 3: Testy jednostkowe i automatyzacja buildu
 
-## Analiza stanu projektu
-
-### ✅ Co już jest zrobione:
-
-1. **Konfiguracja Maven (25%)**
-   - ✅ JUnit 5 (Jupiter) 5.11.0 skonfigurowany w `dependencyManagement`
-   - ✅ Mockito 5.7.0 z integracją JUnit Jupiter
-   - ✅ Maven Surefire Plugin 3.3.0 do uruchamiania testów
-   - ❌ **BRAKUJE: JaCoCo plugin do raportowania pokrycia kodu**
-
-2. **Testy EmployeeService (30%)**
-   - ✅ **KOMPLETNE** - 778 linii testów
-   - ✅ Wszystkie scenariusze pokryte:
-     - Dodawanie pracownika (null, duplikaty emaili, case insensitive)
-     - Wyszukiwanie po firmie (nieistniejąca firma, case insensitive)
-     - Średnie wynagrodzenie (pusta lista, pojedynczy pracownik, wiele)
-     - Maksymalne wynagrodzenie (Optional przy pustej liście)
-     - Walidacja wynagrodzeń (granice, wszystkie role)
-     - Statystyki firm (pojedyncza, wiele, pusta lista)
-
-3. **Testy ImportService (20%)**
-   - ✅ **KOMPLETNE** - 492 linie testów
-   - ✅ Wszystkie scenariusze pokryte:
-     - Poprawny import z weryfikacją danych w systemie
-     - Niepoprawne stanowisko (kontynuacja importu)
-     - Ujemne wynagrodzenie (odrzucenie linii)
-     - Weryfikacja ImportSummary
-     - Użycie `@TempDir` do izolacji testów
-     - Obsługa błędów (puste pola, nieprawidłowe formaty)
-
-4. **Testy ApiService (15%)**
-   - ❌ **BRAKUJE CAŁKOWICIE** - `ApiServiceTest.java` nie istnieje
-   - Potrzebne scenariusze:
-     - Mockowanie HttpClient
-     - Poprawna odpowiedź JSON
-     - Błędy HTTP (404, 500)
-     - Parsowanie danych z JSON do Employee
-
-5. **Pokrycie kodu ≥70% (10%)**
-   - ❌ **BRAKUJE** - brak JaCoCo do generowania raportów
-   - ❌ Brak możliwości weryfikacji pokrycia
-
-### ⚠️ Co wymaga implementacji:
-
 ## Plan implementacji
 
-### 1. Konfiguracja JaCoCo (PRIORYTET: WYSOKI)
+### 1. Konfiguracja JaCoCo
 
 **Lokalizacja:** `pom.xml` (główny pom projektu)
 
@@ -63,9 +19,9 @@ mvn clean test jacoco:report      # Testy + raport pokrycia
 mvn clean verify                  # Pełny cykl z weryfikacją
 ```
 
-### 2. Testy ApiService z mockowaniem (PRIORYTET: KRYTYCZNY)
+### 2. Testy ApiService z mockowaniem
 
-**Lokalizacja:** `service/src/test/java/com/techcorp/ApiServiceTest.java` (NOWY PLIK)
+**Lokalizacja:** `service/src/test/java/com/techcorp/ApiServiceTest.java`
 
 **Wymagane testy:**
 
@@ -184,43 +140,8 @@ Wymagane pokrycie:
 - Pakiet service: ≥70%
 ```
 
-## Podsumowanie
-
-### Kryteria recenzji - status:
-- [❌] Konfiguracja Maven + JUnit 5 + JaCoCo (25%) - **BRAKUJE JaCoCo**
-- [✅] Testy EmployeeService (30%) - **GOTOWE**
-- [✅] Testy ImportService (20%) - **GOTOWE**
-- [❌] Testy ApiService z mockami (15%) - **DO ZROBIENIA**
-- [❌] Pokrycie ≥70% (10%) - **DO WERYFIKACJI po JaCoCo**
-
-### Kolejność implementacji:
-1. **KROK 1:** Dodać JaCoCo plugin do `pom.xml`
-2. **KROK 2:** Utworzyć `ApiServiceTest.java` z 7+ testami
-3. **KROK 3:** Uruchomić `mvn clean test jacoco:report`
-4. **KROK 4:** Zweryfikować pokrycie ≥70% w raporcie
-5. **KROK 5:** Zaktualizować `README.md`
-
-### Szacowany czas:
-- JaCoCo config: 15 min
-- ApiServiceTest: 45-60 min
-- Weryfikacja + dokumentacja: 15 min
-- **RAZEM: ~1.5h**
-
-## Notatki techniczne
-
-### Różnice JUnit 4 vs JUnit 5:
-- JUnit 5: `@Test` z `org.junit.jupiter.api.Test`
-- Mockito: używamy `@ExtendWith(MockitoExtension.class)` zamiast `@RunWith`
-- Assertions: `org.junit.jupiter.api.Assertions`
-
-### JaCoCo - mechanizm działania:
-- Instrumentacja bytecode podczas testów
-- Śledzenie wykonanych linii poprzez Java agent
-- Generowanie raportów w różnych formatach (HTML, XML, CSV)
-
-### Dlaczego mockowanie w testach jednostkowych?
-- **Izolacja:** Testujemy tylko ApiService, nie HttpClient
-- **Szybkość:** Brak prawdziwych połączeń sieciowych
-- **Powtarzalność:** Zawsze te same wyniki
-- **Testowanie błędów:** Możliwość symulacji dowolnych scenariuszy
-- **Brak zależności:** Testy działają offline
+## TODO
+- [ ] Review testów EmployeeService i ImportService
+- [ ] Konfiguracja pom.xml
+- [ ] Testy ApiService
+- [ ] Test coverage >70%
