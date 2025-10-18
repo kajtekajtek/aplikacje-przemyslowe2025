@@ -141,7 +141,7 @@ Wymagane pokrycie:
 ```
 
 ## TODO
-- [ ] Review testów EmployeeService i ImportService
+- [x] Review testów EmployeeService i ImportService
 - [ ] Konfiguracja pom.xml
 - [ ] Testy ApiService
 - [ ] Test coverage >70%
