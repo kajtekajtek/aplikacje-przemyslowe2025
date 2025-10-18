@@ -43,7 +43,7 @@ public class EmployeeServiceTest
     private final Role   ROLE_4         = Role.CEO;
     private final int    SALARY_4       = 30000;
 
-    private final String NULL_EMPLOYEE_EXCEPTION_MESSAGE = "Employee cannot be null.";
+    private final String NULL_EMPLOYEE_EXCEPTION_MESSAGE   = "Employee cannot be null.";
     private final String DUPLICATE_EMAIL_EXCEPTION_MESSAGE = "Employee with email %s already exists.";
 
     @BeforeEach
