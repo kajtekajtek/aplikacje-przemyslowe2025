@@ -3,6 +3,7 @@ package com.techcorp;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.DisplayName;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -52,6 +53,7 @@ public class EmployeeServiceTest
     }
 
     @Test
+    @DisplayName("Should create an empty employee list when service is constructed")
     public void testConstructor()
     {
         assertNotNull(employeeService.getEmployees());
@@ -59,10 +61,12 @@ public class EmployeeServiceTest
     }
     
     @Nested
+    @DisplayName("Add Employee Tests")
     class AddEmployeeTest {
 
         @Test
-        public void shouldReturnZeroWhenEmployeeIsAdded()
+        @DisplayName("Should return 1 when employee is added successfully")
+        public void shouldReturnOneWhenEmployeeIsAdded()
         {
             Employee employee = new Employee(
                 LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
@@ -76,6 +80,7 @@ public class EmployeeServiceTest
         }
 
         @Test
+        @DisplayName("Should throw IllegalArgumentException when employee is null")
         public void shouldThrowIllegalArgumentExceptionWhenEmployeeIsNull()
         {
             IllegalArgumentException exception = assertThrows(
@@ -90,6 +95,7 @@ public class EmployeeServiceTest
         }
 
         @Test
+        @DisplayName("Should contain two employees when two are added")
         public void shouldContainTwosWhenTwoAreAdded()
         {
             Employee employee1 = new Employee(
@@ -108,6 +114,7 @@ public class EmployeeServiceTest
         }
 
         @Test
+        @DisplayName("Should throw IllegalArgumentException when duplicate email is added")
         public void shouldThrowIllegalArgumentExceptionWhenDuplicateEmailIsAdded()
         {
             Employee employee1 = new Employee(
@@ -131,6 +138,7 @@ public class EmployeeServiceTest
         }
 
         @Test
+        @DisplayName("Should throw IllegalArgumentException when duplicate email is added (case insensitive)")
         public void shouldThrowIllegalArgumentExceptionWhenDuplicateEmailIsAddedCaseInsensitive()
         {
             Employee employee1 = new Employee(
@@ -155,10 +163,12 @@ public class EmployeeServiceTest
     }
 
     @Nested
+    @DisplayName("Remove Employee Tests")
     class RemoveEmployeeTest {
 
         @Test
-        public void testRemoveEmployeeWhenEmployeeIsAdded()
+        @DisplayName("Should remove employee successfully when employee exists")
+        public void shouldRemoveEmployee()
         {
             Employee employee = new Employee(
                 LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
@@ -174,7 +184,8 @@ public class EmployeeServiceTest
         }
 
         @Test
-        public void testRemoveEmployeeWhenEmployeeIsNull()
+        @DisplayName("Should throw IllegalArgumentException when employee to remove is null")
+        public void shouldThrowIllegalArgumentExceptionWhenEmployeeIsNull()
         {
             IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
@@ -187,7 +198,8 @@ public class EmployeeServiceTest
         }
 
         @Test
-        public void testRemoveEmployeeWhenEmployeeIsNotFound()
+        @DisplayName("Should return 0 when employee to remove is not found")
+        public void shouldReturnZeroWhenEmployeeIsNotFound()
         {
             Employee employee1 = new Employee(
                 LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
@@ -206,7 +218,8 @@ public class EmployeeServiceTest
         }
 
         @Test
-        public void testRemoveEmployeeWhenEmployeeIsRemovedFromMultiple()
+        @DisplayName("Should remove only the specified employee from multiple employees")
+        public void shouldRemoveOnlyTheSpecifiedEmployeeFromMultipleEmployees()
         {
             Employee employee1 = new Employee(
                 LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
@@ -228,9 +241,11 @@ public class EmployeeServiceTest
     }
 
     @Nested
+    @DisplayName("Getters Tests")
     class GetTest {
 
         @Test
+        @DisplayName("Should return all employees when getting all employees")
         public void shouldReturnAllWhenGettingAllEmployees()
         {
             Employee employee1 = new Employee(
@@ -251,9 +266,11 @@ public class EmployeeServiceTest
         }
 
         @Nested
+        @DisplayName("Get Employees by Company Name Tests")
         class EmployeesByCompanyNameTest {
 
             @Test
+            @DisplayName("Should return employees filtered by company name")
             public void shouldReturnEmployeesByCompanyName()
             {
                 Employee employee1 = new Employee(
@@ -280,6 +297,7 @@ public class EmployeeServiceTest
             }
 
             @Test
+            @DisplayName("Should return employees by company name (case insensitive)")
             public void shouldReturnEmployeesByCompanyNameCaseInsensitive()
             {
                 Employee employee = new Employee(
@@ -296,6 +314,7 @@ public class EmployeeServiceTest
             }
 
             @Test
+            @DisplayName("Should return empty list when company name is not found")
             public void shouldReturnEmptyListWhenCompanyNameIsNotFound()
             {
                 Employee employee = new Employee(
@@ -312,10 +331,12 @@ public class EmployeeServiceTest
         }
 
         @Nested
+        @DisplayName("Get Employees by Role Tests")
         class EmployeesByRoleTest {
 
             @Test
-            public void testGetEmployeesByRole()
+            @DisplayName("Should return employees grouped by role")
+            public void shouldReturnEmployeesGroupedByRole()
             {
                 Employee employee1 = new Employee(
                     LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, Role.ENGINEER, SALARY_1
@@ -342,7 +363,8 @@ public class EmployeeServiceTest
             }
 
             @Test
-            public void testGetEmployeesByRoleEmpty()
+            @DisplayName("Should return empty map when no employees exist")
+            public void shouldReturnEmptyMapWhenNoEmployeesExist()
             {
                 Map<Role, List<Employee>> employeesByRole = employeeService.getEmployeesByRole();
                 
@@ -352,9 +374,11 @@ public class EmployeeServiceTest
         }
 
         @Nested
+        @DisplayName("Get Employees Alphabetically Tests")
         class EmployeesAlphabeticallyTest {
 
             @Test
+            @DisplayName("Should return employees sorted alphabetically by last name")
             public void shouldReturnEmployeesAlphabetically()
             {
                 Employee employee1 = new Employee(
@@ -380,6 +404,7 @@ public class EmployeeServiceTest
             }
 
             @Test
+            @DisplayName("Should return empty list when no employees are added")
             public void shouldReturnEmptyListWhenNoEmployeesAreAdded()
             {
                 List<Employee> sortedEmployees = employeeService.getEmployeesAlphabetically();
@@ -390,9 +415,11 @@ public class EmployeeServiceTest
         }
 
         @Nested
+        @DisplayName("Get Employee Count by Role Tests")
         class EmployeeCountByRoleTest {
 
             @Test
+            @DisplayName("Should return employee count grouped by role")
             public void shouldReturnEmployeeCountByRole()
             {
                 Employee employee1 = new Employee(
@@ -421,6 +448,7 @@ public class EmployeeServiceTest
             }
 
             @Test
+            @DisplayName("Should return empty map when no employees are added")
             public void shouldReturnEmptyMapWhenNoEmployeesAreAdded()
             {
                 Map<Role, Long> countByRole = employeeService.getEmployeeCountByRole();
@@ -431,9 +459,11 @@ public class EmployeeServiceTest
         }
 
         @Nested
+        @DisplayName("Get Employee with Highest Salary Tests")
         class EmployeeWithHighestSalaryTest {
 
             @Test
+            @DisplayName("Should return employee with the highest salary")
             public void shouldReturnEmployeeWithHighestSalary()
             {
                 Employee employee1 = new Employee(
@@ -458,6 +488,7 @@ public class EmployeeServiceTest
             }
 
             @Test
+            @DisplayName("Should return empty Optional when no employees are added")
             public void shouldReturnEmptyOptionalWhenNoEmployeesAreAdded()
             {
                 Optional<Employee> highestPaid = employeeService.getEmployeeWithHighestSalary();
@@ -466,6 +497,7 @@ public class EmployeeServiceTest
             }
 
             @Test
+            @DisplayName("Should return the only employee when single employee is added")
             public void shouldReturnEmployeeWithHighestSalaryWhenSingleEmployeeIsAdded()
             {
                 Employee employee = new Employee(
@@ -483,9 +515,11 @@ public class EmployeeServiceTest
         }
 
         @Nested
+        @DisplayName("Get Average Salary Tests")
         class AverageSalaryTest {
 
             @Test
+            @DisplayName("Should return average salary of all employees")
             public void shouldReturnAverageSalary()
             {
                 Employee employee1 = new Employee(
@@ -508,6 +542,7 @@ public class EmployeeServiceTest
             }
 
             @Test
+            @DisplayName("Should return employee's salary when single employee is added")
             public void shouldReturnAverageSalaryWhenSingleEmployeeIsAdded()
             {
                 Employee employee = new Employee(
@@ -522,6 +557,7 @@ public class EmployeeServiceTest
             }
 
             @Test
+            @DisplayName("Should return 0.0 when no employees are added")
             public void shouldReturnZeroWhenNoEmployeesAreAdded()
             {
                 Double averageSalary = employeeService.getAverageSalary();
@@ -532,9 +568,11 @@ public class EmployeeServiceTest
         }
 
         @Nested
+        @DisplayName("Get Company Statistics Tests")
         class CompanyStatisticsTest {
 
             @Test
+            @DisplayName("Should return valid statistics for a single company")
             public void shouldReturnValidCompanyStatisticsWhenSingleCompanyIsAdded()
             {
                 Employee employee1 = new Employee(
@@ -563,6 +601,7 @@ public class EmployeeServiceTest
             }
 
             @Test
+            @DisplayName("Should return valid statistics for multiple companies")
             public void shouldReturnValidCompanyStatisticsWhenMultipleCompaniesAreAdded()
             {
                 Employee employee1 = new Employee(
@@ -601,6 +640,7 @@ public class EmployeeServiceTest
             }
 
             @Test
+            @DisplayName("Should return empty map when no employees are added")
             public void shouldReturnEmptyMapWhenNoEmployeesAreAdded()
             {
                 Map<String, CompanyStatistics> stats = employeeService.getCompanyStatistics();
@@ -609,6 +649,7 @@ public class EmployeeServiceTest
             }
 
             @Test
+            @DisplayName("Should return valid statistics when single employee is added")
             public void shouldReturnValidCompanyStatisticsWhenSingleEmployeeIsAdded()
             {
                 Employee employee = new Employee(
@@ -628,6 +669,7 @@ public class EmployeeServiceTest
             }
 
             @Test
+            @DisplayName("Should handle employees with same salary correctly")
             public void shouldReturnValidCompanyStatisticsWhenSameSalary()
             {
                 Employee employee1 = new Employee(
@@ -652,6 +694,7 @@ public class EmployeeServiceTest
             }
 
             @Test
+            @DisplayName("Should return valid statistics for three different companies")
             public void shouldReturnValidCompanyStatisticsWhenThreeCompaniesAreAdded()
             {
                 Employee ceo = new Employee(
@@ -685,9 +728,11 @@ public class EmployeeServiceTest
     }
 
     @Nested
+    @DisplayName("Validate Salary Consistency Tests")
     class ValidateSalaryConsistencyTest {
 
         @Test
+        @DisplayName("Should return empty list when no inconsistencies are found")
         public void shouldReturnEmptyListWhenNotFound()
         {
             Employee employee1 = new Employee(
@@ -706,6 +751,7 @@ public class EmployeeServiceTest
         }
 
         @Test
+        @DisplayName("Should return list of employees with salary inconsistencies")
         public void shouldReturnListOfInconsistenciesWhenAreFound()
         {
             Employee employee1 = new Employee(
@@ -731,6 +777,7 @@ public class EmployeeServiceTest
         }
 
         @Test
+        @DisplayName("Should return empty list when employee list is empty")
         public void shouldReturnEmptyListWhenEmployeeListIsEmpty()
         {
             List<Employee> inconsistentEmployees = employeeService.validateSalaryConsistency();
@@ -739,6 +786,7 @@ public class EmployeeServiceTest
         }
 
         @Test
+        @DisplayName("Should return all employees when all have salary inconsistencies")
         public void shouldReturnListOfInconsistenciesWhenAllInconsistent()
         {
             Employee employee1 = new Employee(
@@ -759,6 +807,7 @@ public class EmployeeServiceTest
         }
 
         @Test
+        @DisplayName("Should correctly identify inconsistencies at salary boundaries")
         public void shouldReturnListOfInconsistenciesWhenBoundaryCases()
         {
             Employee employee1 = new Employee(
@@ -787,6 +836,7 @@ public class EmployeeServiceTest
 
 
     @Test
+    @DisplayName("Should not throw exception when printing employees")
     public void shouldNotThrowWhenPrintingEmployees()
     {
         Employee employee = new Employee(
