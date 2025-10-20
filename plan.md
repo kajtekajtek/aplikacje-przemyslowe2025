@@ -142,6 +142,6 @@ Wymagane pokrycie:
 
 ## TODO
 - [x] Review testów EmployeeService i ImportService
-- [ ] Konfiguracja pom.xml
-- [ ] Testy ApiService
-- [ ] Test coverage >70%
+- [x] Konfiguracja pom.xml
+- [x] Testy ApiService
+- [x] Test coverage >70%
