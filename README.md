@@ -1,7 +1,5 @@
 # Zadanie 2
 
-## Uruchomienie
-
 ### Kompilacja i uruchomienie
 
 Skryptem:
@@ -39,7 +37,7 @@ mvn clean test
 
 Uruchomienie testów z raportem pokrycia:
 ```bash
-mvn clean test jacoco:report
+ mvn clean jacoco:prepare-agent test jacoco:report
 ```
 
 Raport HTML:
