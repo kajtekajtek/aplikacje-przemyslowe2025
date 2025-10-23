@@ -7,6 +7,9 @@ import java.util.Comparator;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class EmployeeService 
 {
     private List<Employee> employees;
