@@ -9,39 +9,36 @@ Migracja istniejącego systemu zarządzania pracownikami do architektury Spring 
 **Priorytet: Wysoki**
 
 #### 1.1 Dodanie zależności Spring Boot
-- [ ] Zaktualizować `pom.xml` w głównym katalogu projektu
-- [ ] Dodać `spring-boot-starter` w wersji 3.x
-- [ ] Dodać `spring-boot-starter-test` dla testów
-- [ ] Zachować istniejącą zależność Gson
-- [ ] Dodać `spring-boot-maven-plugin` dla uruchamiania aplikacji
+- [x] Zaktualizować `pom.xml` w głównym katalogu projektu
+- [x] Dodać `spring-boot-starter` w wersji 3.x
+- [x] Dodać `spring-boot-starter-test` dla testów
+- [x] Zachować istniejącą zależność Gson
+- [x] Dodać `spring-boot-maven-plugin` dla uruchamiania aplikacji
 
 #### 1.2 Konfiguracja application.properties
-- [ ] Utworzyć plik `src/main/resources/application.properties`
-- [ ] Zdefiniować `app.api.url=https://jsonplaceholder.typicode.com/users`
-- [ ] Zdefiniować `app.import.csv-file=employees.csv`
-- [ ] Ustawić `logging.level.root=INFO`
+- [x] Utworzyć plik `src/main/resources/application.properties`
+- [x] Zdefiniować `app.api.url=https://jsonplaceholder.typicode.com/users`
+- [x] Zdefiniować `app.import.csv-file=employees.csv`
+- [x] Ustawić `logging.level.root=INFO`
 
 ### 2. Refaktoryzacja serwisów jako Spring Beany
 **Priorytet: Wysoki**
 
 #### 2.1 Refaktoryzacja EmployeeService
-- [ ] Dodać adnotację `@Service` do klasy EmployeeService
-- [ ] Usunąć statyczne referencje do EmployeeService
-- [ ] Usunąć ręczne tworzenie instancji w innych miejscach kodu
-- [ ] Sprawdzić i poprawić wszystkie testy
+- [x] Dodać adnotację `@Service` do klasy EmployeeService
+- [x] Usunąć statyczne referencje do EmployeeService
+- [x] Usunąć ręczne tworzenie instancji w innych miejscach kodu
 
 #### 2.2 Refaktoryzacja ImportService
-- [ ] Dodać adnotację `@Service` do klasy ImportService
-- [ ] Dodać EmployeeService jako zależność przez konstruktor
-- [ ] Usunąć ręczne przekazywanie zależności
-- [ ] Zaktualizować testy jednostkowe
+- [x] Dodać adnotację `@Service` do klasy ImportService
+- [x] Dodać EmployeeService jako zależność przez konstruktor
+- [x] Usunąć ręczne przekazywanie zależności
 
 #### 2.3 Refaktoryzacja ApiService
-- [ ] Dodać adnotację `@Service` do klasy ApiService
+- [x] Dodać adnotację `@Service` do klasy ApiService
 - [ ] Dodać HttpClient jako zależność przez konstruktor
 - [ ] Dodać Gson jako zależność przez konstruktor
-- [ ] Dodać pole z adnotacją `@Value("${app.api.url}")` dla URL API
-- [ ] Zaktualizować testy jednostkowe
+- [x] Dodać pole z adnotacją `@Value("${app.api.url}")` dla URL API
 
 ### 3. Definicja pracowników jako beany w pliku XML
 **Priorytet: Średni**
