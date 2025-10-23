@@ -15,14 +15,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+@Service
 public class ApiService {
     private HttpClient client;
+
+    @Value("${app.api.url}")
+    private String apiUrl;
 
     public ApiService(HttpClient client) {
         this.client = client;
     }
 
-    public List<Employee> fetchEmployeesFromApi(String apiUrl) throws ApiException {
+    public List<Employee> fetchEmployeesFromApi() throws ApiException {
         List<Employee> employees = new ArrayList<>();
 
         try {
