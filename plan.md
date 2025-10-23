@@ -1,129 +1,147 @@
-# CSV and API Integration Implementation Plan
+# Zadanie 3: Testy jednostkowe i automatyzacja buildu
 
-## 1. Refactor Employee Model
+## Plan implementacji
 
-Rename fields in `Employee.java`:
+### 1. Konfiguracja JaCoCo
 
-- `name` → `firstName`
-- `surname` → `lastName`
+**Lokalizacja:** `pom.xml` (główny pom projektu)
 
-Update all references in `Employee.java`, `EmployeeService.java`, and `App.java`.
+**Do zrobienia:**
+- Dodać JaCoCo plugin w sekcji `<build><pluginManagement><plugins>`
+- Skonfigurować goals: `prepare-agent`, `report`
+- Ustawić minimalne pokrycie na 70% dla pakietu `com.techcorp` w module `service`
+- Raport HTML w: `target/site/jacoco/index.html`
 
-## 2. Create New Model Classes
-
-**In `/home/kajtek/Code/aplikacje-przemyslowe2025/zad2/model/src/main/java/com/techcorp/`:**
-
-- `ImportSummary.java`: Contains `int successCount`, `Map<Integer, String> errors`, constructor, getters
-- `CompanyStatistics.java`: Contains `long employeeCount`, `double averageSalary`, `String highestPaidEmployee`, constructor, getters, and `toString()`
-
-## 3. Create Exception Classes
-
-**Create new package:** `/home/kajtek/Code/aplikacje-przemyslowe2025/zad2/model/src/main/java/com/techcorp/exception/`
-
-- `InvalidDataException.java`: Checked exception extending `Exception`
-- `ApiException.java`: Checked exception extending `Exception`
-
-## 4. Add Gson Dependency
-
-Update `/home/kajtek/Code/aplikacje-przemyslowe2025/zad2/service/pom.xml` to add:
-
-```xml
-<dependency>
-    <groupId>com.google.code.gson</groupId>
-    <artifactId>gson</artifactId>
-    <version>2.10.1</version>
-</dependency>
+**Komendy po implementacji:**
+```bash
+mvn clean test                    # Tylko testy
+mvn clean test jacoco:report      # Testy + raport pokrycia
+mvn clean verify                  # Pełny cykl z weryfikacją
 ```
 
-## 5. Implement ImportService
+### 2. Testy ApiService z mockowaniem
 
-**In `/home/kajtek/Code/aplikacje-przemyslowe2025/zad2/service/src/main/java/com/techcorp/`:**
+**Lokalizacja:** `service/src/test/java/com/techcorp/ApiServiceTest.java`
 
-Create `ImportService.java`:
+**Wymagane testy:**
 
-- Constructor accepts `EmployeeService`
-- `importFromCsv(String filePath)` method:
-  - Use `BufferedReader` with try-with-resources
-  - Skip header and empty lines
-  - Parse CSV: firstName, lastName, email, company, position, salary
-  - Validate: Role exists (map "PROGRAMISTA" → ENGINEER), salary > 0
-  - Collect errors with line numbers, continue on errors
-  - Return `ImportSummary`
+#### 2.1 Test poprawnej odpowiedzi JSON
+- **Cel:** Symulacja udanej odpowiedzi HTTP 200 bez prawdziwego API
+- **Mock:** `HttpClient.send()` zwraca mockowany `HttpResponse<String>`
+- **Dane testowe:** JSON z tablicą pracowników
+- **Weryfikacja:**
+  - Lista nie jest pusta
+  - Dane są poprawnie zmapowane (imię, nazwisko, email, firma)
+  - Rola to ENGINEER (zgodnie z EmployeeMapper)
 
-## 6. Implement ApiService
+#### 2.2 Test błędu HTTP 404
+- **Cel:** Weryfikacja rzucania ApiException przy błędach HTTP
+- **Mock:** `HttpResponse.statusCode()` zwraca 404
+- **Weryfikacja:**
+  - Rzucony wyjątek `ApiException`
+  - Komunikat zawiera "HTTP error" i "404"
 
-**In `/home/kajtek/Code/aplikacje-przemyslowe2025/zad2/service/src/main/java/com/techcorp/`:**
+#### 2.3 Test błędu HTTP 500
+- **Cel:** Weryfikacja obsługi błędów serwera
+- **Mock:** `HttpResponse.statusCode()` zwraca 500
+- **Weryfikacja:**
+  - Rzucony wyjątek `ApiException`
+  - Komunikat zawiera "HTTP error" i "500"
 
-Create `ApiService.java`:
+#### 2.4 Test nieprawidłowego JSON
+- **Cel:** Weryfikacja obsługi błędów parsowania
+- **Mock:** `HttpResponse.body()` zwraca nieprawidłowy JSON
+- **Weryfikacja:**
+  - Rzucony wyjątek `ApiException`
+  - Komunikat zawiera "Failed to parse JSON"
 
-- `fetchEmployeesFromApi(String apiUrl)` method:
-  - Use `HttpClient` (Java 11+) to GET from API
-  - Parse JSON response with Gson (`JsonArray`)
-  - Extract: `name` (split to firstName/lastName), `email`, `company.name`
-  - Assign all to ENGINEER role with base salary
-  - Return `List<Employee>`
-  - Throw `ApiException` on HTTP/parsing errors
+#### 2.5 Test błędu sieci (IOException)
+- **Cel:** Weryfikacja obsługi problemów z połączeniem
+- **Mock:** `HttpClient.send()` rzuca `IOException`
+- **Weryfikacja:**
+  - Rzucony wyjątek `ApiException`
+  - Komunikat zawiera "Network error"
 
-## 7. Extend EmployeeService
+#### 2.6 Test przerwania (InterruptedException)
+- **Cel:** Weryfikacja obsługi przerwania żądania
+- **Mock:** `HttpClient.send()` rzuca `InterruptedException`
+- **Weryfikacja:**
+  - Rzucony wyjątek `ApiException`
+  - Komunikat zawiera "Request interrupted"
+  - Flaga przerwania wątku jest ustawiona
 
-Update existing methods in `EmployeeService.java`:
+#### 2.7 Test parsowania pełnej nazwy
+- **Cel:** Weryfikacja poprawności mapowania z JSON
+- **Mock:** JSON z różnymi formatami nazw (pojedyncze słowo, wiele słów)
+- **Weryfikacja:**
+  - Poprawny split imienia i nazwiska
+  - Obsługa edge cases (brak nazwiska, wiele nazwisk)
 
-- Modify `addEmployee(Employee employee)` to:
-  - Check for null argument and handle appropriately
-  - Return `int` (1 for success, 0 for failure/duplicate)
-  - Update App.java accordingly
-  
-- Modify `removeEmployee(Employee employee)` to:
-  - Check for null argument and handle appropriately
-  - Return `int` (1 if removed, 0 if not found/null)
-  - Update App.java accordingly
-
-Add new methods to `EmployeeService.java`:
-
-- `validateSalaryConsistency()`: Stream API to filter employees where `salary < role.getBaseSalary()`
-- `getCompanyStatistics()`: Use `Collectors.groupingBy(Employee::getCompanyName)` with downstream collectors for count, average salary, and max salary employee
-
-## 8. Update Application
-
-Modify `App.java` to add menu options:
-
-- Import from CSV
-- Fetch from API
-- Show salary validation issues
-- Show company statistics (already showing some stats, extend it)
-
-## 9. Create Sample Data
-
-Create `/home/kajtek/Code/aplikacje-przemyslowe2025/zad2/employees.csv`:
-
-```csv
-firstName,lastName,email,company,position,salary
-John,Doe,john.doe@example.com,TechCorp,ENGINEER,8500
-...
+**Techniki mockowania:**
+```java
+@ExtendWith(MockitoExtension.class)
+public class ApiServiceTest {
+    @Mock
+    private HttpClient httpClient;
+    
+    @Mock
+    private HttpResponse<String> httpResponse;
+    
+    private ApiService apiService;
+    
+    @BeforeEach
+    void setUp() {
+        apiService = new ApiService(httpClient);
+    }
+    
+    // Mockowanie odpowiedzi:
+    when(httpClient.send(any(HttpRequest.class), any()))
+        .thenReturn(httpResponse);
+    
+    when(httpResponse.statusCode()).thenReturn(200);
+    when(httpResponse.body()).thenReturn(jsonString);
+}
 ```
 
-Include valid rows, invalid role, invalid salary for testing.
+### 3. Weryfikacja pokrycia kodu
 
-## 10. Update Documentation
+**Po implementacji testów ApiService:**
+1. Uruchomić `mvn clean test jacoco:report`
+2. Otworzyć raport: `service/target/site/jacoco/index.html`
+3. Sprawdzić pokrycie dla pakietu `com.techcorp`:
+   - `EmployeeService` - powinno być ~95-100%
+   - `ImportService` - powinno być ~90-95%
+   - `ApiService` - cel: >70%
+   - `EmployeeMapper` - zostanie pokryty przez testy ApiService
 
-Update `/home/kajtek/Code/aplikacje-przemyslowe2025/README.md` with:
+**Metryki pokrycia:**
+- **Line coverage**: % wykonanych linii kodu
+- **Branch coverage**: % wykonanych gałęzi (if/else, switch)
+- **Instruction coverage**: % wykonanych instrukcji JVM
 
-- Task 2 description
-- Build instructions: `mvn clean install`
-- Run instructions
-- CSV format specification
-- API integration details
+### 4. Dokumentacja w README
 
-### To-dos
+**Aktualizacja:** `README.md`
 
-- [x] Rename name/surname to firstName/lastName in Employee.java and update all references
-- [x] Create ImportSummary and CompanyStatistics model classes
-- [x] Create exception package with InvalidDataException and ApiException
-- [x] Add Gson dependency to service/pom.xml
-- [x] Update addEmployee and removeEmployee methods with null handling and int return values
-- [x] Implement ImportService with CSV parsing and validation
-- [x] Implement ApiService with HTTP client and JSON parsing
-- [x] Add validateSalaryConsistency and getCompanyStatistics methods
-- [x] Add menu options for CSV import, API fetch, and new analytics
-- [x] Create employees.csv with sample data including test cases
-- [x] Document Task 2 implementation in README.md
+**Dodać sekcję:**
+```markdown
+### Testy z pokryciem kodu
+
+Uruchomienie testów:
+mvn clean test
+
+Uruchomienie testów z raportem pokrycia:
+mvn clean test jacoco:report
+
+Raport HTML:
+service/target/site/jacoco/index.html
+
+Wymagane pokrycie:
+- Pakiet service: ≥70%
+```
+
+## TODO
+- [x] Review testów EmployeeService i ImportService
+- [x] Konfiguracja pom.xml
+- [x] Testy ApiService
+- [x] Test coverage >70%

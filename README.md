@@ -1,6 +1,4 @@
-# Zadanie 2
-
-## Uruchomienie
+# Zadanie 3
 
 ### Kompilacja i uruchomienie
 
@@ -30,7 +28,20 @@ Lub manualnie:
 java -jar app/target/app-1.0-SNAPSHOT.jar
 ```
 
-### Testy
+### Testy z pokryciem kodu
+
+Uruchomienie testów:
 ```bash
 mvn clean test
+```
+
+Uruchomienie testów z raportem pokrycia:
+```bash
+ mvn clean jacoco:prepare-agent test jacoco:report
+```
+
+Raport HTML:
+```bash
+service/target/site/jacoco/index.html
+model/target/site/jacoco/index.html
 ```

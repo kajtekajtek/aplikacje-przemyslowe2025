@@ -19,7 +19,7 @@ public class Employee
                     int    salary) {
         this.lastName     = lastName;
         this.firstName    = firstName;
-        this.emailAddress = emailAddress;
+        this.emailAddress = emailAddress.toLowerCase();
         this.companyName  = companyName;
         this.role         = role;
         this.salary       = salary;
