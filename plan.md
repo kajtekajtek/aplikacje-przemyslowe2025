@@ -39,6 +39,7 @@ Migracja istniejącego systemu zarządzania pracownikami do architektury Spring 
 - [ ] Dodać HttpClient jako zależność przez konstruktor
 - [ ] Dodać Gson jako zależność przez konstruktor
 - [x] Dodać pole z adnotacją `@Value("${app.api.url}")` dla URL API
+- [ ] dostosować testy
 
 ### 3. Definicja pracowników jako beany w pliku XML
 **Priorytet: Średni**

@@ -1,5 +1,6 @@
 package com.techcorp;
 
+import com.google.gson.Gson;
 import com.techcorp.exception.ApiException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,11 +34,14 @@ public class ApiServiceTest {
     @Mock
     private HttpResponse<String> httpResponse;
 
+    private Gson gson;
+
     private ApiService apiService;
 
     @BeforeEach
     void setUp() {
-        apiService = new ApiService(httpClient);
+        gson       = new Gson();
+        apiService = new ApiService(httpClient, gson);
     }
 
     @Test
