@@ -9,24 +9,29 @@ import com.techcorp.exception.ApiException;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ImportResource;
 
 @SpringBootApplication
+@ImportResource("classpath:employees-beans.xml")
 public class EmployeeManagementApplication implements CommandLineRunner {
     private final EmployeeService employeeService;
     private final ImportService   importService;
     private final ApiService      apiService;
     private final Scanner         scanner;
+    private final List<Employee>  xmlEmployees;
 
     public EmployeeManagementApplication(
         EmployeeService employeeService,
         ImportService importService,
         ApiService apiService,
-        Scanner scanner
+        Scanner scanner,
+        List<Employee> xmlEmployees
     ) {
         this.employeeService = employeeService;
         this.importService = importService;
         this.apiService = apiService;
         this.scanner = scanner;
+        this.xmlEmployees = xmlEmployees;
     }
 
     public static void main(String[] args) {
@@ -108,37 +113,10 @@ public class EmployeeManagementApplication implements CommandLineRunner {
     }
     
     private void initializeSampleData() {
-        employeeService.addEmployee(new Employee(
-            "Smith", "John", "john.smith@techcorp.com", "TechCorp", Role.CEO, 25000
-        ));
-        employeeService.addEmployee(new Employee(
-            "Johnson", "Emma", "emma.johnson@techcorp.com", "TechCorp", Role.VP, 18000
-        ));
-        employeeService.addEmployee(new Employee(
-            "Williams", "Michael", "michael.williams@techcorp.com", "TechCorp", Role.MANAGER, 12000
-        ));
-        employeeService.addEmployee(new Employee(
-            "Brown", "Sarah", "sarah.brown@techcorp.com", "TechCorp", Role.ENGINEER, 9000
-        ));
-        employeeService.addEmployee(new Employee(
-            "Davis", "James", "james.davis@techcorp.com", "TechCorp", Role.ENGINEER, 8500
-        ));
-        employeeService.addEmployee(new Employee(
-            "Miller", "Olivia", "olivia.miller@techcorp.com", "TechCorp", Role.INTERN, 3000
-        ));
-        
-        employeeService.addEmployee(new Employee(
-            "Wilson", "Robert", "robert.wilson@innovate.com", "Innovate Inc", Role.CEO, 28000
-        ));
-        employeeService.addEmployee(new Employee(
-            "Moore", "Lisa", "lisa.moore@innovate.com", "Innovate Inc", Role.MANAGER, 13000
-        ));
-        employeeService.addEmployee(new Employee(
-            "Taylor", "David", "david.taylor@innovate.com", "Innovate Inc", Role.ENGINEER, 8000
-        ));
-        employeeService.addEmployee(new Employee(
-            "Anderson", "Jennifer", "jennifer.anderson@innovate.com", "Innovate Inc", Role.INTERN, 3500
-        ));
+        System.out.println("Loading " + xmlEmployees.size() + " employees from XML configuration...");
+        for (Employee employee : xmlEmployees) {
+            employeeService.addEmployee(employee);
+        }
     }
     
     private void displayMenu() {
