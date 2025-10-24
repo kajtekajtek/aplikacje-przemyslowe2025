@@ -15,12 +15,18 @@ public class EmployeeManagementApplication implements CommandLineRunner {
     private final EmployeeService employeeService;
     private final ImportService   importService;
     private final ApiService      apiService;
-    private static Scanner         scanner;
+    private final Scanner         scanner;
 
-    public EmployeeManagementApplication(EmployeeService employeeService, ImportService importService, ApiService apiService) {
+    public EmployeeManagementApplication(
+        EmployeeService employeeService,
+        ImportService importService,
+        ApiService apiService,
+        Scanner scanner
+    ) {
         this.employeeService = employeeService;
         this.importService = importService;
         this.apiService = apiService;
+        this.scanner = scanner;
     }
 
     public static void main(String[] args) {
@@ -29,8 +35,6 @@ public class EmployeeManagementApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        scanner = new Scanner(System.in);
-        
         initializeSampleData();
         
         System.out.println("==============================================");
