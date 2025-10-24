@@ -11,20 +11,20 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class App implements CommandLineRunner {
+public class EmployeeManagementApplication implements CommandLineRunner {
     private final EmployeeService employeeService;
     private final ImportService   importService;
     private final ApiService      apiService;
     private static Scanner         scanner;
 
-    public App(EmployeeService employeeService, ImportService importService, ApiService apiService) {
+    public EmployeeManagementApplication(EmployeeService employeeService, ImportService importService, ApiService apiService) {
         this.employeeService = employeeService;
         this.importService = importService;
         this.apiService = apiService;
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(App.class, args);
+        SpringApplication.run(EmployeeManagementApplication.class, args);
     }
 
     @Override
