@@ -38,7 +38,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
-          <mainClass>com.techcorp.App</mainClass>
+          <mainClass>com.techcorp.EmployeeManagementApplication</mainClass>
         </configuration>
         <executions>
           <execution>
