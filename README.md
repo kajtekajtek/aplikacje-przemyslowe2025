@@ -39,11 +39,6 @@ mvn clean package -DskipTests
 java -jar app/target/app-1.0-SNAPSHOT.jar
 ```
 
-### Uruchomienie skryptem
-```bash
-./scripts/compile_and_run.sh
-```
-
 ## Konfiguracja
 
 ### application.properties
