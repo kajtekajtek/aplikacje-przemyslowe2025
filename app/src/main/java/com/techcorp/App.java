@@ -4,13 +4,11 @@ import java.util.Scanner;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.net.http.HttpClient;
 import com.techcorp.exception.ApiException;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class App implements CommandLineRunner {
@@ -23,11 +21,6 @@ public class App implements CommandLineRunner {
         this.employeeService = employeeService;
         this.importService = importService;
         this.apiService = apiService;
-    }
-
-    @Bean
-    public HttpClient httpClient() {
-        return HttpClient.newHttpClient();
     }
 
     public static void main(String[] args) {
