@@ -10,6 +10,7 @@ public class Employee
     private String companyName;
     private Role   role;
     private int    salary;
+	private EmploymentStatus status;
 
     public static Employee createEmployee(
         String lastName, 
@@ -18,9 +19,9 @@ public class Employee
         String companyName,
         Role   role
     ) {
-        return new Employee(
-            lastName, firstName, emailAddress, companyName, role, role.getBaseSalary()
-        );
+		return new Employee(
+			lastName, firstName, emailAddress, companyName, role, role.getBaseSalary(), EmploymentStatus.ACTIVE
+		);
     }
     
     public Employee(
@@ -31,23 +32,45 @@ public class Employee
         Role   role, 
         int    salary
     ) {
-        validateParameters(lastName, firstName, emailAddress, companyName, role, salary);
-
-        this.lastName     = lastName;
-        this.firstName    = firstName;
-        this.emailAddress = emailAddress.toLowerCase();
-        this.companyName  = companyName;
-        this.role         = role;
-        this.salary       = salary;
+		this(
+			lastName,
+			firstName,
+			emailAddress,
+			companyName,
+			role,
+			salary,
+			EmploymentStatus.ACTIVE
+		);
     }
 
-    private void validateParameters(
+	public Employee(
+		String lastName,
+		String firstName,
+		String emailAddress,
+		String companyName,
+		Role   role,
+		int    salary,
+		EmploymentStatus status
+	) {
+		validateParameters(lastName, firstName, emailAddress, companyName, role, salary, status);
+
+		this.lastName     = lastName;
+		this.firstName    = firstName;
+		this.emailAddress = emailAddress.toLowerCase();
+		this.companyName  = companyName;
+		this.role         = role;
+		this.salary       = salary;
+		this.status       = status;
+	}
+
+	private void validateParameters(
         String lastName, 
         String firstName, 
         String emailAddress, 
         String companyName, 
         Role   role, 
-        int    salary
+        int    salary,
+        EmploymentStatus status
     ) {
         if (salary < 0) 
             throw new IllegalArgumentException("Salary cannot be negative");
@@ -61,6 +84,8 @@ public class Employee
             throw new IllegalArgumentException("Company name cannot be empty");
         if (role == null) 
             throw new IllegalArgumentException("Role cannot be null");
+        if (status == null) 
+            throw new IllegalArgumentException("Employment status cannot be null");
     }
 
     public String getFullName()     { return this.firstName + " " + this.lastName; }
@@ -70,17 +95,24 @@ public class Employee
     public String getCompanyName()  { return this.companyName; }
     public Role   getRole()         { return this.role; }
     public int    getSalary()       { return this.salary; }
+	public EmploymentStatus getStatus() { return this.status; }
 
     public void setSalary(int salary) { this.salary = salary; }
+	public void setStatus(EmploymentStatus status) {
+		if (status == null) throw new IllegalArgumentException("Employment status cannot be null");
+		this.status = status;
+	}
 
-    @Override
-    public String toString() {
-        return getFullName() 
-             + " " 
-             + getRole().toString() 
-             + " " 
-             + getEmailAddress();
-    }
+	@Override
+	public String toString() {
+		return getFullName()
+		     + " "
+		     + getRole().toString()
+		     + " "
+		     + getEmailAddress()
+		     + " "
+		     + getStatus().toString();
+	}
 
     @Override
     public boolean equals(Object obj) {
