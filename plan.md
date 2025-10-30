@@ -9,28 +9,28 @@ Stworzenie kontrolerów REST, które umożliwią udostępnienie funkcjonalności
 **Priorytet: Wysoki**
 
 #### 1.1 Dodanie zależności Spring Web
-- [ ] Dodać `spring-boot-starter-web` do `pom.xml` w głównym katalogu projektu
-- [ ] Usunąć lub zastąpić `spring-boot-starter` jeśli już istnieje
-- [ ] Zachować `spring-boot-starter-test` dla testów
+- [x] Dodać `spring-boot-starter-web` do `pom.xml` w głównym katalogu projektu
+- [x] Usunąć lub zastąpić `spring-boot-starter` jeśli już istnieje
+- [x] Zachować `spring-boot-starter-test` dla testów
 
 #### 1.2 Aktualizacja application.properties
-- [ ] Dodać `server.port=8080` do `src/main/resources/application.properties`
-- [ ] Dodać `spring.application.name=employee-management-api`
-- [ ] Dodać `spring.jackson.serialization.write-dates-as-timestamps=false`
-- [ ] Zachować istniejące ustawienia z poprzedniego zadania
+- [x] Dodać `server.port=8080` do `src/main/resources/application.properties`
+- [x] Dodać `spring.application.name=employee-management-api`
+- [x] Dodać `spring.jackson.serialization.write-dates-as-timestamps=false`
+- [x] Zachować istniejące ustawienia z poprzedniego zadania
 
 ### 2. Model: Status zatrudnienia
 **Priorytet: Wysoki**
 
 #### 2.1 Utworzenie enum EmploymentStatus
-- [ ] Utworzyć klasę `EmploymentStatus.java` w pakiecie `model`
-- [ ] Dodać wartości: `ACTIVE`, `ON_LEAVE`, `TERMINATED`
+- [x] Utworzyć klasę `EmploymentStatus.java` w pakiecie `model`
+- [x] Dodać wartości: `ACTIVE`, `ON_LEAVE`, `TERMINATED`
 
 #### 2.2 Rozszerzenie modelu Employee
-- [ ] Dodać pole `status` typu `EmploymentStatus` do klasy `Employee`
-- [ ] Zaktualizować konstruktor(-y) klasy `Employee`
-- [ ] Dodać getter i setter dla pola `status`
-- [ ] Zaktualizować metodę `toString()` jeśli istnieje
+- [x] Dodać pole `status` typu `EmploymentStatus` do klasy `Employee`
+- [x] Zaktualizować konstruktor(-y) klasy `Employee`
+- [x] Dodać getter i setter dla pola `status`
+- [x] Zaktualizować metodę `toString()` jeśli istnieje
 
 #### 2.3 Aktualizacja istniejących testów
 - [ ] Sprawdzić czy wszystkie istniejące testy przechodzą
