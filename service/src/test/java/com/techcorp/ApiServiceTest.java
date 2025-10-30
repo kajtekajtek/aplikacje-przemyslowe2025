@@ -1,5 +1,6 @@
 package com.techcorp;
 
+import com.google.gson.Gson;
 import com.techcorp.exception.ApiException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,11 +34,14 @@ public class ApiServiceTest {
     @Mock
     private HttpResponse<String> httpResponse;
 
+    private Gson gson;
+
     private ApiService apiService;
 
     @BeforeEach
     void setUp() {
-        apiService = new ApiService(httpClient);
+        gson       = new Gson();
+        apiService = new ApiService(httpClient, gson);
     }
 
     @Test
@@ -137,10 +141,28 @@ public class ApiServiceTest {
     }
 
     @Test
-    @DisplayName("Name parsing: handles single and multi-word names")
-    void shouldReturnEmployeesWithSingleAndMultiWordNames() throws Exception {
+    @DisplayName("Name parsing: throws on employee with single-word name")
+    void shouldThrowOnEmployeeWithSingleWordName() throws Exception {
         String json = "[\n" +
-                "  {\"name\":\"Single\",\"email\":\"s@x.com\",\"company\":{\"name\":\"X\"}},\n" +
+                "  {\"name\":\"Single\",\"email\":\"s@x.com\",\"company\":{\"name\":\"X\"}}\n" +
+                "]";
+
+        when(httpClient.send(
+            any(HttpRequest.class), ArgumentMatchers.<HttpResponse.BodyHandler<String>>any()
+        )).thenReturn(httpResponse);
+        when(httpResponse.statusCode()).thenReturn(200);
+        when(httpResponse.body()).thenReturn(json);
+
+        ApiException ex = assertThrows(ApiException.class, () ->
+                apiService.fetchEmployeesFromApi(API_URL)
+        );
+        assertTrue(ex.getMessage().toLowerCase().contains("name cannot be empty"));
+    }
+
+    @Test
+    @DisplayName("Name parsing: handles multi-word name")
+    void shouldReturnEmployeesWithMultiWordName() throws Exception {
+        String json = "[\n" +
                 "  {\"name\":\"Multi Word Name\",\"email\":\"m@y.com\",\"company\":{\"name\":\"Y\"}}\n" +
                 "]";
 
@@ -152,11 +174,9 @@ public class ApiServiceTest {
 
         List<Employee> employees = apiService.fetchEmployeesFromApi(API_URL);
 
-        assertEquals("Single", employees.get(0).getFirstName());
-        assertEquals("", employees.get(0).getLastName());
-
-        assertEquals("Multi", employees.get(1).getFirstName());
-        assertEquals("Word Name", employees.get(1).getLastName());
+        assertEquals(1, employees.size());
+        assertEquals("Multi", employees.get(0).getFirstName());
+        assertEquals("Word Name", employees.get(0).getLastName());
     }
 }
 

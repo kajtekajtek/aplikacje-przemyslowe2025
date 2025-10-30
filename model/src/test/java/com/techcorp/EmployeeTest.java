@@ -1,6 +1,8 @@
 package com.techcorp;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Nested;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class EmployeeTest
@@ -12,24 +14,80 @@ public class EmployeeTest
     private final Role   ROLE         = Role.ENGINEER;
     private final int    SALARY       = 8500;
 
-    @Test
-    public void testEmployeeConstructorAndGetters()
-    {
-        Employee employee = new Employee(
-            SURNAME, NAME, EMAIL, COMPANY_NAME, ROLE, SALARY
-        );
-                    
-        assertEmployeeDetails(employee, SURNAME, NAME, EMAIL, COMPANY_NAME, ROLE, SALARY);
-    }
+    @Nested
+    class ConstructorTest {
 
-    @Test
-    public void testCreateEmployee()
-    {
-        Employee employee = Employee.createEmployee(
-            SURNAME, NAME, EMAIL, COMPANY_NAME, ROLE
-        );
+        @Test
+        public void givenValidParametersConstructorCreatesEmployee()
+        {
+            Employee employee = new Employee(
+                SURNAME, NAME, EMAIL, COMPANY_NAME, ROLE, SALARY
+            );
+                        
+            assertEmployeeDetails(
+                employee, SURNAME, NAME, EMAIL, COMPANY_NAME, ROLE, SALARY
+            );
+        }
 
-        assertEmployeeDetails(employee, SURNAME, NAME, EMAIL, COMPANY_NAME, ROLE, ROLE.getBaseSalary());
+        @Test
+        public void givenValidParametersCreateEmployeeCreatesEmployee()
+        {
+            Employee employee = Employee.createEmployee(
+                SURNAME, NAME, EMAIL, COMPANY_NAME, ROLE
+            );
+
+            assertEmployeeDetails(
+                employee, SURNAME, NAME, EMAIL, COMPANY_NAME, ROLE, ROLE.getBaseSalary()
+            );
+        }
+
+        @Test
+        public void givenEmptyParametersConstructorThrowsIllegalArgumentException()
+        {
+            assertAll(
+                () -> assertConstructorThrowsIllegalArgumentException(
+                    "", NAME, EMAIL, COMPANY_NAME, ROLE, SALARY),
+                () -> assertConstructorThrowsIllegalArgumentException(
+                    SURNAME, "", EMAIL, COMPANY_NAME, ROLE, SALARY),
+                () -> assertConstructorThrowsIllegalArgumentException(
+                    SURNAME, NAME, "", COMPANY_NAME, ROLE, SALARY),
+                () -> assertConstructorThrowsIllegalArgumentException(
+                    SURNAME, NAME, EMAIL, "", ROLE, SALARY)
+            );
+        }
+
+        @Test
+        public void givenNullParametersConstructorThrowsIllegalArgumentException()
+        {
+            assertAll(
+                () -> assertConstructorThrowsIllegalArgumentException(
+                    null, NAME, EMAIL, COMPANY_NAME, ROLE, SALARY),
+                () -> assertConstructorThrowsIllegalArgumentException(
+                    SURNAME, null, EMAIL, COMPANY_NAME, ROLE, SALARY),
+                () -> assertConstructorThrowsIllegalArgumentException(
+                    SURNAME, NAME, null, COMPANY_NAME, ROLE, SALARY),
+                () -> assertConstructorThrowsIllegalArgumentException(
+                    SURNAME, NAME, EMAIL, null, ROLE, SALARY),
+                () -> assertConstructorThrowsIllegalArgumentException(
+                    SURNAME, NAME, EMAIL, COMPANY_NAME, null, SALARY)
+            );
+        }
+
+        @Test
+        public void givenNegativeSalaryConstructorThrowsIllegalArgumentException()
+        {
+            assertAll(
+                () -> assertConstructorThrowsIllegalArgumentException(
+                    SURNAME, NAME, EMAIL, COMPANY_NAME, ROLE, -1)
+            );
+        }
+
+        private void assertConstructorThrowsIllegalArgumentException(String lastName, String firstName, String email, String companyName, Role role, int salary) {
+            assertThrows(IllegalArgumentException.class, () -> new Employee(
+                lastName, firstName, email, companyName, role, salary
+            ));
+        }
+
     }
 
     @Test

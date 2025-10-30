@@ -1,147 +1,133 @@
-# Zadanie 3: Testy jednostkowe i automatyzacja buildu
+# Plan implementacji zadania 4: Migracja do Spring Boot
 
-## Plan implementacji
+## Przegląd zadania
+Migracja istniejącego systemu zarządzania pracownikami do architektury Spring Boot z wykorzystaniem Dependency Injection oraz definiowaniem pracowników jako beany Spring w pliku konfiguracyjnym XML.
 
-### 1. Konfiguracja JaCoCo
+## Struktura zadań
 
-**Lokalizacja:** `pom.xml` (główny pom projektu)
+### 1. Konfiguracja projektu Spring Boot
+**Priorytet: Wysoki**
 
-**Do zrobienia:**
-- Dodać JaCoCo plugin w sekcji `<build><pluginManagement><plugins>`
-- Skonfigurować goals: `prepare-agent`, `report`
-- Ustawić minimalne pokrycie na 70% dla pakietu `com.techcorp` w module `service`
-- Raport HTML w: `target/site/jacoco/index.html`
+#### 1.1 Dodanie zależności Spring Boot
+- [x] Zaktualizować `pom.xml` w głównym katalogu projektu
+- [x] Dodać `spring-boot-starter` w wersji 3.x
+- [x] Dodać `spring-boot-starter-test` dla testów
+- [x] Zachować istniejącą zależność Gson
+- [x] Dodać `spring-boot-maven-plugin` dla uruchamiania aplikacji
 
-**Komendy po implementacji:**
-```bash
-mvn clean test                    # Tylko testy
-mvn clean test jacoco:report      # Testy + raport pokrycia
-mvn clean verify                  # Pełny cykl z weryfikacją
-```
+#### 1.2 Konfiguracja application.properties
+- [x] Utworzyć plik `src/main/resources/application.properties`
+- [x] Zdefiniować `app.api.url=https://jsonplaceholder.typicode.com/users`
+- [x] Zdefiniować `app.import.csv-file=employees.csv`
+- [x] Ustawić `logging.level.root=INFO`
 
-### 2. Testy ApiService z mockowaniem
+### 2. Refaktoryzacja serwisów jako Spring Beany
+**Priorytet: Wysoki**
 
-**Lokalizacja:** `service/src/test/java/com/techcorp/ApiServiceTest.java`
+#### 2.1 Refaktoryzacja EmployeeService
+- [x] Dodać adnotację `@Service` do klasy EmployeeService
+- [x] Usunąć statyczne referencje do EmployeeService
+- [x] Usunąć ręczne tworzenie instancji w innych miejscach kodu
 
-**Wymagane testy:**
+#### 2.2 Refaktoryzacja ImportService
+- [x] Dodać adnotację `@Service` do klasy ImportService
+- [x] Dodać EmployeeService jako zależność przez konstruktor
+- [x] Usunąć ręczne przekazywanie zależności
 
-#### 2.1 Test poprawnej odpowiedzi JSON
-- **Cel:** Symulacja udanej odpowiedzi HTTP 200 bez prawdziwego API
-- **Mock:** `HttpClient.send()` zwraca mockowany `HttpResponse<String>`
-- **Dane testowe:** JSON z tablicą pracowników
-- **Weryfikacja:**
-  - Lista nie jest pusta
-  - Dane są poprawnie zmapowane (imię, nazwisko, email, firma)
-  - Rola to ENGINEER (zgodnie z EmployeeMapper)
+#### 2.3 Refaktoryzacja ApiService
+- [x] Dodać adnotację `@Service` do klasy ApiService
+- [x] Dodać HttpClient jako zależność przez konstruktor
+- [x] Dodać Gson jako zależność przez konstruktor
+- [x] Dodać pole z adnotacją `@Value("${app.api.url}")` dla URL API
+- [x] dostosować testy
 
-#### 2.2 Test błędu HTTP 404
-- **Cel:** Weryfikacja rzucania ApiException przy błędach HTTP
-- **Mock:** `HttpResponse.statusCode()` zwraca 404
-- **Weryfikacja:**
-  - Rzucony wyjątek `ApiException`
-  - Komunikat zawiera "HTTP error" i "404"
+### 3. Definicja pracowników jako beany w pliku XML
+**Priorytet: Średni**
 
-#### 2.3 Test błędu HTTP 500
-- **Cel:** Weryfikacja obsługi błędów serwera
-- **Mock:** `HttpResponse.statusCode()` zwraca 500
-- **Weryfikacja:**
-  - Rzucony wyjątek `ApiException`
-  - Komunikat zawiera "HTTP error" i "500"
+#### 3.1 Utworzenie pliku konfiguracyjnego XML
+- [x] Utworzyć plik `src/main/resources/employees-beans.xml`
+- [x] Zdefiniować strukturę XML z odpowiednimi namespace'ami
+- [x] Dodać definicje beanów dla pracowników (employee1, employee2, itp.)
+- [x] Utworzyć listę `xmlEmployees` z referencjami do wszystkich beanów pracowników
 
-#### 2.4 Test nieprawidłowego JSON
-- **Cel:** Weryfikacja obsługi błędów parsowania
-- **Mock:** `HttpResponse.body()` zwraca nieprawidłowy JSON
-- **Weryfikacja:**
-  - Rzucony wyjątek `ApiException`
-  - Komunikat zawiera "Failed to parse JSON"
+#### 3.2 Konfiguracja wstrzykiwania XML
+- [x] Dodać adnotację `@ImportResource("classpath:employees-beans.xml")` do głównej klasy aplikacji
+- [x] Sprawdzić dostępność beanów XML w kontekście Spring
 
-#### 2.5 Test błędu sieci (IOException)
-- **Cel:** Weryfikacja obsługi problemów z połączeniem
-- **Mock:** `HttpClient.send()` rzuca `IOException`
-- **Weryfikacja:**
-  - Rzucony wyjątek `ApiException`
-  - Komunikat zawiera "Network error"
+### 4. Konfiguracja zewnętrznych zależności jako beany
+**Priorytet: Średni**
 
-#### 2.6 Test przerwania (InterruptedException)
-- **Cel:** Weryfikacja obsługi przerwania żądania
-- **Mock:** `HttpClient.send()` rzuca `InterruptedException`
-- **Weryfikacja:**
-  - Rzucony wyjątek `ApiException`
-  - Komunikat zawiera "Request interrupted"
-  - Flaga przerwania wątku jest ustawiona
+#### 4.1 Utworzenie klasy konfiguracyjnej AppConfig
+- [x] Utworzyć klasę `AppConfig` w pakiecie `config`
+- [x] Dodać adnotację `@Configuration`
+- [x] Dodać metodę `httpClient()` z adnotacją `@Bean` zwracającą `HttpClient.newHttpClient()`
+- [x] Dodać metodę `gson()` z adnotacją `@Bean` zwracającą nową instancję `Gson`
 
-#### 2.7 Test parsowania pełnej nazwy
-- **Cel:** Weryfikacja poprawności mapowania z JSON
-- **Mock:** JSON z różnymi formatami nazw (pojedyncze słowo, wiele słów)
-- **Weryfikacja:**
-  - Poprawny split imienia i nazwiska
-  - Obsługa edge cases (brak nazwiska, wiele nazwisk)
+#### 4.2 Weryfikacja wstrzykiwania zależności
+- [x] Sprawdzić poprawność wstrzykiwania HttpClient w ApiService
+- [x] Sprawdzić poprawność wstrzykiwania Gson w ApiService
 
-**Techniki mockowania:**
-```java
-@ExtendWith(MockitoExtension.class)
-public class ApiServiceTest {
-    @Mock
-    private HttpClient httpClient;
-    
-    @Mock
-    private HttpResponse<String> httpResponse;
-    
-    private ApiService apiService;
-    
-    @BeforeEach
-    void setUp() {
-        apiService = new ApiService(httpClient);
-    }
-    
-    // Mockowanie odpowiedzi:
-    when(httpClient.send(any(HttpRequest.class), any()))
-        .thenReturn(httpResponse);
-    
-    when(httpResponse.statusCode()).thenReturn(200);
-    when(httpResponse.body()).thenReturn(jsonString);
-}
-```
+### 5. Klasa startowa aplikacji
+**Priorytet: Wysoki**
 
-### 3. Weryfikacja pokrycia kodu
+#### 5.1 Utworzenie głównej klasy aplikacji
+- [x] Utworzyć klasę `EmployeeManagementApplication` w głównym pakiecie
+- [x] Dodać adnotację `@SpringBootApplication`
+- [x] Dodać adnotację `@ImportResource("classpath:employees-beans.xml")`
+- [x] Zaimplementować interfejs `CommandLineRunner`
 
-**Po implementacji testów ApiService:**
-1. Uruchomić `mvn clean test jacoco:report`
-2. Otworzyć raport: `service/target/site/jacoco/index.html`
-3. Sprawdzić pokrycie dla pakietu `com.techcorp`:
-   - `EmployeeService` - powinno być ~95-100%
-   - `ImportService` - powinno być ~90-95%
-   - `ApiService` - cel: >70%
-   - `EmployeeMapper` - zostanie pokryty przez testy ApiService
+#### 5.2 Implementacja metody run()
+- [x] Wstrzyknąć wszystkie potrzebne serwisy przez konstruktor:
+  - [x] ImportService
+  - [x] EmployeeService
+  - [x] ApiService
+  - [x] List<Employee> xmlEmployees z adnotacją `@Qualifier("xmlEmployees")`
+- [x] Zaimplementować demonstrację funkcjonalności:
+  - [x] Import pracowników z pliku CSV
+  - [x] Dodanie pracowników z beana xmlEmployees
+  - [x] Pobranie danych z REST API
+  - [x] Wyświetlenie statystyk dla wybranej firmy
+  - [x] Walidacja spójności wynagrodzeń
+  - [x] Wyświetlenie pracowników z niskimi wynagrodzeniami
 
-**Metryki pokrycia:**
-- **Line coverage**: % wykonanych linii kodu
-- **Branch coverage**: % wykonanych gałęzi (if/else, switch)
-- **Instruction coverage**: % wykonanych instrukcji JVM
+### 6. Weryfikacja i testy
+**Priorytet: Wysoki**
 
-### 4. Dokumentacja w README
+#### 6.1 Testy jednostkowe
+- [x] Sprawdzić czy wszystkie istniejące testy przechodzą bez modyfikacji
+- [x] Uruchomić testy dla wszystkich modułów (model, service)
+- [x] Naprawić ewentualne problemy z kontekstem Spring w testach
 
-**Aktualizacja:** `README.md`
+#### 6.2 Testy integracyjne
+- [x] Uruchomić aplikację komendą `mvn spring-boot:run`
+- [x] Sprawdzić poprawność inicjalizacji kontekstu Spring
+- [x] Zweryfikować działanie wszystkich funkcjonalności demonstracyjnych
+- [x] Sprawdzić logi aplikacji pod kątem błędów
 
-**Dodać sekcję:**
-```markdown
-### Testy z pokryciem kodu
+#### 6.3 Budowanie aplikacji
+- [x] Przetestować komendę `mvn package`
+- [x] Sprawdzić czy generuje się wykonywalny JAR
+- [x] Przetestować uruchamianie JAR-a
 
-Uruchomienie testów:
-mvn clean test
+### 7. Dokumentacja
+**Priorytet: Niski**
 
-Uruchomienie testów z raportem pokrycia:
-mvn clean test jacoco:report
+#### 7.1 Aktualizacja README.md
+- [x] Dodać sekcję o migracji do Spring Boot
+- [x] Wyjaśnić różne sposoby definiowania beanów (adnotacje, klasy konfiguracyjne, XML)
+- [x] Dodać instrukcje uruchomienia aplikacji
+- [x] Dodać informacje o testowaniu
 
-Raport HTML:
-service/target/site/jacoco/index.html
+#### 7.2 Dokumentacja konfiguracji
+- [x] Opisać strukturę pliku `application.properties`
+- [x] Wyjaśnić konfigurację XML w `employees-beans.xml`
+- [x] Opisać klasę konfiguracyjną `AppConfig`
 
-Wymagane pokrycie:
-- Pakiet service: ≥70%
-```
+## Kryteria sukcesu
 
-## TODO
-- [x] Review testów EmployeeService i ImportService
-- [x] Konfiguracja pom.xml
-- [x] Testy ApiService
-- [x] Test coverage >70%
+- [x] Aplikacja uruchamia się bez błędów komendą `mvn spring-boot:run`
+- [x] Wszystkie istniejące testy przechodzą bez modyfikacji
+- [x] Wszystkie serwisy są zarządzane przez Spring Container
+- [x] Pracownicy z pliku XML są poprawnie wstrzykiwani
+- [x] Demonstracja wszystkich funkcjonalności działa poprawnie
+- [x] Dokumentacja jest aktualna i kompletna

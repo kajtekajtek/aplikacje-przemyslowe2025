@@ -6,6 +6,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import com.techcorp.exception.InvalidDataException;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class ImportService {
     private static final String HEADER     = "firstName,lastName,email,company,position,salary";
     private static final String DELIMITER  = ",";

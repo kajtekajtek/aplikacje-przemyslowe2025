@@ -7,6 +7,12 @@
   <packaging>pom</packaging>
   <name>zad2</name>
 
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.2.0</version>
+  </parent>
+
   <modules>
     <module>model</module>
     <module>service</module>
@@ -16,10 +22,15 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>17</maven.compiler.release>
+    <java.version>17</java.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+      </dependency>
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
@@ -56,14 +67,34 @@
   </dependencies>
   <build>
     <pluginManagement>
-      <!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
       <plugins>
-        <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>0.8.11</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>prepare-agent</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>report</id>
+              <phase>test</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>
           <version>3.4.0</version>
         </plugin>
-        <!-- default lifecycle, jar packaging: see https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
         <plugin>
           <artifactId>maven-resources-plugin</artifactId>
           <version>3.3.1</version>
@@ -88,7 +119,6 @@
           <artifactId>maven-deploy-plugin</artifactId>
           <version>3.1.2</version>
         </plugin>
-        <!-- site lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#site_Lifecycle -->
         <plugin>
           <artifactId>maven-site-plugin</artifactId>
           <version>3.12.1</version>
@@ -96,25 +126,6 @@
         <plugin>
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.6.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.jacoco</groupId>
-          <artifactId>jacoco-maven-plugin</artifactId>
-          <version>0.8.11</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>prepare-agent</goal>
-              </goals>
-            </execution>
-            <execution>
-              <id>report</id>
-              <phase>test</phase>
-              <goals>
-                <goal>report</goal>
-              </goals>
-            </execution>
-          </executions>
         </plugin>
       </plugins>
     </pluginManagement>

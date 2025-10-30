@@ -4,21 +4,42 @@ import java.util.Scanner;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.net.http.HttpClient;
 import com.techcorp.exception.ApiException;
 
-public class App {
-    private static EmployeeService employeeService;
-    private static ImportService   importService;
-    private static ApiService      apiService;
-    private static Scanner         scanner;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ImportResource;
+
+@SpringBootApplication
+@ImportResource("classpath:employees-beans.xml")
+public class EmployeeManagementApplication implements CommandLineRunner {
+    private final EmployeeService employeeService;
+    private final ImportService   importService;
+    private final ApiService      apiService;
+    private final Scanner         scanner;
+    private final List<Employee>  xmlEmployees;
+
+    public EmployeeManagementApplication(
+        EmployeeService employeeService,
+        ImportService importService,
+        ApiService apiService,
+        Scanner scanner,
+        List<Employee> xmlEmployees
+    ) {
+        this.employeeService = employeeService;
+        this.importService = importService;
+        this.apiService = apiService;
+        this.scanner = scanner;
+        this.xmlEmployees = xmlEmployees;
+    }
 
     public static void main(String[] args) {
-        employeeService = new EmployeeService();
-        importService   = new ImportService(employeeService);
-        apiService      = new ApiService(HttpClient.newHttpClient());
-        scanner         = new Scanner(System.in);
-        
+        SpringApplication.run(EmployeeManagementApplication.class, args);
+    }
+
+    @Override
+    public void run(String... args) {
         initializeSampleData();
         
         System.out.println("==============================================");
@@ -91,41 +112,14 @@ public class App {
         scanner.close();
     }
     
-    private static void initializeSampleData() {
-        employeeService.addEmployee(new Employee(
-            "Smith", "John", "john.smith@techcorp.com", "TechCorp", Role.CEO, 25000
-        ));
-        employeeService.addEmployee(new Employee(
-            "Johnson", "Emma", "emma.johnson@techcorp.com", "TechCorp", Role.VP, 18000
-        ));
-        employeeService.addEmployee(new Employee(
-            "Williams", "Michael", "michael.williams@techcorp.com", "TechCorp", Role.MANAGER, 12000
-        ));
-        employeeService.addEmployee(new Employee(
-            "Brown", "Sarah", "sarah.brown@techcorp.com", "TechCorp", Role.ENGINEER, 9000
-        ));
-        employeeService.addEmployee(new Employee(
-            "Davis", "James", "james.davis@techcorp.com", "TechCorp", Role.ENGINEER, 8500
-        ));
-        employeeService.addEmployee(new Employee(
-            "Miller", "Olivia", "olivia.miller@techcorp.com", "TechCorp", Role.INTERN, 3000
-        ));
-        
-        employeeService.addEmployee(new Employee(
-            "Wilson", "Robert", "robert.wilson@innovate.com", "Innovate Inc", Role.CEO, 28000
-        ));
-        employeeService.addEmployee(new Employee(
-            "Moore", "Lisa", "lisa.moore@innovate.com", "Innovate Inc", Role.MANAGER, 13000
-        ));
-        employeeService.addEmployee(new Employee(
-            "Taylor", "David", "david.taylor@innovate.com", "Innovate Inc", Role.ENGINEER, 8000
-        ));
-        employeeService.addEmployee(new Employee(
-            "Anderson", "Jennifer", "jennifer.anderson@innovate.com", "Innovate Inc", Role.INTERN, 3500
-        ));
+    private void initializeSampleData() {
+        System.out.println("Loading " + xmlEmployees.size() + " employees from XML configuration...");
+        for (Employee employee : xmlEmployees) {
+            employeeService.addEmployee(employee);
+        }
     }
     
-    private static void displayMenu() {
+    private void displayMenu() {
         System.out.println("\n==============================================");
         System.out.println("                MAIN MENU");
         System.out.println("==============================================");
@@ -148,7 +142,7 @@ public class App {
         System.out.print("Enter your choice: ");
     }
     
-    private static int getMenuChoice() {
+    private int getMenuChoice() {
         try {
             int choice = Integer.parseInt(scanner.nextLine().trim());
             return choice;
@@ -157,7 +151,7 @@ public class App {
         }
     }
     
-    private static void addNewEmployee() {
+    private void addNewEmployee() {
         System.out.println("=== Add New Employee ===\n");
         
         try {
@@ -217,7 +211,7 @@ public class App {
         }
     }
     
-    private static void removeEmployee() {
+    private void removeEmployee() {
         System.out.println("=== Remove Employee ===\n");
         
         List<Employee> employees = employeeService.getEmployees();
@@ -252,7 +246,7 @@ public class App {
         }
     }
     
-    private static void listAllEmployees() {
+    private void listAllEmployees() {
         System.out.println("=== All Employees ===\n");
         
         List<Employee> employees = employeeService.getEmployees();
@@ -278,7 +272,7 @@ public class App {
         }
     }
     
-    private static void listEmployeesByCompany() {
+    private void listEmployeesByCompany() {
         System.out.println("=== Employees by Company ===\n");
         
         System.out.print("Enter company name: ");
@@ -306,7 +300,7 @@ public class App {
         }
     }
     
-    private static void listEmployeesByRole() {
+    private void listEmployeesByRole() {
         System.out.println("=== Employees Grouped by Role ===\n");
         
         Map<Role, List<Employee>> employeesByRole = employeeService.getEmployeesByRole();
@@ -332,7 +326,7 @@ public class App {
         }
     }
     
-    private static void listEmployeesAlphabetically() {
+    private void listEmployeesAlphabetically() {
         System.out.println("=== Employees (Alphabetically by Last Name) ===\n");
         
         List<Employee> employees = employeeService.getEmployeesAlphabetically();
@@ -359,7 +353,7 @@ public class App {
         }
     }
     
-    private static void showEmployeeCountByRole() {
+    private void showEmployeeCountByRole() {
         System.out.println("=== Employee Count by Role ===\n");
         
         Map<Role, Long> countByRole = employeeService.getEmployeeCountByRole();
@@ -379,7 +373,7 @@ public class App {
         }
     }
     
-    private static void showEmployeeWithHighestSalary() {
+    private void showEmployeeWithHighestSalary() {
         System.out.println("=== Employee with Highest Salary ===\n");
         
         Optional<Employee> highestPaid = employeeService.getEmployeeWithHighestSalary();
@@ -399,7 +393,7 @@ public class App {
         }
     }
     
-    private static void showAverageSalary() {
+    private void showAverageSalary() {
         System.out.println("=== Average Salary ===\n");
         
         Double avgSalary = employeeService.getAverageSalary();
@@ -415,7 +409,7 @@ public class App {
         }
     }
     
-    private static void showStatistics() {
+    private void showStatistics() {
         System.out.println("=== Complete Employee Statistics ===\n");
         
         List<Employee> employees = employeeService.getEmployees();
@@ -466,7 +460,7 @@ public class App {
         System.out.println("\n═════════════════════════════════════════════════\n");
     }
     
-    private static void importFromCSV() {
+    private void importFromCSV() {
         System.out.println("=== Import Employees from CSV ===\n");
         
         System.out.print("Enter CSV file path (or press Enter for 'employees.csv'): ");
@@ -503,7 +497,7 @@ public class App {
         }
     }
     
-    private static void fetchFromAPI() {
+    private void fetchFromAPI() {
         System.out.println("=== Fetch Employees from API ===\n");
         
         System.out.print("Enter API URL (or press Enter for default): ");
@@ -559,7 +553,7 @@ public class App {
         }
     }
     
-    private static void showSalaryValidationIssues() {
+    private void showSalaryValidationIssues() {
         System.out.println("=== Salary Consistency Validation ===\n");
         
         List<Employee> inconsistentEmployees = employeeService.validateSalaryConsistency();
@@ -589,7 +583,7 @@ public class App {
         }
     }
     
-    private static void showCompanyStatistics() {
+    private void showCompanyStatistics() {
         System.out.println("=== Company Statistics ===\n");
         
         Map<String, CompanyStatistics> stats = employeeService.getCompanyStatistics();

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean id="xmlEmployee1" class="com.techcorp.Employee">
+        <constructor-arg name="lastName" value="Anderson"/>
+        <constructor-arg name="firstName" value="Thomas"/>
+        <constructor-arg name="emailAddress" value="thomas.anderson@xmlcorp.com"/>
+        <constructor-arg name="companyName" value="XMLCorp"/>
+        <constructor-arg name="role" value="CEO"/>
+        <constructor-arg name="salary" value="30000"/>
+    </bean>
+
+    <bean id="xmlEmployee2" class="com.techcorp.Employee">
+        <constructor-arg name="lastName" value="Martinez"/>
+        <constructor-arg name="firstName" value="Sofia"/>
+        <constructor-arg name="emailAddress" value="sofia.martinez@xmlcorp.com"/>
+        <constructor-arg name="companyName" value="XMLCorp"/>
+        <constructor-arg name="role" value="VP"/>
+        <constructor-arg name="salary" value="20000"/>
+    </bean>
+
+    <bean id="xmlEmployee3" class="com.techcorp.Employee">
+        <constructor-arg name="lastName" value="Chen"/>
+        <constructor-arg name="firstName" value="Wei"/>
+        <constructor-arg name="emailAddress" value="wei.chen@xmlcorp.com"/>
+        <constructor-arg name="companyName" value="XMLCorp"/>
+        <constructor-arg name="role" value="MANAGER"/>
+        <constructor-arg name="salary" value="14000"/>
+    </bean>
+
+    <bean id="xmlEmployee4" class="com.techcorp.Employee">
+        <constructor-arg name="lastName" value="Kowalski"/>
+        <constructor-arg name="firstName" value="Jan"/>
+        <constructor-arg name="emailAddress" value="jan.kowalski@xmlcorp.com"/>
+        <constructor-arg name="companyName" value="XMLCorp"/>
+        <constructor-arg name="role" value="ENGINEER"/>
+        <constructor-arg name="salary" value="9500"/>
+    </bean>
+
+    <bean id="xmlEmployee5" class="com.techcorp.Employee">
+        <constructor-arg name="lastName" value="Nowak"/>
+        <constructor-arg name="firstName" value="Anna"/>
+        <constructor-arg name="emailAddress" value="anna.nowak@xmlcorp.com"/>
+        <constructor-arg name="companyName" value="XMLCorp"/>
+        <constructor-arg name="role" value="ENGINEER"/>
+        <constructor-arg name="salary" value="9000"/>
+    </bean>
+
+    <bean id="xmlEmployee6" class="com.techcorp.Employee">
+        <constructor-arg name="lastName" value="Wiśniewski"/>
+        <constructor-arg name="firstName" value="Piotr"/>
+        <constructor-arg name="emailAddress" value="piotr.wisniewski@xmlcorp.com"/>
+        <constructor-arg name="companyName" value="XMLCorp"/>
+        <constructor-arg name="role" value="INTERN"/>
+        <constructor-arg name="salary" value="3500"/>
+    </bean>
+
+    <util:list id="xmlEmployees" value-type="com.techcorp.Employee">
+        <ref bean="xmlEmployee1"/>
+        <ref bean="xmlEmployee2"/>
+        <ref bean="xmlEmployee3"/>
+        <ref bean="xmlEmployee4"/>
+        <ref bean="xmlEmployee5"/>
+        <ref bean="xmlEmployee6"/>
+    </util:list>
+
+</beans>
+
