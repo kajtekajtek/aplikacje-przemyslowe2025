@@ -83,33 +83,33 @@ Stworzenie kontrolerów REST, które umożliwią udostępnienie funkcjonalności
 **Priorytet: Wysoki**
 
 #### 5.1 GlobalExceptionHandler
-- [ ] Utworzyć klasę `GlobalExceptionHandler.java` w pakiecie `exception`
-- [ ] Dodać adnotację `@RestControllerAdvice`
+- [x] Utworzyć klasę `GlobalExceptionHandler.java` w pakiecie `exception`
+- [x] Dodać adnotację `@RestControllerAdvice`
 
 #### 5.2 Obsługa EmployeeNotFoundException
-- [ ] Dodać metodę z adnotacją `@ExceptionHandler(EmployeeNotFoundException.class)`
-- [ ] Zwracać `ResponseEntity<ErrorResponse>` ze statusem `404 NOT_FOUND`
-- [ ] Ustawić poprawnie pola obiektu `ErrorResponse` (message, timestamp, status, path)
+- [x] Dodać metodę z adnotacją `@ExceptionHandler(EmployeeNotFoundException.class)`
+- [x] Zwracać `ResponseEntity<ErrorResponse>` ze statusem `404 NOT_FOUND`
+- [x] Ustawić poprawnie pola obiektu `ErrorResponse` (message, timestamp, status, path)
 
 #### 5.3 Obsługa DuplicateEmailException
-- [ ] Dodać metodę z adnotacją `@ExceptionHandler(DuplicateEmailException.class)`
-- [ ] Zwracać `ResponseEntity<ErrorResponse>` ze statusem `409 CONFLICT`
-- [ ] Ustawić poprawnie pola obiektu `ErrorResponse`
+- [x] Dodać metodę z adnotacją `@ExceptionHandler(DuplicateEmailException.class)`
+- [x] Zwracać `ResponseEntity<ErrorResponse>` ze statusem `409 CONFLICT`
+- [x] Ustawić poprawnie pola obiektu `ErrorResponse`
 
 #### 5.4 Obsługa InvalidDataException
-- [ ] Dodać metodę z adnotacją `@ExceptionHandler(InvalidDataException.class)`
-- [ ] Zwracać `ResponseEntity<ErrorResponse>` ze statusem `400 BAD_REQUEST`
-- [ ] Ustawić poprawnie pola obiektu `ErrorResponse`
+- [x] Dodać metodę z adnotacją `@ExceptionHandler(InvalidDataException.class)`
+- [x] Zwracać `ResponseEntity<ErrorResponse>` ze statusem `400 BAD_REQUEST`
+- [x] Ustawić poprawnie pola obiektu `ErrorResponse` (z informacją o numerze linii)
 
 #### 5.5 Obsługa IllegalArgumentException
-- [ ] Dodać metodę z adnotacją `@ExceptionHandler(IllegalArgumentException.class)`
-- [ ] Zwracać `ResponseEntity<ErrorResponse>` ze statusem `400 BAD_REQUEST`
-- [ ] Ustawić poprawnie pola obiektu `ErrorResponse`
+- [x] Dodać metodę z adnotacją `@ExceptionHandler(IllegalArgumentException.class)`
+- [x] Zwracać `ResponseEntity<ErrorResponse>` ze statusem `400 BAD_REQUEST`
+- [x] Ustawić poprawnie pola obiektu `ErrorResponse`
 
 #### 5.6 Obsługa ogólna (Exception)
-- [ ] Dodać metodę z adnotacją `@ExceptionHandler(Exception.class)`
-- [ ] Zwracać `ResponseEntity<ErrorResponse>` ze statusem `500 INTERNAL_SERVER_ERROR`
-- [ ] Ustawić poprawnie pola obiektu `ErrorResponse`
+- [x] Dodać metodę z adnotacją `@ExceptionHandler(Exception.class)`
+- [x] Zwracać `ResponseEntity<ErrorResponse>` ze statusem `500 INTERNAL_SERVER_ERROR`
+- [x] Ustawić poprawnie pola obiektu `ErrorResponse`
 
 ### 6. Kontroler REST dla pracowników
 **Priorytet: Wysoki**
