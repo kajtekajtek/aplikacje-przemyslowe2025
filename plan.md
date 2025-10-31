@@ -127,50 +127,50 @@ Stworzenie kontrolerów REST, które umożliwią udostępnienie funkcjonalności
 - [x] Zwracać status `200 OK`
 
 #### 6.3 Metoda GET pracownika po emailu
-- [ ] Dodać metodę z adnotacją `@GetMapping("/{email}")`
-- [ ] Przyjąć parametr `@PathVariable String email`
-- [ ] Zwracać `ResponseEntity<EmployeeDTO>`
-- [ ] Mapować `Employee` na `EmployeeDTO`
-- [ ] Zwracać status `200 OK` jeśli istnieje, `404 NOT_FOUND` jeśli nie
+- [x] Dodać metodę z adnotacją `@GetMapping("/{email}")`
+- [x] Przyjąć parametr `@PathVariable String email`
+- [x] Zwracać `ResponseEntity<EmployeeDTO>`
+- [x] Mapować `Employee` na `EmployeeDTO`
+- [x] Zwracać status `200 OK` jeśli istnieje, `404 NOT_FOUND` jeśli nie
 
 #### 6.4 Metoda GET z filtrowaniem po firmie
-- [ ] Dodać metodę z adnotacją `@GetMapping` z parametrem `@RequestParam(required = false)`
-- [ ] Zwracać `ResponseEntity<List<EmployeeDTO>>`
-- [ ] Obsłużyć przypadek gdy parametr nie jest podany (zwrócić wszystkich)
-- [ ] Zwracać status `200 OK`
+- [x] Dodać metodę z adnotacją `@GetMapping` z parametrem `@RequestParam(required = false)`
+- [x] Zwracać `ResponseEntity<List<EmployeeDTO>>`
+- [x] Obsłużyć przypadek gdy parametr nie jest podany (zwrócić wszystkich)
+- [x] Zwracać status `200 OK`
 
 #### 6.5 Metoda POST tworzenia pracownika
-- [ ] Dodać metodę z adnotacją `@PostMapping`
-- [ ] Przyjąć parametr `@RequestBody EmployeeDTO`
-- [ ] Mapować `EmployeeDTO` na `Employee`
-- [ ] Zwracać `ResponseEntity<EmployeeDTO>` ze statusem `201 CREATED`
-- [ ] Dodać nagłówek `Location` z URI nowego zasobu
-- [ ] Obsłużyć wyjątek `DuplicateEmailException`
+- [x] Dodać metodę z adnotacją `@PostMapping`
+- [x] Przyjąć parametr `@RequestBody EmployeeDTO`
+- [x] Mapować `EmployeeDTO` na `Employee`
+- [x] Zwracać `ResponseEntity<EmployeeDTO>` ze statusem `201 CREATED`
+- [x] Dodać nagłówek `Location` z URI nowego zasobu
+- [x] Obsłużyć wyjątek `DuplicateEmailException`
 
 #### 6.6 Metoda PUT aktualizacji pracownika
-- [ ] Dodać metodę z adnotacją `@PutMapping("/{email}")`
-- [ ] Przyjąć parametry `@PathVariable String email` i `@RequestBody EmployeeDTO`
-- [ ] Mapować `EmployeeDTO` na `Employee`
-- [ ] Zwracać `ResponseEntity<EmployeeDTO>` ze statusem `200 OK`
-- [ ] Obsłużyć przypadek braku pracownika (`404 NOT_FOUND`)
+- [x] Dodać metodę z adnotacją `@PutMapping("/{email}")`
+- [x] Przyjąć parametry `@PathVariable String email` i `@RequestBody EmployeeDTO`
+- [x] Mapować `EmployeeDTO` na `Employee`
+- [x] Zwracać `ResponseEntity<EmployeeDTO>` ze statusem `200 OK`
+- [x] Obsłużyć przypadek braku pracownika (`404 NOT_FOUND`)
 
 #### 6.7 Metoda DELETE usuwania pracownika
-- [ ] Dodać metodę z adnotacją `@DeleteMapping("/{email}")`
-- [ ] Przyjąć parametr `@PathVariable String email`
-- [ ] Zwracać `ResponseEntity<Void>` ze statusem `204 NO_CONTENT`
-- [ ] Obsłużyć przypadek braku pracownika (`404 NOT_FOUND`)
+- [x] Dodać metodę z adnotacją `@DeleteMapping("/{email}")`
+- [x] Przyjąć parametr `@PathVariable String email`
+- [x] Zwracać `ResponseEntity<Void>` ze statusem `204 NO_CONTENT`
+- [x] Obsłużyć przypadek braku pracownika (`404 NOT_FOUND`)
 
 #### 6.8 Metoda PATCH zmiany statusu
-- [ ] Dodać metodę z adnotacją `@PatchMapping("/{email}/status")`
-- [ ] Przyjąć parametry `@PathVariable String email` i `@RequestBody Map<String, String>`
-- [ ] Zwracać `ResponseEntity<EmployeeDTO>` ze statusem `200 OK`
-- [ ] Obsłużyć przypadek braku pracownika (`404 NOT_FOUND`)
+- [x] Dodać metodę z adnotacją `@PatchMapping("/{email}/status")`
+- [x] Przyjąć parametry `@PathVariable String email` i `@RequestBody Map<String, String>`
+- [x] Zwracać `ResponseEntity<EmployeeDTO>` ze statusem `200 OK`
+- [x] Obsłużyć przypadek braku pracownika (`404 NOT_FOUND`)
 
 #### 6.9 Metoda GET pracowników po statusie
-- [ ] Dodać metodę z adnotacją `@GetMapping("/status/{status}")`
-- [ ] Przyjąć parametr `@PathVariable String status`
-- [ ] Zwracać `ResponseEntity<List<EmployeeDTO>>`
-- [ ] Zwracać status `200 OK`
+- [x] Dodać metodę z adnotacją `@GetMapping("/status/{status}")`
+- [x] Przyjąć parametr `@PathVariable String status`
+- [x] Zwracać `ResponseEntity<List<EmployeeDTO>>`
+- [x] Zwracać status `200 OK`
 
 ### 7. Mapper między Employee a EmployeeDTO
 **Priorytet: Średni**
