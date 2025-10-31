@@ -37,26 +37,26 @@ Stworzenie kontrolerów REST, które umożliwią udostępnienie funkcjonalności
 - [x] Dodać testy dla nowego pola `status` w `EmployeeTest.java`
 
 ### 3. Obiekty transferu danych (DTO)
-**Priorytet: Wysoki**
+**Priorytet: Wysoki** ✅ **ZREALIZOWANE**
 
 #### 3.1 EmployeeDTO
-- [ ] Utworzyć klasę `EmployeeDTO.java` w pakiecie `dto`
-- [ ] Dodać pola: `firstName`, `lastName`, `email`, `company`, `position`, `salary`, `status`
-- [ ] Dodać domyślny konstruktor i konstruktor z wszystkimi parametrami
-- [ ] Dodać gettery i settery dla wszystkich pól
-- [ ] Dodać adnotacje Jackson `@JsonCreator` i `@JsonProperty` jeśli potrzebne
+- [x] Utworzyć klasę `EmployeeDTO.java` w pakiecie `dto`
+- [x] Dodać pola: `firstName`, `lastName`, `email`, `company`, `position`, `salary`, `status`
+- [x] Dodać domyślny konstruktor i konstruktor z wszystkimi parametrami
+- [x] Dodać gettery i settery dla wszystkich pól
+- [x] Dodać adnotacje Jackson `@JsonCreator` i `@JsonProperty` jeśli potrzebne
 
 #### 3.2 CompanyStatisticsDTO
-- [ ] Utworzyć klasę `CompanyStatisticsDTO.java` w pakiecie `dto`
-- [ ] Dodać pola: `companyName`, `employeeCount`, `averageSalary`, `highestSalary`, `topEarnerName`
-- [ ] Dodać domyślny konstruktor i konstruktor z wszystkimi parametrami
-- [ ] Dodać gettery i settery dla wszystkich pól
+- [x] Utworzyć klasę `CompanyStatisticsDTO.java` w pakiecie `dto`
+- [x] Dodać pola: `companyName`, `employeeCount`, `averageSalary`, `highestSalary`, `topEarnerName`
+- [x] Dodać domyślny konstruktor i konstruktor z wszystkimi parametrami
+- [x] Dodać gettery i settery dla wszystkich pól
 
 #### 3.3 ErrorResponse
-- [ ] Utworzyć klasę `ErrorResponse.java` w pakiecie `dto`
-- [ ] Dodać pola: `message`, `timestamp`, `status`, `path`
-- [ ] Dodać domyślny konstruktor i konstruktor z wszystkimi parametrami
-- [ ] Dodać gettery i settery dla wszystkich pól
+- [x] Utworzyć klasę `ErrorResponse.java` w pakiecie `dto`
+- [x] Dodać pola: `message`, `timestamp`, `status`, `path`
+- [x] Dodać domyślny konstruktor i konstruktor z wszystkimi parametrami
+- [x] Dodać gettery i settery dla wszystkich pól
 
 ### 4. Wyjątki biznesowe
 **Priorytet: Średni**
