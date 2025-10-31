@@ -228,60 +228,60 @@ Stworzenie kontrolerów REST, które umożliwią udostępnienie funkcjonalności
 **Priorytet: Wysoki**
 
 #### 10.1 Utworzenie EmployeeControllerTest
-- [ ] Utworzyć klasę `EmployeeControllerTest.java` w pakiecie `controller` (katalog test)
-- [ ] Dodać adnotację `@WebMvcTest(EmployeeController.class)`
-- [ ] Dodać `@MockBean EmployeeService`
-- [ ] Dodać `@Autowired MockMvc`
+- [x] Utworzyć klasę `EmployeeControllerTest.java` w pakiecie `controller` (katalog test)
+- [x] Dodać adnotację `@WebMvcTest(EmployeeController.class)`
+- [x] Dodać `@MockBean EmployeeService`
+- [x] Dodać `@Autowired MockMvc`
 
 #### 10.2 Test GET wszystkich pracowników
-- [ ] Dodać test weryfikujący status `200 OK`
-- [ ] Weryfikować zawartość JSON używając `jsonPath()`
-- [ ] Mockować odpowiedź serwisu
+- [x] Dodać test weryfikujący status `200 OK`
+- [x] Weryfikować zawartość JSON używając `jsonPath()`
+- [x] Mockować odpowiedź serwisu
 
 #### 10.3 Test GET pracownika po emailu
-- [ ] Dodać test weryfikujący status `200 OK` i zwrócone dane
-- [ ] Dodać test weryfikujący status `404 NOT_FOUND` dla nieistniejącego emaila
-- [ ] Używać `jsonPath()` do weryfikacji JSON
+- [x] Dodać test weryfikujący status `200 OK` i zwrócone dane
+- [x] Dodać test weryfikujący status `404 NOT_FOUND` dla nieistniejącego emaila
+- [x] Używać `jsonPath()` do weryfikacji JSON
 
 #### 10.4 Test GET z filtrowaniem po firmie
-- [ ] Dodać test weryfikujący filtrowanie z parametrem
-- [ ] Dodać test weryfikujący zwrócenie wszystkich bez parametru
+- [x] Dodać test weryfikujący filtrowanie z parametrem
+- [x] Dodać test weryfikujący zwrócenie wszystkich bez parametru
 
 #### 10.5 Test POST tworzenia pracownika
-- [ ] Dodać test weryfikujący status `201 CREATED`
-- [ ] Weryfikować nagłówek `Location`
-- [ ] Weryfikować zwrócony obiekt w ciele odpowiedzi
+- [x] Dodać test weryfikujący status `201 CREATED`
+- [x] Weryfikować nagłówek `Location`
+- [x] Weryfikować zwrócony obiekt w ciele odpowiedzi
 
 #### 10.6 Test POST z duplikatem emaila
-- [ ] Dodać test weryfikujący status `409 CONFLICT`
-- [ ] Weryfikować obiekt `ErrorResponse`
+- [x] Dodać test weryfikujący status `409 CONFLICT`
+- [x] Weryfikować obiekt `ErrorResponse`
 
 #### 10.7 Test PUT aktualizacji pracownika
-- [ ] Dodać test weryfikujący status `200 OK`
-- [ ] Dodać test weryfikujący status `404 NOT_FOUND`
+- [x] Dodać test weryfikujący status `200 OK`
+- [x] Dodać test weryfikujący status `404 NOT_FOUND`
 
 #### 10.8 Test DELETE usuwania pracownika
-- [ ] Dodać test weryfikujący status `204 NO_CONTENT`
-- [ ] Dodać test weryfikujący status `404 NOT_FOUND`
+- [x] Dodać test weryfikujący status `204 NO_CONTENT`
+- [x] Dodać test weryfikujący status `404 NOT_FOUND`
 
 #### 10.9 Test PATCH zmiany statusu
-- [ ] Dodać test weryfikujący status `200 OK`
-- [ ] Weryfikować zmianę statusu w zwróconym obiekcie
+- [x] Dodać test weryfikujący status `200 OK`
+- [x] Weryfikować zmianę statusu w zwróconym obiekcie
 
 #### 10.10 Test GET pracowników po statusie
-- [ ] Dodać test weryfikujący filtrowanie po statusie
-- [ ] Weryfikować zawartość zwróconej listy
+- [x] Dodać test weryfikujący filtrowanie po statusie
+- [x] Weryfikować zawartość zwróconej listy
 
 #### 10.11 Utworzenie StatisticsControllerTest
-- [ ] Utworzyć klasę `StatisticsControllerTest.java` w pakiecie `controller` (katalog test)
-- [ ] Dodać adnotację `@WebMvcTest(StatisticsController.class)`
-- [ ] Dodać `@MockBean EmployeeService`
-- [ ] Dodać `@Autowired MockMvc`
+- [x] Utworzyć klasę `StatisticsControllerTest.java` w pakiecie `controller` (katalog test)
+- [x] Dodać adnotację `@WebMvcTest(StatisticsController.class)`
+- [x] Dodać `@MockBean EmployeeService`
+- [x] Dodać `@Autowired MockMvc`
 
 #### 10.12 Testy StatisticsController
-- [ ] Dodać testy dla wszystkich endpointów statystyk
-- [ ] Weryfikować status `200 OK`
-- [ ] Weryfikować format odpowiedzi JSON
+- [x] Dodać testy dla wszystkich endpointów statystyk
+- [x] Weryfikować status `200 OK`
+- [x] Weryfikować format odpowiedzi JSON
 
 ### 11. Weryfikacja i testowanie
 **Priorytet: Wysoki**
