@@ -115,16 +115,16 @@ Stworzenie kontrolerów REST, które umożliwią udostępnienie funkcjonalności
 **Priorytet: Wysoki**
 
 #### 6.1 Utworzenie EmployeeController
-- [ ] Utworzyć klasę `EmployeeController.java` w pakiecie `controller`
-- [ ] Dodać adnotację `@RestController`
-- [ ] Dodać adnotację `@RequestMapping("/api/employees")`
-- [ ] Wstrzyknąć `EmployeeService` przez konstruktor
+- [x] Utworzyć klasę `EmployeeController.java` w pakiecie `controller`
+- [x] Dodać adnotację `@RestController`
+- [x] Dodać adnotację `@RequestMapping("/api/employees")`
+- [x] Wstrzyknąć `EmployeeService` przez konstruktor
 
 #### 6.2 Metoda GET wszystkich pracowników
-- [ ] Dodać metodę z adnotacją `@GetMapping` bez parametrów
-- [ ] Zwracać `ResponseEntity<List<EmployeeDTO>>`
-- [ ] Mapować listę `Employee` na listę `EmployeeDTO`
-- [ ] Zwracać status `200 OK`
+- [x] Dodać metodę z adnotacją `@GetMapping` bez parametrów
+- [x] Zwracać `ResponseEntity<List<EmployeeDTO>>`
+- [x] Mapować listę `Employee` na listę `EmployeeDTO`
+- [x] Zwracać status `200 OK`
 
 #### 6.3 Metoda GET pracownika po emailu
 - [ ] Dodać metodę z adnotacją `@GetMapping("/{email}")`
@@ -176,10 +176,10 @@ Stworzenie kontrolerów REST, które umożliwią udostępnienie funkcjonalności
 **Priorytet: Średni**
 
 #### 7.1 Klasa EmployeeMapper
-- [ ] Utworzyć klasę `EmployeeMapper.java` w pakiecie `controller` lub `dto`
-- [ ] Dodać metodę statyczną `toDTO(Employee employee)` - mapowanie Employee -> EmployeeDTO
-- [ ] Dodać metodę statyczną `toEntity(EmployeeDTO dto)` - mapowanie EmployeeDTO -> Employee
-- [ ] Dodać metodę statyczną `toDTOList(List<Employee> employees)` - mapowanie listy
+- [x] Utworzyć klasę `EmployeeMapper.java` w pakiecie `controller` lub `dto`
+- [x] Dodać metodę statyczną `toDTO(Employee employee)` - mapowanie Employee -> EmployeeDTO
+- [x] Dodać metodę statyczną `toEntity(EmployeeDTO dto)` - mapowanie EmployeeDTO -> Employee
+- [x] Dodać metodę statyczną `toDTOList(List<Employee> employees)` - mapowanie listy
 
 ### 8. Rozszerzenie serwisów
 **Priorytet: Średni**
