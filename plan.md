@@ -33,8 +33,8 @@ Stworzenie kontrolerów REST, które umożliwią udostępnienie funkcjonalności
 - [x] Zaktualizować metodę `toString()` jeśli istnieje
 
 #### 2.3 Aktualizacja istniejących testów
-- [ ] Sprawdzić czy wszystkie istniejące testy przechodzą
-- [ ] Dodać testy dla nowego pola `status` w `EmployeeTest.java`
+- [x] Sprawdzić czy wszystkie istniejące testy przechodzą
+- [x] Dodać testy dla nowego pola `status` w `EmployeeTest.java`
 
 ### 3. Obiekty transferu danych (DTO)
 **Priorytet: Wysoki**
