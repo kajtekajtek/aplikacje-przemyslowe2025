@@ -9,6 +9,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.techcorp.exception.EmployeeNotFoundException;
+import com.techcorp.exception.DuplicateEmailException;
+
 @Service
 public class EmployeeService 
 {
@@ -27,10 +30,20 @@ public class EmployeeService
             );
 
         if (emailExists) {
-            throw new IllegalArgumentException("Employee with email " + employee.getEmailAddress() + " already exists.");
+            throw new com.techcorp.exception.DuplicateEmailException(
+                "Employee with email " + employee.getEmailAddress() + " already exists."
+            );
         }
 
         return this.employees.add(employee) ? 1 : 0;
+    }
+
+    public void removeEmployeeByEmail(String email) {
+        Employee employee = getEmployeeByEmail(email)
+            .orElseThrow(() -> new EmployeeNotFoundException(
+                "Employee with email " + email + " not found"
+            ));
+        this.employees.remove(employee);
     }
 
     public int removeEmployee(Employee employee) { 
@@ -41,15 +54,18 @@ public class EmployeeService
     }
 
     public List<Employee> getEmployees() { return this.employees; }
+
     public List<Employee> getEmployeesByCompanyName(String companyName) {
         return this.employees.stream()
             .filter(e -> e.getCompanyName().equalsIgnoreCase(companyName))
             .collect(Collectors.toList());
     }
+
     public Map<Role, List<Employee>> getEmployeesByRole() {
         return this.employees.stream()
             .collect(Collectors.groupingBy(Employee::getRole));
     }
+
     public List<Employee> getEmployeesAlphabetically() {
         return this.employees.stream()
             .sorted(Comparator.comparing(Employee::getLastName))
@@ -61,6 +77,18 @@ public class EmployeeService
             .collect(Collectors.groupingBy(
                 Employee::getRole, Collectors.counting()
             ));
+    }
+
+    public Optional<Employee> getEmployeeByEmail(String email) {
+        return this.employees.stream()
+            .filter(e -> e.getEmailAddress().equalsIgnoreCase(email))
+            .findFirst();
+    }
+
+    public List<Employee> getEmployeesByStatus(EmploymentStatus status) {
+        return this.employees.stream()
+            .filter(e -> e.getStatus() == status)
+            .collect(Collectors.toList());
     }
 
     public Optional<Employee> getEmployeeWithHighestSalary() {
@@ -105,6 +133,38 @@ public class EmployeeService
                     }
                 )
             ));
+    }
+
+    public void updateEmployeeStatus(String email, EmploymentStatus status) {
+        Employee employee = getEmployeeByEmail(email)
+            .orElseThrow(() -> new EmployeeNotFoundException(
+                "Employee with email " + email + " not found"
+            ));
+        employee.setStatus(status);
+    }
+
+    public void updateEmployee(String email, Employee updatedEmployee) {
+        Employee existingEmployee = getEmployeeByEmail(email)
+            .orElseThrow(() -> new EmployeeNotFoundException(
+                "Employee with email " + email + " not found"
+            ));
+        
+        if (!email.equalsIgnoreCase(updatedEmployee.getEmailAddress())) {
+            boolean emailExists = this.employees.stream()
+                .anyMatch(e -> e.getEmailAddress().equalsIgnoreCase(updatedEmployee.getEmailAddress())
+                            && !e.equals(existingEmployee));
+            
+            if (emailExists) {
+                throw new DuplicateEmailException(
+                    "Employee with email " + updatedEmployee.getEmailAddress() + " already exists"
+                );
+            }
+        }
+
+        int index = this.employees.indexOf(existingEmployee);
+        if (index != -1) {
+            this.employees.set(index, updatedEmployee);
+        }
     }
 
 }
