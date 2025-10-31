@@ -62,22 +62,22 @@ Stworzenie kontrolerów REST, które umożliwią udostępnienie funkcjonalności
 **Priorytet: Średni**
 
 #### 4.1 EmployeeNotFoundException
-- [ ] Utworzyć klasę `EmployeeNotFoundException.java` w pakiecie `exception`
-- [ ] Rozszerzyć klasę `RuntimeException` lub `Exception`
-- [ ] Dodać konstruktor przyjmujący komunikat błędu
-- [ ] Dodać konstruktor przyjmujący komunikat i przyczynę (throwable)
+- [x] Utworzyć klasę `EmployeeNotFoundException.java` w pakiecie `exception`
+- [x] Rozszerzyć klasę `RuntimeException` lub `Exception`
+- [x] Dodać konstruktor przyjmujący komunikat błędu
+- [x] Dodać konstruktor przyjmujący komunikat i przyczynę (throwable)
 
 #### 4.2 DuplicateEmailException
-- [ ] Utworzyć klasę `DuplicateEmailException.java` w pakiecie `exception`
-- [ ] Rozszerzyć klasę `RuntimeException` lub `Exception`
-- [ ] Dodać konstruktor przyjmujący komunikat błędu
-- [ ] Dodać konstruktor przyjmujący komunikat i przyczynę (throwable)
+- [x] Utworzyć klasę `DuplicateEmailException.java` w pakiecie `exception`
+- [x] Rozszerzyć klasę `RuntimeException` lub `Exception`
+- [x] Dodać konstruktor przyjmujący komunikat błędu
+- [x] Dodać konstruktor przyjmujący komunikat i przyczynę (throwable)
 
 #### 4.3 InvalidDataException
-- [ ] Utworzyć klasę `InvalidDataException.java` w pakiecie `exception`
-- [ ] Rozszerzyć klasę `RuntimeException` lub `Exception`
-- [ ] Dodać konstruktor przyjmujący komunikat błędu
-- [ ] Dodać konstruktor przyjmujący komunikat i przyczynę (throwable)
+- [x] Utworzyć klasę `InvalidDataException.java` w pakiecie `exception`
+- [x] Rozszerzyć klasę `RuntimeException` lub `Exception`
+- [x] Dodać konstruktor przyjmujący komunikat błędu
+- [x] Dodać konstruktor przyjmujący komunikat i przyczynę (throwable)
 
 ### 5. Globalna obsługa błędów
 **Priorytet: Wysoki**
