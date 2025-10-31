@@ -601,7 +601,7 @@ public class EmployeeManagementApplication implements CommandLineRunner {
             System.out.println("└─────────────────────────────────────────────────────────────────┘");
             System.out.println("  Total Employees:       " + companyStats.getEmployeesCount());
             System.out.println("  Average Salary:        $" + String.format("%,.2f", companyStats.getAverageSalary()));
-            System.out.println("  Highest Paid Employee: " + companyStats.getHighestPaidEmployeeName());
+            System.out.println("  Highest Paid Employee: " + companyStats.getTopEarnerName());
             System.out.println();
         });
         

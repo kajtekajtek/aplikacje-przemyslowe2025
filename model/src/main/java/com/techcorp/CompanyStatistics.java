@@ -1,21 +1,30 @@
 package com.techcorp;
 
 public class CompanyStatistics {
+    
+    private final String companyName;
     private final long   employeesCount;
     private final double averageSalary;
-    private final String highestPaidEmployeeName;
+    private final int    highestSalary;
+    private final String topEarnerName;
 
     public CompanyStatistics(
-        long   employeesCount, 
+        String companyName,
+        long   employeesCount,
+        int    highestSalary,
         double averageSalary, 
-        String highestPaidEmployeeName
+        String topEarnerName
     ) {
+        this.companyName             = companyName;
         this.employeesCount          = employeesCount;
+        this.highestSalary           = highestSalary;
         this.averageSalary           = averageSalary;
-        this.highestPaidEmployeeName = highestPaidEmployeeName;
+        this.topEarnerName           = topEarnerName;
     }
 
+    public String getCompanyName()             { return companyName; }
     public long   getEmployeesCount()          { return employeesCount; }
+    public int    getHighestSalary()           { return highestSalary; }
     public double getAverageSalary()           { return averageSalary; }
-    public String getHighestPaidEmployeeName() { return highestPaidEmployeeName; }
+    public String getTopEarnerName()           { return topEarnerName; }
 }
