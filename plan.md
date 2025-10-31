@@ -287,42 +287,42 @@ Stworzenie kontrolerów REST, które umożliwią udostępnienie funkcjonalności
 **Priorytet: Wysoki**
 
 #### 11.1 Testy jednostkowe
-- [ ] Uruchomić wszystkie testy jednostkowe (`mvn test`)
-- [ ] Sprawdzić czy wszystkie testy przechodzą
-- [ ] Naprawić ewentualne błędy
+- [x] Uruchomić wszystkie testy jednostkowe (`mvn test`)
+- [x] Sprawdzić czy wszystkie testy przechodzą
+- [x] Naprawić ewentualne błędy
 
 #### 11.2 Testy integracyjne
-- [ ] Uruchomić aplikację komendą `mvn spring-boot:run`
-- [ ] Sprawdzić czy serwer startuje na porcie 8080
-- [ ] Sprawdzić logi aplikacji pod kątem błędów
+- [x] Uruchomić aplikację komendą `mvn spring-boot:run`
+- [x] Sprawdzić czy serwer startuje na porcie 8080
+- [x] Sprawdzić logi aplikacji pod kątem błędów
 
 #### 11.3 Testowanie endpointów z curl
-- [ ] Przetestować GET wszystkich pracowników
-- [ ] Przetestować POST nowego pracownika
-- [ ] Przetestować PUT aktualizacji pracownika
-- [ ] Przetestować PATCH zmiany statusu
-- [ ] Przetestować DELETE pracownika
-- [ ] Przetestować GET statystyk
+- [x] Przetestować GET wszystkich pracowników
+- [x] Przetestować POST nowego pracownika
+- [x] Przetestować PUT aktualizacji pracownika
+- [x] Przetestować PATCH zmiany statusu
+- [x] Przetestować DELETE pracownika
+- [x] Przetestować GET statystyk
 
 ### 12. Dokumentacja
 **Priorytet: Średni**
 
 #### 12.1 Aktualizacja README.md
-- [ ] Dodać sekcję o REST API
-- [ ] Opisać wszystkie endpointy z przykładami żądań curl
-- [ ] Dodać instrukcje uruchomienia aplikacji
-- [ ] Opisać format odpowiedzi JSON
+- [x] Dodać sekcję o REST API
+- [x] Opisać wszystkie endpointy z przykładami żądań curl
+- [x] Dodać instrukcje uruchomienia aplikacji
+- [x] Opisać format odpowiedzi JSON
 
 #### 12.2 Dokumentacja endpointów
-- [ ] Opisać EmployeeController i wszystkie jego endpointy
-- [ ] Opisać StatisticsController i wszystkie jego endpointy
-- [ ] Opisać kody odpowiedzi HTTP (200, 201, 204, 400, 404, 409, 500)
-- [ ] Opisać strukturę DTO
+- [x] Opisać EmployeeController i wszystkie jego endpointy
+- [x] Opisać StatisticsController i wszystkie jego endpointy
+- [x] Opisać kody odpowiedzi HTTP (200, 201, 204, 400, 404, 409, 500)
+- [x] Opisać strukturę DTO
 
 #### 12.3 Dokumentacja obsługi błędów
-- [ ] Opisać GlobalExceptionHandler
-- [ ] Opisać wszystkie obsługiwane wyjątki i kody odpowiedzi
-- [ ] Dodać przykłady błędów
+- [x] Opisać GlobalExceptionHandler
+- [x] Opisać wszystkie obsługiwane wyjątki i kody odpowiedzi
+- [x] Dodać przykłady błędów
 
 ## Harmonogram realizacji
 
