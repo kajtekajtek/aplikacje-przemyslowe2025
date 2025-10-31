@@ -145,7 +145,12 @@ public class EmployeeService
         if (companyName == null || companyName.isEmpty()) {
             return new CompanyStatistics("", 0, 0, 0.0, "N/A");
         }
-        return getCompanyStatistics().get(companyName);
+        Map<String, CompanyStatistics> stats = getCompanyStatistics();
+        CompanyStatistics companyStats = stats.get(companyName);
+        if (companyStats == null) {
+            return new CompanyStatistics(companyName, 0, 0, 0.0, "N/A");
+        }
+        return companyStats;
     }
 
     public Map<String, CompanyStatistics> getCompanyStatistics() {
