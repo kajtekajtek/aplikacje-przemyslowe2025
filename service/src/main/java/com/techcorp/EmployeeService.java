@@ -91,9 +91,29 @@ public class EmployeeService
             .collect(Collectors.toList());
     }
 
+    public Optional<Employee> getEmployeeWithHighestSalary(String companyName) {
+        if (companyName == null || companyName.isEmpty()) return Optional.empty();
+
+        return this.employees.stream()
+            .filter(e -> e.getCompanyName().equalsIgnoreCase(companyName))
+            .filter(e -> e.getStatus() == EmploymentStatus.ACTIVE)
+            .max(Comparator.comparing(Employee::getSalary));
+    }
+
     public Optional<Employee> getEmployeeWithHighestSalary() {
         return this.employees.stream()
             .max(Comparator.comparing(Employee::getSalary));
+    }
+
+    public Double getAverageSalary(String companyName) {
+        if (companyName == null || companyName.isEmpty()) {
+            return getAverageSalary();
+        }
+        return this.employees.stream()
+            .filter(e -> e.getCompanyName().equalsIgnoreCase(companyName))
+            .mapToDouble(Employee::getSalary)
+            .average()
+            .orElse(0.0);
     }
 
     public Double getAverageSalary() {
@@ -113,8 +133,24 @@ public class EmployeeService
             .collect(Collectors.toList());
     }
 
+    public Map<EmploymentStatus, Long> getStatusDistribution() {
+        return this.employees.stream()
+            .collect(Collectors.groupingBy(
+                Employee::getStatus,
+                Collectors.counting()
+            ));
+    }
+
+    public CompanyStatistics getCompanyStatistics(String companyName) {
+        if (companyName == null || companyName.isEmpty()) {
+            return new CompanyStatistics("", 0, 0, 0.0, "N/A");
+        }
+        return getCompanyStatistics().get(companyName);
+    }
+
     public Map<String, CompanyStatistics> getCompanyStatistics() {
         return this.employees.stream()
+            .filter(e -> e.getStatus() == EmploymentStatus.ACTIVE)
             .collect(Collectors.groupingBy(
                 Employee::getCompanyName,
                 Collectors.collectingAndThen(
@@ -125,11 +161,15 @@ public class EmployeeService
                             .mapToDouble(Employee::getSalary)
                             .average()
                             .orElse(0.0);
-                        String highestPaidName = employeeList.stream()
+                        int highestSalary = employeeList.stream()
+                            .mapToInt(Employee::getSalary)
+                            .max()
+                            .orElse(0);
+                        String topEarnerName = employeeList.stream()
                             .max(Comparator.comparing(Employee::getSalary))
                             .map(Employee::getFullName)
                             .orElse("N/A");
-                        return new CompanyStatistics(count, avgSalary, highestPaidName);
+                        return new CompanyStatistics(employeeList.get(0).getCompanyName(), count, highestSalary, avgSalary, topEarnerName);
                     }
                 )
             ));

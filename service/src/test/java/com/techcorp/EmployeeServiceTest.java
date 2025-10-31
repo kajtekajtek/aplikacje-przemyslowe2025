@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import com.techcorp.exception.DuplicateEmailException;
 
 public class EmployeeServiceTest
 {
@@ -114,8 +115,8 @@ public class EmployeeServiceTest
         }
 
         @Test
-        @DisplayName("Should throw IllegalArgumentException when duplicate email is added")
-        public void shouldThrowIllegalArgumentExceptionWhenDuplicateEmailIsAdded()
+        @DisplayName("Should throw DuplicateEmailException when duplicate email is added")
+        public void shouldThrowDuplicateEmailExceptionWhenDuplicateEmailIsAdded()
         {
             Employee employee1 = new Employee(
                 LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
@@ -126,8 +127,8 @@ public class EmployeeServiceTest
             
             employeeService.addEmployee(employee1);
             
-            IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+            DuplicateEmailException exception = assertThrows(
+                DuplicateEmailException.class,
                 () -> employeeService.addEmployee(employee2)
             );
             
@@ -138,8 +139,8 @@ public class EmployeeServiceTest
         }
 
         @Test
-        @DisplayName("Should throw IllegalArgumentException when duplicate email is added (case insensitive)")
-        public void shouldThrowIllegalArgumentExceptionWhenDuplicateEmailIsAddedCaseInsensitive()
+        @DisplayName("Should throw DuplicateEmailException when duplicate email is added (case insensitive)")
+        public void shouldThrowDuplicateEmailExceptionWhenDuplicateEmailIsAddedCaseInsensitive()
         {
             Employee employee1 = new Employee(
                 LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
@@ -150,8 +151,8 @@ public class EmployeeServiceTest
             
             employeeService.addEmployee(employee1);
             
-            IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+            DuplicateEmailException exception = assertThrows(
+                DuplicateEmailException.class,
                 () -> employeeService.addEmployee(employee2)
             );
             
@@ -597,7 +598,7 @@ public class EmployeeServiceTest
                 CompanyStatistics companyStats = stats.get(COMPANY_NAME_1);
                 assertEquals(3, companyStats.getEmployeesCount());
                 assertEquals(8000.0, companyStats.getAverageSalary(), 0.01);
-                assertEquals("Sam Gamgee", companyStats.getHighestPaidEmployeeName());
+                assertEquals("Sam Gamgee", companyStats.getTopEarnerName());
             }
 
             @Test
@@ -631,12 +632,12 @@ public class EmployeeServiceTest
                 CompanyStatistics companyStats = stats.get("TechCorp");
                 assertEquals(2, companyStats.getEmployeesCount());
                 assertEquals(10000.0, companyStats.getAverageSalary(), 0.01);
-                assertEquals(employee2.getFullName(), companyStats.getHighestPaidEmployeeName());
+                assertEquals(employee2.getFullName(), companyStats.getTopEarnerName());
                 
                 companyStats = stats.get(COMPANY_NAME_3);
                 assertEquals(2, companyStats.getEmployeesCount());
                 assertEquals(7000.0, companyStats.getAverageSalary(), 0.01);
-                assertEquals(employee4.getFullName(), companyStats.getHighestPaidEmployeeName());
+                assertEquals(employee4.getFullName(), companyStats.getTopEarnerName());
             }
 
             @Test
@@ -665,7 +666,7 @@ public class EmployeeServiceTest
                 
                 assertEquals(1, companyStats.getEmployeesCount());
                 assertEquals(8500.0, companyStats.getAverageSalary(), 0.01);
-                assertEquals(employee.getFullName(), companyStats.getHighestPaidEmployeeName());
+                assertEquals(employee.getFullName(), companyStats.getTopEarnerName());
             }
 
             @Test
@@ -688,8 +689,8 @@ public class EmployeeServiceTest
                 assertEquals(2, companyStats.getEmployeesCount());
                 assertEquals(8000.0, companyStats.getAverageSalary(), 0.01);
                 assertTrue(
-                    companyStats.getHighestPaidEmployeeName().equals(employee1.getFullName()) ||
-                    companyStats.getHighestPaidEmployeeName().equals(employee2.getFullName())
+                    companyStats.getTopEarnerName().equals(employee1.getFullName()) ||
+                    companyStats.getTopEarnerName().equals(employee2.getFullName())
                 );
             }
 

@@ -104,7 +104,7 @@ public class EmployeeController {
         Employee updatedEmployee = EmployeeMapper.dtoToEntity(employeeDTO);
         employeeService.updateEmployee(email, updatedEmployee);
         
-        Employee savedEmployee = employeeService.findEmployeeByEmail(updatedEmployee.getEmailAddress())
+        Employee savedEmployee = employeeService.getEmployeeByEmail(updatedEmployee.getEmailAddress())
             .orElseThrow(() -> new EmployeeNotFoundException(
                 "Employee with email " + updatedEmployee.getEmailAddress() + " not found after update"
             ));
@@ -137,7 +137,7 @@ public class EmployeeController {
         
         employeeService.updateEmployeeStatus(email, status);
         
-        Employee employee = employeeService.findEmployeeByEmail(email)
+        Employee employee = employeeService.getEmployeeByEmail(email)
             .orElseThrow(() -> new EmployeeNotFoundException(
                 "Employee with email " + email + " not found after status update"
             ));
