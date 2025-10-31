@@ -1,9 +1,48 @@
 package com.techcorp;
 
 import com.google.gson.JsonObject;
+import com.techcorp.dto.EmployeeDTO;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class EmployeeMapper {
-    
+
+    public static EmployeeDTO entityToDTO(Employee employee) {
+        return new EmployeeDTO(
+            employee.getFirstName(),
+            employee.getLastName(),
+            employee.getEmailAddress(),
+            employee.getCompanyName(),
+            employee.getRole(),
+            employee.getSalary(),
+            employee.getStatus()
+        );
+    }
+
+    public static Employee dtoToEntity(EmployeeDTO employeeDTO) {
+        return new Employee(
+            employeeDTO.getLastName(),
+            employeeDTO.getFirstName(),
+            employeeDTO.getEmailAddress(),
+            employeeDTO.getCompanyName(),
+            employeeDTO.getRole(),
+            employeeDTO.getSalary(),
+            employeeDTO.getStatus()
+        );
+    }
+
+    public static List<EmployeeDTO> entityToDTOList(List<Employee> employees) {
+        return employees.stream()
+            .map(EmployeeMapper::entityToDTO)
+            .collect(Collectors.toList());
+    }
+
+    public static List<Employee> dtoToEntitiesList(List<EmployeeDTO> employeeDTOs) {
+        return employeeDTOs.stream()
+            .map(EmployeeMapper::dtoToEntity)
+            .collect(Collectors.toList());
+    }
+
     public static Employee jsonObjectToEmployee(JsonObject jsonObject) {
         String fullName = jsonObject.get("name").getAsString();
         String[] fullNameSplit = parseFullName(fullName);
