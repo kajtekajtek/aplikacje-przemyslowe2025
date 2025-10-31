@@ -182,47 +182,47 @@ Stworzenie kontrolerów REST, które umożliwią udostępnienie funkcjonalności
 - [x] Dodać metodę statyczną `toDTOList(List<Employee> employees)` - mapowanie listy
 
 ### 8. Rozszerzenie serwisów
-**Priorytet: Średni**
+**Priorytet: Średni** ✅ **ZREALIZOWANE**
 
 #### 8.1 Rozszerzenie EmployeeService
-- [ ] Dodać metodę `getEmployeesByStatus(EmploymentStatus status)` jeśli nie istnieje
-- [ ] Dodać metodę `updateEmployeeStatus(String email, EmploymentStatus status)` jeśli nie istnieje
-- [ ] Upewnić się, że metody rzucają odpowiednie wyjątki (`EmployeeNotFoundException`)
+- [x] Dodać metodę `getEmployeesByStatus(EmploymentStatus status)` jeśli nie istnieje
+- [x] Dodać metodę `updateEmployeeStatus(String email, EmploymentStatus status)` jeśli nie istnieje
+- [x] Upewnić się, że metody rzucają odpowiednie wyjątki (`EmployeeNotFoundException`)
 
 #### 8.2 Rozszerzenie CompanyStatistics
-- [ ] Upewnić się, że metoda zwracająca statystyki uwzględnia status zatrudnienia
-- [ ] Dodać metodę zwracającą rozkład statusów jeśli potrzebna
+- [x] Upewnić się, że metoda zwracająca statystyki uwzględnia status zatrudnienia
+- [x] Dodać metodę zwracającą rozkład statusów jeśli potrzebna
 
 ### 9. Kontroler REST dla statystyk
-**Priorytet: Wysoki**
+**Priorytet: Wysoki** ✅ **ZREALIZOWANE**
 
 #### 9.1 Utworzenie StatisticsController
-- [ ] Utworzyć klasę `StatisticsController.java` w pakiecie `controller`
-- [ ] Dodać adnotację `@RestController`
-- [ ] Dodać adnotację `@RequestMapping("/api/statistics")`
-- [ ] Wstrzyknąć `EmployeeService` przez konstruktor
+- [x] Utworzyć klasę `StatisticsController.java` w pakiecie `controller`
+- [x] Dodać adnotację `@RestController`
+- [x] Dodać adnotację `@RequestMapping("/api/statistics")`
+- [x] Wstrzyknąć `EmployeeService` przez konstruktor
 
 #### 9.2 Metoda GET średniego wynagrodzenia
-- [ ] Dodać metodę z adnotacją `@GetMapping("/salary/average")`
-- [ ] Przyjąć parametr `@RequestParam(required = false) String company`
-- [ ] Zwracać `ResponseEntity<Map<String, Double>>` z kluczem "averageSalary"
-- [ ] Zwracać status `200 OK`
+- [x] Dodać metodę z adnotacją `@GetMapping("/salary/average")`
+- [x] Przyjąć parametr `@RequestParam(required = false) String company`
+- [x] Zwracać `ResponseEntity<Map<String, Double>>` z kluczem "averageSalary"
+- [x] Zwracać status `200 OK`
 
 #### 9.3 Metoda GET statystyk firmy
-- [ ] Dodać metodę z adnotacją `@GetMapping("/company/{companyName}")`
-- [ ] Przyjąć parametr `@PathVariable String companyName`
-- [ ] Zwracać `ResponseEntity<CompanyStatisticsDTO>`
-- [ ] Zwracać status `200 OK`
+- [x] Dodać metodę z adnotacją `@GetMapping("/company/{companyName}")`
+- [x] Przyjąć parametr `@PathVariable String companyName`
+- [x] Zwracać `ResponseEntity<CompanyStatisticsDTO>`
+- [x] Zwracać status `200 OK`
 
 #### 9.4 Metoda GET liczby stanowisk
-- [ ] Dodać metodę z adnotacją `@GetMapping("/positions")`
-- [ ] Zwracać `ResponseEntity<Map<String, Integer>>`
-- [ ] Zwracać status `200 OK`
+- [x] Dodać metodę z adnotacją `@GetMapping("/positions")`
+- [x] Zwracać `ResponseEntity<Map<String, Integer>>`
+- [x] Zwracać status `200 OK`
 
 #### 9.5 Metoda GET rozkładu statusów
-- [ ] Dodać metodę z adnotacją `@GetMapping("/status")`
-- [ ] Zwracać `ResponseEntity<Map<String, Integer>>`
-- [ ] Zwracać status `200 OK`
+- [x] Dodać metodę z adnotacją `@GetMapping("/status")`
+- [x] Zwracać `ResponseEntity<Map<String, Integer>>`
+- [x] Zwracać status `200 OK`
 
 ### 10. Testy kontrolerów z MockMvc
 **Priorytet: Wysoki**
