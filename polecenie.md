@@ -1,151 +1,172 @@
-# Zadanie 4: Migracja do Spring Boot
+# Zadanie 5
 
-## Kontekst
-
-System zarządzania pracownikami wymaga refaktoryzacji do architektury Spring Boot z wykorzystaniem mechanizmu Dependency Injection. Dotychczasowa implementacja oparta na ręcznym tworzeniu obiektów i przekazywaniu zależności zostanie zastąpiona zarządzaniem przez kontener Spring. Dodatkowo system zostanie rozszerzony o możliwość definiowania pracowników bezpośrednio jako beany Spring w pliku konfiguracyjnym XML, co pozwoli poznać alternatywny sposób konfiguracji aplikacji Spring oprócz adnotacji.
+System zarządzania pracownikami wymaga udostępnienia funkcjonalności poprzez interfejs programistyczny (API)zwracający dane w formacie JSON. Zadaniem jest stworzenie kontrolerów REST, które umożliwią innym aplikacjom konsumowanie danych systemu.
 
 ## Wymagania funkcjonalne
 
-### 1. Konfiguracja projektu Spring Boot
+### 1. Konfiguracja Spring Web
 
-Należy dodać do pom.xml lub build.gradle zależności Spring Boot w wersji 3.x, które obejmują spring-boot-starter oraz spring-boot-starter-test. Dotychczasowa zależność Gson z poprzedniego zadania powinna zostać zachowana, ponieważ jest nadal wykorzystywana do parsowania odpowiedzi z REST API.
-
-Należy utworzyć plik application.properties w katalogu src/main/resources zawierający kluczowe parametry konfiguracyjne aplikacji. Plik powinien definiować adres URL zewnętrznego API jako app.api.url=https://jsonplaceholder.typicode.com/users, ścieżkę do pliku CSV jako app.import.csv-file=employees.csv oraz poziom logowania ustawiony na logging.level.root=INFO.
-
-### 2. Refaktoryzacja serwisów jako Spring Beany
-
-Należy przekształcić wszystkie istniejące klasy serwisów w komponenty zarządzane przez Spring Container poprzez zastosowanie odpowiednich adnotacji stereotypowych.
-
-Klasa EmployeeService powinna zostać oznaczona adnotacją @Service, co sprawi że Spring automatycznie utworzy jej instancję jako singleton bean. Należy usunąć wszelkie statyczne referencje oraz ręczne tworzenie instancji tej klasy w innych miejscach kodu, ponieważ Spring będzie teraz odpowiedzialny za zarządzanie jej cyklem życia.
-
-Klasa ImportService również musi być oznaczona adnotacją @Service i powinna przyjmować EmployeeService jako zależność przez konstruktor. Spring automatycznie wstrzyknie odpowiednią instancję podczas tworzenia beana ImportService. Dzięki mechanizmowi autowiring nie jest konieczne jawne przekazywanie zależności ani używanie adnotacji @Autowired przy konstruktorze w nowszych wersjach Spring Boot.
-
-Klasa ApiService powinna być oznaczona adnotacją @Service i przyjmować przez konstruktor dwa obiekty: HttpClient oraz Gson, które będą zdefiniowane jako beany w klasie konfiguracyjnej. Dodatkowo należy wstrzyknąć adres URL API używając adnotacji @Value("${app.api.url}") na odpowiednim polu lub parametrze konstruktora, co pozwoli na łatwą zmianę adresu bez modyfikacji kodu źródłowego.
-
-### 3. Definicja pracowników jako beany w pliku XML
-
-Należy utworzyć plik konfiguracyjny XML o nazwie employees-beans.xml w katalogu src/main/resources, który będzie definiował obiekty pracowników bezpośrednio jako beany Spring. Jest to alternatywny sposób konfiguracji aplikacji Spring oprócz używania adnotacji i klas konfiguracyjnych z adnotacją @Configuration. Plik XML powinien mieć następującą strukturę:
-
+Dodać zależność spring-boot-starter-web do pom.xml lub build.gradle. Konfiguracja w application.properties:
 ```
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:util="http://www.springframework.org/schema/util"
-       xsi:schemaLocation="
-           http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans.xsd
-           http://www.springframework.org/schema/util
-           http://www.springframework.org/schema/util/spring-util.xsd">
-    
-    <bean id="employee1" class="com.techcorp.employee.model.Employee">
-        <constructor-arg value="Jan"/>
-        <constructor-arg value="Kowalski"/>
-        <constructor-arg value="jan.kowalski@techcorp.com"/>
-        <constructor-arg value="TechCorp"/>
-        <constructor-arg value="MANAGER"/>
-        <constructor-arg value="12500"/>
-    </bean>
-    
-    <bean id="employee2" class="com.techcorp.employee.model.Employee">
-        <constructor-arg value="Anna"/>
-        <constructor-arg value="Nowak"/>
-        <constructor-arg value="anna.nowak@techcorp.com"/>
-        <constructor-arg value="TechCorp"/>
-        <constructor-arg value="PROGRAMISTA"/>
-        <constructor-arg value="8500"/>
-    </bean>
-    
-    <!-- Definicja kolejnych pracowników -->
-    
-    <util:list id="xmlEmployees" value-type="com.techcorp.employee.model.Employee">
-        <ref bean="employee1"/>
-        <ref bean="employee2"/>
-        <!-- Referencje do kolejnych beanów pracowników -->
-    </util:list>
-</beans>
+server.port=8080
+spring.application.name=employee-management-api
+spring.jackson.serialization.write-dates-as-timestamps=false
 ```
 
-W tym podejściu każdy pracownik jest definiowany jako osobny bean z unikalnym identyfikatorem. Wartości dla pól obiektu Employee są przekazywane przez argumenty konstruktora wykorzystując element <constructor-arg>. Następnie wszystkie referencje do tych beanów są zbierane w liście o nazwie xmlEmployees przy użyciu mechanizmu util:list z przestrzeni nazw util, co pozwala na łatwe wstrzyknięcie całej kolekcji pracowników jako jednego beana.
+### 2. Obiekty transferu danych (DTO)
 
-Aby załadować tę konfigurację XML do aplikacji Spring Boot, należy użyć adnotacji @ImportResource w głównej klasie aplikacji lub w klasie konfiguracyjnej. Adnotacja powinna wskazywać na lokalizację pliku w classpath: @ImportResource("classpath:employees-beans.xml"). Spring automatycznie przetworzy ten plik podczas inicjalizacji kontekstu i utworzy wszystkie zdefiniowane w nim beany, które będą dostępne do wstrzykiwania w innych komponentach aplikacji.
+Utworzyć klasy DTO oddzielające model wewnętrzny od reprezentacji API:
+- EmployeeDTO - uniwersalna reprezentacja pracownika w API używana we wszystkich operacjach (GET, POST, PUT). Zawiera pola: firstName, lastName, email, company, position, salary, status.
+- CompanyStatisticsDTO - statystyki firmy z polami: companyName, employeeCount, averageSalary, highestSalary, topEarnerName.
+- ErrorResponse - standardowa odpowiedź błędu z polami: message, timestamp, status, path.
 
-### 4. Konfiguracja zewnętrznych zależności jako beany
+### 3. Kontroler REST dla pracowników
 
-Należy utworzyć klasę AppConfig oznaczoną adnotacją @Configuration, która będzie zawierała metody fabrykujące dla obiektów zewnętrznych bibliotek. Każda metoda powinna być oznaczona adnotacją @Bean, co sprawi że Spring zarejestruje zwracany obiekt jako bean dostępny do wstrzykiwania.
+Klasa EmployeeController z adnotacją @RestController i @RequestMapping("/api/employees") implementuje endpointy:
+- GET /api/employees - zwraca listę wszystkich pracowników jako List<EmployeeDTO> ze statusem 200 OK.
+- GET /api/employees/{email} - zwraca konkretnego pracownika po emailu jako EmployeeDTO. Zwraca 200 OK jeśli istnieje, 404 Not Found jeśli nie.
+- GET /api/employees?company=X - filtruje pracowników po nazwie firmy używając @RequestParam(required = false). Jeśli parametr nie podany, zwraca wszystkich.
+- POST /api/employees - tworzy nowego pracownika przyjmując @RequestBody EmployeeDTO. Zwraca 201 Created z nagłówkiem Location oraz utworzonym obiektem w ciele.
+- PUT /api/employees/{email} - aktualizuje dane pracownika przyjmując email w ścieżce i @RequestBody EmployeeDTO. Zwraca 200 OK z zaktualizowanym obiektem lub 404 Not Found.
+- DELETE /api/employees/{email} - usuwa pracownika. Zwraca 204 No Content przy sukcesie lub 404 Not Found jeśli nie istnieje.
+- Wszystkie metody zwracają ResponseEntity<T> dla pełnej kontroli nad odpowiedzią HTTP.
 
-Pierwsza metoda powinna tworzyć i zwracać instancję HttpClient poprzez wywołanie HttpClient.newHttpClient(). Ta instancja będzie używana przez ApiService do wykonywania zapytań HTTP do zewnętrznego API.
+### 4. Kontroler REST dla statystyk
 
-Druga metoda powinna tworzyć i zwracać nową instancję Gson poprzez wywołanie jej konstruktora domyślnego. Ten obiekt będzie wykorzystywany do parsowania odpowiedzi JSON z zewnętrznego API w obiekty Java.
+Klasa StatisticsController z @RestController i @RequestMapping("/api/statistics") implementuje:
+- GET /api/statistics/salary/average - zwraca średnie wynagrodzenie jako Map<String, Double> gdzie klucz to "averageSalary".
+- GET /api/statistics/salary/average?company=X - średnie wynagrodzenie w konkretnej firmie (parametr opcjonalny).
+- GET /api/statistics/company/{companyName} - szczegółowe statystyki firmy jako CompanyStatisticsDTO.
+- GET /api/statistics/positions - liczba pracowników na każdym stanowisku jako Map<String, Integer>.
+- GET /api/statistics/status - rozkład pracowników według statusu zatrudnienia jako Map<String, Integer>.
 
-Dzięki definiowaniu tych obiektów jako beany możliwe jest ich łatwe wykorzystanie w różnych częściach aplikacji poprzez wstrzykiwanie zależności, a także potencjalna podmiana implementacji w środowisku testowym bez modyfikacji klas serwisów.
+### 5. Obsługa błędów
 
-### 5. Klasa startowa aplikacji
+Klasa GlobalExceptionHandler z @RestControllerAdvice zawiera metody z @ExceptionHandler dla:
+- EmployeeNotFoundException - zwraca 403 Not Found z obiektem ErrorResponse.
+- DuplicateEmailException - zwraca 409 Conflict gdy próbujemy utworzyć pracownika z istniejącym emailem.
+- InvalidDataException - zwraca 400 Bad Request dla błędów walidacji danych.
+- IllegalArgumentException - zwraca 400 Bad Request dla nieprawidłowych argumentów.
+- Exception - catch-all zwracający 500 Internal Server Error dla nieobsłużonych wyjątków.
 
-Należy utworzyć klasę EmployeeManagementApplication oznaczoną adnotacjami @SpringBootApplication oraz @ImportResource("classpath:employees-beans.xml"), która będzie głównym punktem wejścia do aplikacji. Adnotacja @ImportResource jest kluczowa, ponieważ nakazuje Spring wczytać definicje beanów z pliku XML podczas inicjalizacji kontekstu. Klasa ta powinna implementować interfejs CommandLineRunner, co pozwoli na automatyczne wykonanie logiki biznesowej po pełnej inicjalizacji kontekstu Spring.
+### 6. Nowa funkcjonalność: Status zatrudnienia
 
-W metodzie run interfejsu CommandLineRunner należy zademonstrować działanie wszystkich kluczowych funkcjonalności systemu. Demonstracja powinna obejmować import pracowników z pliku CSV poprzez wywołanie odpowiedniej metody ImportService, następnie dodanie do systemu pracowników z beana xmlEmployeeswstrzykniętego z użyciem adnotacji @Qualifier("xmlEmployees") lub @Resource(name = "xmlEmployees"), pobranie danych z REST API przez ApiService oraz wyświetlenie statystyk dla wybranej firmy używając metod analitycznych z EmployeeService. Na koniec należy wywołać metodę walidacji spójności wynagrodzeń i wyświetlić pracowników, którzy zarabiają poniżej bazowej stawki dla swojego stanowiska.
+Dodać do modelu Employee pole status typu enum EmploymentStatus z wartościami: ACTIVE, ON_LEAVE, TERMINATED.
 
-Wszystkie niezbędne serwisy oraz bean xmlEmployees typu List<Employee> powinny zostać wstrzyknięte przez konstruktor klasy EmployeeManagementApplication, dzięki czemu Spring automatycznie dostarczy ich instancje podczas tworzenia beana. Warto zauważyć różnicę między definiowaniem beanów przez adnotacje w kodzie Java, przez metody z adnotacją @Bean w klasach konfiguracyjnych oraz przez pliki XML - wszystkie te podejścia prowadzą do tego samego rezultatu, czyli zarządzania obiektami przez kontener Spring, ale oferują różne poziomy elastyczności i czytelności konfiguracji.
+Dodatkowe endpointy:
+- PATCH /api/employees/{email}/status - zmienia tylko status pracownika przyjmując @RequestBody z polem status. Zwraca 200 OK z zaktualizowanym pracownikiem.
+- GET /api/employees/status/{status} - zwraca listę pracowników o danym statusie ze statusem 200 OK.
+- Metody w serwisie powinny umożliwiać filtrowanie po statusie oraz zwracać statystyki rozkładu statusów.
 
-Struktura projektu
+### 7. Testy API z MockMvc
+
+Napisać testy używające @WebMvcTest i MockMvc:
+- Test GET wszystkich - weryfikacja statusu 200 i zawartości JSON
+- Test GET po emailu - weryfikacja zwróconych danych
+- Test GET nieistniejącego - weryfikacja 404
+- Test POST - weryfikacja 201 i nagłówka Location
+- Test POST z duplikatem - weryfikacja 409
+- Test DELETE - weryfikacja 204
+- Test filtrowania po firmie
+- Test PATCH zmiany statusu
+Serwisy mockować przez @MockBean. Do weryfikacji JSON używać jsonPath().
+
+### Struktura projektu
 
 ```
-project-root/
-├── pom.xml (lub build.gradle)
-├── src/
-│   ├── main/
-│   │   ├── java/com.techcorp.employee/
-│   │   │   ├── EmployeeManagementApplication.java
-│   │   │   ├── config/
-│   │   │   │   └── AppConfig.java
-│   │   │   ├── model/
-│   │   │   │   ├── Employee.java
-│   │   │   │   ├── Position.java
-│   │   │   │   ├── ImportSummary.java
-│   │   │   │   └── CompanyStatistics.java
-│   │   │   ├── service/
-│   │   │   │   ├── EmployeeService.java
-│   │   │   │   ├── ImportService.java
-│   │   │   │   └── ApiService.java
-│   │   │   └── exception/
-│   │   │       ├── InvalidDataException.java
-│   │   │       └── ApiException.java
-│   │   └── resources/
-│   │       ├── application.properties
-│   │       ├── employees.csv
-│   │       └── employees-beans.xml (plik z definicjami beanów)
-│   └── test/
-│       └── java/com.techcorp.employee/
-│           └── service/
-│               └── (testy z poprzedniego zadania bez zmian)
-└── README.md
+src/
+├── main/
+│   ├── java/com.techcorp.employee/
+│   │   ├── EmployeeManagementApplication.java
+│   │   ├── controller/
+│   │   │   ├── EmployeeController.java
+│   │   │   └── StatisticsController.java
+│   │   ├── dto/
+│   │   │   ├── EmployeeDTO.java
+│   │   │   ├── CompanyStatisticsDTO.java
+│   │   │   └── ErrorResponse.java
+│   │   ├── service/
+│   │   │   ├── EmployeeService.java
+│   │   │   └── (pozostałe z poprzednich zadań)
+│   │   ├── exception/
+│   │   │   ├── GlobalExceptionHandler.java
+│   │   │   ├── EmployeeNotFoundException.java
+│   │   │   ├── DuplicateEmailException.java
+│   │   │   └── InvalidDataException.java
+│   │   └── model/
+│   │       ├── Employee.java
+│   │       ├── Position.java
+│   │       └── EmploymentStatus.java (nowy)
+│   └── resources/
+│       └── application.properties
+└── test/
+    └── java/com.techcorp.employee/
+        └── controller/
+            ├── EmployeeControllerTest.java
+            └── StatisticsControllerTest.java
 ```
 
 ## Wymagania techniczne
 
-Wszystkie klasy serwisów muszą być zarządzane przez Spring Container jako beany. Zabrania się używania operatora new do tworzenia instancji klas oznaczonych adnotacjami stereotypowymi takimi jak @Service czy @Component. Zależności między serwisami należy wstrzykiwać wyłącznie przez konstruktor, unikając wstrzykiwania przez pola czy settery, co jest zgodne z najlepszymi praktykami Spring.
+- Kontrolery używają @RestController co łączy @Controller i @ResponseBody. Metody oznaczane przez @GetMapping, @PostMapping, @PutMapping, @DeleteMapping, @PatchMapping dla odpowiednich operacji HTTP. Parametry ścieżki przez @PathVariable, query parameters przez @RequestParam, ciało żądania przez @RequestBody.
+- Wszystkie metody kontrolerów zwracają ResponseEntity<T> dla kontroli nad kodem HTTP i nagłówkami. DTO są oddzielone od modelu domenowego i mapowane w kontrolerze lub dedykowanym mapperze. Jackson automatycznie serializuje obiekty Java do JSON i deserializuje JSON do obiektów.
+- Testy używają @WebMvcTest(NazwaKontrolera.class) do załadowania tylko warstwy web. Serwisy mockowane przez @MockBean. MockMvc wstrzykiwany przez @Autowired służy do wykonywania żądań HTTP.
 
-Parametry konfiguracyjne takie jak adresy URL czy ścieżki do plików muszą być pobierane z pliku application.properties poprzez adnotację @Value, co umożliwia łatwą zmianę konfiguracji bez rekompilacji aplikacji. Klasa modelu Employee musi posiadać publiczny konstruktor przyjmujący wszystkie wymagane parametry w odpowiedniej kolejności, aby Spring mógł utworzyć jej instancje na podstawie definicji w pliku XML.
+## Przykłady testowania
 
-Pracownicy zdefiniowani w pliku employees-beans.xml muszą być dostępni jako bean typu List<Employee> o nazwie xmlEmployees, który można wstrzyknąć używając adnotacji @Qualifier lub @Resource. Aplikacja musi poprawnie startować komendą mvn spring-boot:run lub gradle bootRun i wykonywać wszystkie operacje demonstracyjne bez błędów. Testy jednostkowe z poprzedniego zadania powinny działać bez konieczności jakichkolwiek modyfikacji.
+Uruchomienie: mvn spring-boot:run
 
-## Polecenia do uruchomienia
+### GET wszystkich
+curl http://localhost:8080/api/employees
 
-Dla użytkowników Maven dostępne są następujące komendy: mvn spring-boot:run uruchamia aplikację, mvn testwykonuje wszystkie testy, a mvn package buduje pakiet JAR wykonywalny.
+### POST nowy pracownik
+curl -X POST http://localhost:8080/api/employees \
+  -H "Content-Type: application/json" \
+  -d '{"firstName":"Jan","lastName":"Kowalski","email":"jan@example.com","company":"TechCorp","position":"PROGRAMISTA","salary":8000,"status":"ACTIVE"}'
 
-Dla użytkowników Gradle analogiczne komendy to: gradle bootRun uruchamia aplikację, gradle test wykonuje testy, a gradle build buduje projekt wraz z pakietem wykonywalnym.
+### PUT aktualizacja
+curl -X PUT http://localhost:8080/api/employees/jan@example.com \
+  -H "Content-Type: application/json" \
+  -d '{"firstName":"Jan","lastName":"Kowalski","email":"jan@example.com","company":"TechCorp","position":"MANAGER","salary":12000,"status":"ACTIVE"}'
+
+### PATCH zmiana statusu
+curl -X PATCH http://localhost:8080/api/employees/jan@example.com/status \
+  -H "Content-Type: application/json" \
+  -d '{"status":"ON_LEAVE"}'
+
+### DELETE
+curl -X DELETE http://localhost:8080/api/employees/jan@example.com
+
+### GET statystyki
+curl http://localhost:8080/api/statistics/company/TechCorp
+
+## Kryteria oceny
+
+### Kontrolery REST z operacjami CRUD
+
+- Wszystkie endpointy (GET, POST, PUT, DELETE, PATCH) zaimplementowane z poprawnymi adnotacjami. Używanie @PathVariable, @RequestParam, @RequestBody. Zwracanie ResponseEntity z odpowiednimi kodami HTTP (200, 201, 204, 404). Kontroler statystyk zwraca zagregowane dane.
+- 35%
+
+### DTO i mapowanie
+
+- Klasy EmployeeDTO, CompanyStatisticsDTO, ErrorResponse poprawnie zdefiniowane. DTO oddzielone od modelu domenowego. Mapowanie między Employee a EmployeeDTO działa w obu kierunkach. Jackson automatycznie serializuje/deserializuje JSON.
+- 20%
+
+### Obsługa błędów
+
+- @RestControllerAdvice z metodami @ExceptionHandler dla różnych wyjątków. Spójne obiekty ErrorResponse zwracane z właściwymi kodami HTTP (400, 404, 409, 500).
+- 20%
+
+### Status zatrudnienia i endpointy
+	
+- Enum EmploymentStatus dodany do modelu i DTO. Endpoint PATCH do zmiany statusu. Endpoint GET do filtrowania po statusie. Statystyki uwzględniają rozkład statusów zatrudnienia.
+- 10%
+
+### Testy z MockMvc
+
+- Testy używają @WebMvcTest i MockMvc. Pokryte scenariusze pozytywne i negatywne (success i error cases). Weryfikacja kodów HTTP i zawartości JSON przez jsonPath(). Mockowanie serwisów przez @MockBean.
+- 15%
 
 ## Oddanie
 
-Link do repozytorium z zaktualizowanym kodem zawierającym plik konfiguracyjny pom.xml lub build.gradle z zależnościami Spring Boot, plik application.properties z parametrami konfiguracyjnymi, plik employees-beans.xml z definicjami beanów pracowników w katalogu resources, przykładowy plik employees.csv oraz plik README dokumentujący proces migracji do Spring Boot, wyjaśniający różne sposoby definiowania i konfigurowania beanów (adnotacje, klasy konfiguracyjne, XML) oraz zawierający szczegółową instrukcję uruchomienia i testowania aplikacji.
-
-## Kryteria recenzji:
-
-- Konfiguracja Spring Boot i adnotacje serwisów (25%)
-Projekt zawiera poprawne zależności Spring Boot w pom.xml lub build.gradle. Wszystkie klasy serwisów są oznaczone adnotacją @Service z wstrzykiwaniem zależności przez konstruktor bez użycia operatora new. Plik application.properties definiuje wszystkie wymagane parametry konfiguracyjne. Aplikacja poprawnie startuje i inicjalizuje kontekst Spring.
-- Konfiguracja beanów w klasie AppConfig (20%)
-Klasa AppConfig z adnotacją @Configuration zawiera metody fabrykujące oznaczone @Beandla HttpClient i Gson. Wszystkie beany są prawidłowo wstrzykiwane w serwisach, które ich potrzebują. Metody są poprawnie zaimplementowane i zwracają gotowe do użycia obiekty.
-- Definicja pracowników jako beanów w XML (30%)
-Klasa EmployeeManagementApplication ma adnotacje @SpringBootApplication i @ImportResource, implementuje CommandLineRunner i demonstruje import z CSV, wykorzystanie beana xmlEmployees, pobieranie z API oraz operacje analityczne. Wszystkie zależności włącznie z listą xmlEmployees są wstrzykiwane przez konstruktor z odpowiednim użyciem @Qualifier lub @Resource.
-- Klasa startowa i demonstracja funkcjonalności (25%)
-Klasa EmployeeManagementApplication ma adnotacje @SpringBootApplication i @ImportResource, implementuje CommandLineRunner i demonstruje import z CSV, wykorzystanie beana xmlEmployees, pobieranie z API oraz operacje analityczne. Wszystkie zależności włącznie z listą xmlEmployees są wstrzykiwane przez konstruktor z odpowiednim użyciem @Qualifier lub @Resource.
+Link do repozytorium z kodem, testami oraz README zawierającym listę wszystkich endpointów z przykładami żądań curl lub Postman oraz instrukcję uruchomienia.

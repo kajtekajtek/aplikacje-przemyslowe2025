@@ -32,7 +32,7 @@ public class ApiService {
         this.gson = gson;
     }
 
-    public List<Employee> fetchEmployeesFromApi(String apiUrl) throws ApiException {
+    public List<Employee> fetchEmployeesFromApi(String apiUrl) {
         List<Employee> employees = new ArrayList<>();
 
         try {

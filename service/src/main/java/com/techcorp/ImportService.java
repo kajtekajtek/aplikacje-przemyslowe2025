@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import com.techcorp.exception.InvalidDataException;
+import com.techcorp.exception.DuplicateEmailException;
 
 import org.springframework.stereotype.Service;
 
@@ -43,7 +44,7 @@ public class ImportService {
 
                 try {
                     employeeService.addEmployee(employee);
-                } catch (IllegalArgumentException e) {
+                } catch (IllegalArgumentException | DuplicateEmailException e) {
                     summary.addError(lineIdx, new InvalidDataException(
                         lineIdx, e.getMessage()
                     ));
