@@ -10,11 +10,13 @@ System zarządzania pracownikami wymaga możliwości przesyłania i pobierania p
 
 W pliku application.properties należy skonfigurować parametry związane z uploadem plików oraz określić katalog, w którym będą przechowywane przesłane pliki. Konfiguracja powinna obejmować maksymalny rozmiar pojedynczego pliku oraz maksymalny rozmiar całego żądania, aby zapobiec przeciążeniu serwera przez zbyt duże przesyłki. Należy również określić katalog roboczy, w którym aplikacja będzie zapisywać przesłane pliki oraz generować raporty do pobrania.
 
+```
 spring.servlet.multipart.max-file-size=10MB
 spring.servlet.multipart.max-request-size=10MB
 spring.servlet.multipart.enabled=true
 app.upload.directory=uploads/
 app.reports.directory=reports/
+```
 
 Katalogi uploads/ i reports/ powinny być tworzone automatycznie przy starcie aplikacji, jeśli nie istnieją. Można to zrealizować w klasie z adnotacją @Component implementującej interfejs CommandLineRunner lub w dedykowanej klasie konfiguracyjnej.
 
