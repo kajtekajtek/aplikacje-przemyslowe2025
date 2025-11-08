@@ -12,7 +12,5 @@ public abstract class FileStorageService {
     public abstract Resource loadFile(String filename);
     
     public abstract void deleteFile(String filename);
-    
-    public abstract boolean validateFile(MultipartFile file, String[] allowedExtensions, long maxSizeInBytes);
 
 }
