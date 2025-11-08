@@ -1,5 +1,7 @@
 package com.techcorp;
 
+import com.techcorp.exception.FileStorageException;
+import com.techcorp.exception.InvalidFileException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -89,8 +91,8 @@ class FileStorageServiceImplTest {
             new byte[0]
         );
 
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        InvalidFileException exception = assertThrows(
+            InvalidFileException.class,
             () -> fileStorageService.saveFile(emptyFile)
         );
         
@@ -106,8 +108,8 @@ class FileStorageServiceImplTest {
             "content".getBytes()
         );
 
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        InvalidFileException exception = assertThrows(
+            InvalidFileException.class,
             () -> fileStorageService.saveFile(file)
         );
         
@@ -124,8 +126,8 @@ class FileStorageServiceImplTest {
             largeContent
         );
 
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        InvalidFileException exception = assertThrows(
+            InvalidFileException.class,
             () -> fileStorageService.saveFile(largeFile)
         );
         
@@ -229,8 +231,8 @@ class FileStorageServiceImplTest {
             "content".getBytes()
         );
 
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        InvalidFileException exception = assertThrows(
+            InvalidFileException.class,
             () -> fileStorageService.saveFile(file)
         );
         
@@ -306,8 +308,8 @@ class FileStorageServiceImplTest {
             "content".getBytes()
         );
 
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        InvalidFileException exception = assertThrows(
+            InvalidFileException.class,
             () -> fileStorageService.saveFile(file)
         );
         

@@ -1,5 +1,7 @@
 package com.techcorp;
 
+import com.techcorp.exception.FileStorageException;
+import com.techcorp.exception.InvalidFileException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.core.io.Resource;
@@ -63,14 +65,14 @@ public class FileStorageServiceImpl extends FileStorageService {
         try {
             Files.createDirectories(this.uploadPath);
         } catch (IOException ex) {
-            throw new RuntimeException("Cannot create upload directory", ex);
+            throw new FileStorageException("Cannot create upload directory", ex);
         }
     }
 
     @Override
     public String saveFile(MultipartFile file) {
         if (file.isEmpty()) {
-            throw new IllegalArgumentException(
+            throw new InvalidFileException(
                 "Cannot save empty file"
             );
         }
@@ -88,7 +90,7 @@ public class FileStorageServiceImpl extends FileStorageService {
                 StandardCopyOption.REPLACE_EXISTING);
             return filename;
         } catch (IOException ex) {
-            throw new RuntimeException("Error saving file", ex);
+            throw new FileStorageException("Error saving file", ex);
         }
     }
 
@@ -98,7 +100,7 @@ public class FileStorageServiceImpl extends FileStorageService {
         try {
             return new UrlResource(filePath.toUri());
         } catch (MalformedURLException ex) {
-            throw new RuntimeException("Error loading file", ex);
+            throw new FileStorageException("Error loading file", ex);
         }
     }
 
@@ -108,24 +110,24 @@ public class FileStorageServiceImpl extends FileStorageService {
             Path filePath = uploadPath.resolve(filename).normalize();
             Files.deleteIfExists(filePath);
         } catch (IOException ex) {
-            throw new RuntimeException("Error deleting file", ex);
+            throw new FileStorageException("Error deleting file", ex);
         }
     }
 
     private void isValidFileCheck(String name, String extension, long fileSize) {
         if (name == null) {
-            throw new IllegalArgumentException("File name is required");
+            throw new InvalidFileException("File name is required");
         }
 
         if (!allowedExtensions.contains(extension)) {
-            throw new IllegalArgumentException(
+            throw new InvalidFileException(
                 "Unallowed file extension. Allowed: " 
                 + allowedExtensions
             );
         }
 
         if (fileSize > maxSizeInBytes) {
-            throw new IllegalArgumentException("File is too large. Maximum size: " 
+            throw new InvalidFileException("File is too large. Maximum size: " 
             + maxSizeInBytes + " bytes"
             );
         }
