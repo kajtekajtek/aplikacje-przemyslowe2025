@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -99,6 +100,19 @@ public class GlobalExceptionHandler {
             request.getDescription(false).replace("uri=", "")
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceededException(
+        MaxUploadSizeExceededException ex,
+        WebRequest request
+    ) {
+        ErrorResponse errorResponse = new ErrorResponse(
+            "File is too large. Maximum size: " + ex.getMaxUploadSize() + " bytes",
+            HttpStatus.PAYLOAD_TOO_LARGE.value(),
+            request.getDescription(false).replace("uri=", "")
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.PAYLOAD_TOO_LARGE);
     }
 
     @ExceptionHandler(Exception.class)
