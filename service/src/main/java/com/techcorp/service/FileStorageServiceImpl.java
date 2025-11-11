@@ -96,6 +96,45 @@ public class FileStorageServiceImpl extends FileStorageService {
     }
 
     @Override
+    public String saveFile(MultipartFile file, String customDirectory) {
+        if (file.isEmpty()) {
+            throw new InvalidFileException(
+                "Cannot save empty file"
+            );
+        }
+        if (customDirectory == null || customDirectory.isEmpty()) {
+            throw new IllegalArgumentException("Custom directory cannot be null or empty");
+        }
+
+        String originalFilename = file.getOriginalFilename();
+
+        if (file.getSize() > maxSizeInBytes) {
+            throw new InvalidFileException("File is too large. Maximum size: " 
+                + maxSizeInBytes + " bytes"
+            );
+        }
+
+        Path customPath = Paths.get(customDirectory).toAbsolutePath().normalize();
+        
+        try {
+            Files.createDirectories(customPath);
+        } catch (IOException ex) {
+            throw new FileStorageException("Cannot create directory: " + customDirectory, ex);
+        }
+
+        String filename = UUID.randomUUID().toString() + "_" + originalFilename;
+        Path targetLocation = customPath.resolve(filename);
+
+        try {
+            Files.copy(file.getInputStream(), targetLocation, 
+                StandardCopyOption.REPLACE_EXISTING);
+            return targetLocation.toString();
+        } catch (IOException ex) {
+            throw new FileStorageException("Error saving file", ex);
+        }
+    }
+
+    @Override
     public Resource loadFile(String filename) {
         Path filePath = uploadPath.resolve(filename).normalize();
         try {

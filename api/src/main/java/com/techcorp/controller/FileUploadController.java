@@ -1,5 +1,6 @@
 package com.techcorp.controller;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -9,16 +10,24 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
 
+import com.techcorp.model.DocumentType;
+import com.techcorp.model.EmployeeDocument;
 import com.techcorp.model.ImportSummary;
+import com.techcorp.service.DocumentService;
 import com.techcorp.service.FileStorageService;
 import com.techcorp.service.ImportService;
 import com.techcorp.service.RaportGeneratorService;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/files")
@@ -27,14 +36,18 @@ public class FileUploadController {
     private final ImportService importService;
     private final FileStorageService fileStorageService;
     private final RaportGeneratorService raportGeneratorService;
+    private final DocumentService documentService;
+    
     public FileUploadController(
         ImportService importService, 
         FileStorageService fileStorageService,
-        RaportGeneratorService raportGeneratorService
+        RaportGeneratorService raportGeneratorService,
+        DocumentService documentService
     ) {
         this.importService = importService;
         this.fileStorageService = fileStorageService;
         this.raportGeneratorService = raportGeneratorService;
+        this.documentService = documentService;
     }
 
     @PostMapping({"/import/csv", "/import/xml"})
@@ -82,6 +95,66 @@ public class FileUploadController {
         return ResponseEntity.ok()
             .headers(headers)
             .body(resource);
+    }
+
+    @PostMapping("/documents/{email}")
+    public ResponseEntity<EmployeeDocument> uploadDocument(
+        @PathVariable String email,
+        @RequestParam("file") MultipartFile file,
+        @RequestParam("type") String type
+    ) {
+        DocumentType documentType = DocumentType.valueOf(type.toUpperCase());
+        EmployeeDocument document = documentService.saveDocument(email, file, documentType);
+        
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(document);
+    }
+
+    @GetMapping("/documents/{email}")
+    public ResponseEntity<List<EmployeeDocument>> getEmployeeDocuments(
+        @PathVariable String email
+    ) {
+        List<EmployeeDocument> documents = documentService.getDocuments(email);
+        return ResponseEntity.ok(documents);
+    }
+
+    @GetMapping("/documents/{email}/{documentId}")
+    public ResponseEntity<Resource> getDocument(
+        @PathVariable String email,
+        @PathVariable String documentId
+    ) {
+        Optional<EmployeeDocument> documentOpt = documentService.getDocument(email, documentId);
+        
+        if (documentOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        EmployeeDocument document = documentOpt.get();
+        File file = new File(document.getFilePath());
+        
+        if (!file.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        FileSystemResource resource = new FileSystemResource(file);
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDispositionFormData("attachment", document.getOriginalFileName());
+        headers.setContentLength(file.length());
+        
+        return ResponseEntity.ok()
+            .headers(headers)
+            .body(resource);
+    }
+
+    @DeleteMapping("/documents/{email}/{documentId}")
+    public ResponseEntity<Void> deleteDocument(
+        @PathVariable String email,
+        @PathVariable String documentId
+    ) {
+        documentService.deleteDocument(email, documentId);
+        return ResponseEntity.noContent().build();
     }
 
 }

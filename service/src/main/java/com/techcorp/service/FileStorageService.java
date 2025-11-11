@@ -9,6 +9,8 @@ public abstract class FileStorageService {
     
     public abstract String saveFile(MultipartFile file);
     
+    public abstract String saveFile(MultipartFile file, String customDirectory);
+    
     public abstract Resource loadFile(String filename);
     
     public abstract void deleteFile(String filename);

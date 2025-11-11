@@ -1,10 +1,12 @@
 package com.techcorp.controller;
 
+import com.techcorp.model.DocumentType;
+import com.techcorp.model.EmployeeDocument;
 import com.techcorp.model.ImportSummary;
 import com.techcorp.exception.GlobalExceptionHandler;
 import com.techcorp.model.exception.InvalidDataException;
 import com.techcorp.model.exception.FileStorageException;
-import com.techcorp.model.exception.InvalidDataException;
+import com.techcorp.service.DocumentService;
 import com.techcorp.service.FileStorageService;
 import com.techcorp.service.ImportService;
 
@@ -22,9 +24,19 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.time.LocalDateTime;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Optional;
+
+import org.junit.jupiter.api.io.TempDir;
 
 @WebMvcTest(controllers = FileUploadController.class)
 @ContextConfiguration(classes = {FileUploadController.class, GlobalExceptionHandler.class})
@@ -41,6 +53,12 @@ class FileUploadControllerTest {
 
     @MockBean
     private com.techcorp.service.RaportGeneratorService raportGeneratorService;
+
+    @MockBean
+    private DocumentService documentService;
+
+    @TempDir
+    Path tempDir;
 
     private MockMultipartFile validCsvFile;
     private MockMultipartFile validXmlFile;
@@ -849,6 +867,270 @@ class FileUploadControllerTest {
                 org.hamcrest.Matchers.containsString("statistics_ABC.pdf")));
 
         verify(raportGeneratorService, times(1)).generatePdfReport("ABC");
+    }
+
+    // Employee Documents Tests
+
+    @Test
+    @DisplayName("Should upload document and return 201 Created")
+    public void shouldUploadDocumentAndReturn201Created() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+            "file", "contract.pdf", "application/pdf", "contract content".getBytes()
+        );
+
+        EmployeeDocument mockDocument = new EmployeeDocument(
+            "john@techcorp.com", "doc_123.pdf", "contract.pdf",
+            DocumentType.CONTRACT, "/uploads/documents/john@techcorp.com/doc_123.pdf"
+        );
+
+        when(documentService.saveDocument(eq("john@techcorp.com"), any(), eq(DocumentType.CONTRACT)))
+            .thenReturn(mockDocument);
+
+        mockMvc.perform(multipart("/api/files/documents/john@techcorp.com")
+                .file(file)
+                .param("type", "CONTRACT"))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.employeeEmail").value("john@techcorp.com"))
+            .andExpect(jsonPath("$.originalFileName").value("contract.pdf"))
+            .andExpect(jsonPath("$.fileType").value("CONTRACT"));
+
+        verify(documentService, times(1)).saveDocument(eq("john@techcorp.com"), any(), eq(DocumentType.CONTRACT));
+    }
+
+    @Test
+    @DisplayName("Should upload different document types")
+    public void shouldUploadDifferentDocumentTypes() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+            "file", "cert.pdf", "application/pdf", "content".getBytes()
+        );
+
+        EmployeeDocument mockDocument = new EmployeeDocument(
+            "john@techcorp.com", "doc_456.pdf", "cert.pdf",
+            DocumentType.CERTIFICATE, "/uploads/doc_456.pdf"
+        );
+
+        when(documentService.saveDocument(eq("john@techcorp.com"), any(), eq(DocumentType.CERTIFICATE)))
+            .thenReturn(mockDocument);
+
+        mockMvc.perform(multipart("/api/files/documents/john@techcorp.com")
+                .file(file)
+                .param("type", "CERTIFICATE"))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.fileType").value("CERTIFICATE"));
+
+        verify(documentService, times(1)).saveDocument(eq("john@techcorp.com"), any(), eq(DocumentType.CERTIFICATE));
+    }
+
+    @Test
+    @DisplayName("Should get all documents for employee")
+    public void shouldGetAllDocumentsForEmployee() throws Exception {
+        EmployeeDocument doc1 = new EmployeeDocument(
+            "john@techcorp.com", "doc1.pdf", "contract.pdf",
+            DocumentType.CONTRACT, "/path/doc1.pdf"
+        );
+        EmployeeDocument doc2 = new EmployeeDocument(
+            "john@techcorp.com", "doc2.pdf", "cert.pdf",
+            DocumentType.CERTIFICATE, "/path/doc2.pdf"
+        );
+
+        when(documentService.getDocuments("john@techcorp.com"))
+            .thenReturn(Arrays.asList(doc1, doc2));
+
+        mockMvc.perform(get("/api/files/documents/john@techcorp.com"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$[0].originalFileName").value("contract.pdf"))
+            .andExpect(jsonPath("$[1].originalFileName").value("cert.pdf"));
+
+        verify(documentService, times(1)).getDocuments("john@techcorp.com");
+    }
+
+    @Test
+    @DisplayName("Should return empty list when employee has no documents")
+    public void shouldReturnEmptyListWhenEmployeeHasNoDocuments() throws Exception {
+        when(documentService.getDocuments("john@techcorp.com"))
+            .thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/api/files/documents/john@techcorp.com"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$.length()").value(0));
+
+        verify(documentService, times(1)).getDocuments("john@techcorp.com");
+    }
+
+    @Test
+    @DisplayName("Should get specific document by ID")
+    public void shouldGetSpecificDocumentById() throws Exception {
+        EmployeeDocument mockDocument = new EmployeeDocument(
+            "doc-123", "john@techcorp.com", "doc_456.pdf", "contract.pdf",
+            DocumentType.CONTRACT, LocalDateTime.now(), tempDir.toString() + "/test.pdf"
+        );
+
+        // Create temp file
+        Files.write(Path.of(mockDocument.getFilePath()), "content".getBytes());
+
+        when(documentService.getDocument("john@techcorp.com", "doc-123"))
+            .thenReturn(Optional.of(mockDocument));
+
+        mockMvc.perform(get("/api/files/documents/john@techcorp.com/doc-123"))
+            .andExpect(status().isOk())
+            .andExpect(header().string("Content-Disposition",
+                org.hamcrest.Matchers.containsString("contract.pdf")));
+
+        verify(documentService, times(1)).getDocument("john@techcorp.com", "doc-123");
+    }
+
+    @Test
+    @DisplayName("Should return 404 when document not found")
+    public void shouldReturn404WhenDocumentNotFound() throws Exception {
+        when(documentService.getDocument("john@techcorp.com", "non-existent"))
+            .thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/files/documents/john@techcorp.com/non-existent"))
+            .andExpect(status().isNotFound());
+
+        verify(documentService, times(1)).getDocument("john@techcorp.com", "non-existent");
+    }
+
+    @Test
+    @DisplayName("Should delete document and return 204 No Content")
+    public void shouldDeleteDocumentAndReturn204NoContent() throws Exception {
+        doNothing().when(documentService).deleteDocument("john@techcorp.com", "doc-123");
+
+        mockMvc.perform(delete("/api/files/documents/john@techcorp.com/doc-123"))
+            .andExpect(status().isNoContent());
+
+        verify(documentService, times(1)).deleteDocument("john@techcorp.com", "doc-123");
+    }
+
+    @Test
+    @DisplayName("Should handle exception when deleting non-existent document")
+    public void shouldHandleExceptionWhenDeletingNonExistentDocument() throws Exception {
+        doThrow(new IllegalArgumentException("Document not found"))
+            .when(documentService).deleteDocument("john@techcorp.com", "non-existent");
+
+        mockMvc.perform(delete("/api/files/documents/john@techcorp.com/non-existent"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message").value("Document not found"));
+
+        verify(documentService, times(1)).deleteDocument("john@techcorp.com", "non-existent");
+    }
+
+    @Test
+    @DisplayName("Should handle invalid document type")
+    public void shouldHandleInvalidDocumentType() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+            "file", "doc.pdf", "application/pdf", "content".getBytes()
+        );
+
+        mockMvc.perform(multipart("/api/files/documents/john@techcorp.com")
+                .file(file)
+                .param("type", "INVALID_TYPE"))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Should upload document with case insensitive type")
+    public void shouldUploadDocumentWithCaseInsensitiveType() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+            "file", "contract.pdf", "application/pdf", "content".getBytes()
+        );
+
+        EmployeeDocument mockDocument = new EmployeeDocument(
+            "john@techcorp.com", "doc.pdf", "contract.pdf",
+            DocumentType.CONTRACT, "/path/doc.pdf"
+        );
+
+        when(documentService.saveDocument(eq("john@techcorp.com"), any(), eq(DocumentType.CONTRACT)))
+            .thenReturn(mockDocument);
+
+        mockMvc.perform(multipart("/api/files/documents/john@techcorp.com")
+                .file(file)
+                .param("type", "contract"))
+            .andExpect(status().isCreated());
+
+        verify(documentService, times(1)).saveDocument(eq("john@techcorp.com"), any(), eq(DocumentType.CONTRACT));
+    }
+
+    @Test
+    @DisplayName("Should get documents for different employees")
+    public void shouldGetDocumentsForDifferentEmployees() throws Exception {
+        EmployeeDocument johnDoc = new EmployeeDocument(
+            "john@techcorp.com", "doc1.pdf", "contract.pdf",
+            DocumentType.CONTRACT, "/path/doc1.pdf"
+        );
+        EmployeeDocument janeDoc = new EmployeeDocument(
+            "jane@techcorp.com", "doc2.pdf", "cert.pdf",
+            DocumentType.CERTIFICATE, "/path/doc2.pdf"
+        );
+
+        when(documentService.getDocuments("john@techcorp.com"))
+            .thenReturn(Collections.singletonList(johnDoc));
+        when(documentService.getDocuments("jane@techcorp.com"))
+            .thenReturn(Collections.singletonList(janeDoc));
+
+        mockMvc.perform(get("/api/files/documents/john@techcorp.com"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(1))
+            .andExpect(jsonPath("$[0].originalFileName").value("contract.pdf"));
+
+        mockMvc.perform(get("/api/files/documents/jane@techcorp.com"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(1))
+            .andExpect(jsonPath("$[0].originalFileName").value("cert.pdf"));
+
+        verify(documentService, times(1)).getDocuments("john@techcorp.com");
+        verify(documentService, times(1)).getDocuments("jane@techcorp.com");
+    }
+
+    @Test
+    @DisplayName("Should upload document with ID_CARD type")
+    public void shouldUploadDocumentWithIdCardType() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+            "file", "id.pdf", "application/pdf", "content".getBytes()
+        );
+
+        EmployeeDocument mockDocument = new EmployeeDocument(
+            "john@techcorp.com", "doc.pdf", "id.pdf",
+            DocumentType.ID_CARD, "/path/doc.pdf"
+        );
+
+        when(documentService.saveDocument(eq("john@techcorp.com"), any(), eq(DocumentType.ID_CARD)))
+            .thenReturn(mockDocument);
+
+        mockMvc.perform(multipart("/api/files/documents/john@techcorp.com")
+                .file(file)
+                .param("type", "ID_CARD"))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.fileType").value("ID_CARD"));
+
+        verify(documentService, times(1)).saveDocument(eq("john@techcorp.com"), any(), eq(DocumentType.ID_CARD));
+    }
+
+    @Test
+    @DisplayName("Should upload document with OTHER type")
+    public void shouldUploadDocumentWithOtherType() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+            "file", "other.pdf", "application/pdf", "content".getBytes()
+        );
+
+        EmployeeDocument mockDocument = new EmployeeDocument(
+            "john@techcorp.com", "doc.pdf", "other.pdf",
+            DocumentType.OTHER, "/path/doc.pdf"
+        );
+
+        when(documentService.saveDocument(eq("john@techcorp.com"), any(), eq(DocumentType.OTHER)))
+            .thenReturn(mockDocument);
+
+        mockMvc.perform(multipart("/api/files/documents/john@techcorp.com")
+                .file(file)
+                .param("type", "OTHER"))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.fileType").value("OTHER"));
+
+        verify(documentService, times(1)).saveDocument(eq("john@techcorp.com"), any(), eq(DocumentType.OTHER));
     }
 }
 
