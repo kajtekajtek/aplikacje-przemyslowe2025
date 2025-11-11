@@ -7,6 +7,8 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.techcorp.exception.FileNotFoundException;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -249,8 +251,8 @@ public class ImportServiceTest
     public void shouldThrowIOExceptionWhenFileDoesNotExist()
     {
         String nonExistentPath = "nonexistent.csv";
-        IOException exception = assertThrows(
-            IOException.class,
+        FileNotFoundException exception = assertThrows(
+            FileNotFoundException.class,
             () -> importService.importFromFile(nonExistentPath)
         );
         assertTrue(exception.getMessage().contains(FILE_DOES_NOT_EXIST_EXCEPTION_MESSAGE));

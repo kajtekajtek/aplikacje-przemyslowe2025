@@ -1,10 +1,10 @@
 package com.techcorp;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import com.techcorp.exception.FileNotFoundException;
 import com.techcorp.exception.InvalidDataException;
 import com.techcorp.exception.DuplicateEmailException;
 
@@ -33,7 +33,7 @@ public class ImportService {
         throw new IllegalArgumentException("Employee service cannot be null");
     }
 
-    public ImportSummary importFromFile(String filePath) throws IOException {
+    public ImportSummary importFromFile(String filePath) {
         validateFilePath(filePath);
         validateFileExists(filePath);
 
@@ -48,7 +48,7 @@ public class ImportService {
         }
     }
 
-    private void validateFilePath(String filePath) throws IOException {
+    private void validateFilePath(String filePath) {
         if (filePath == null) {
             throw new IllegalArgumentException("File path cannot be null");
         }
@@ -58,7 +58,7 @@ public class ImportService {
         }
     }
 
-    private void validateFileExists(String filePath) throws IOException {
+    private void validateFileExists(String filePath) {
         if (!Files.exists(Path.of(filePath))) {
             throw new FileNotFoundException("File does not exist");
         }
@@ -72,7 +72,7 @@ public class ImportService {
         return filePath.substring(lastDotIndex + 1);
     }
 
-    private ImportSummary importFromCsv(String filePath) throws IOException {
+    private ImportSummary importFromCsv(String filePath) {
         summary = new ImportSummary();
 
         try (BufferedReader reader = Files.newBufferedReader(Path.of(filePath))) {
@@ -87,6 +87,11 @@ public class ImportService {
 
                 handleEmployee(employee, lineIdx);
             }
+        } catch (IOException e) {
+            summary.addError(0, new InvalidDataException(
+                0, "Error reading CSV file: " + e.getMessage()
+            ));
+            return summary;
         }
 
         return summary;
@@ -140,7 +145,7 @@ public class ImportService {
         return new Employee(lastName, firstName, email, company, role, salary);
     }
 
-    private ImportSummary importFromXml(String filePath) throws IOException {
+    private ImportSummary importFromXml(String filePath) {
         summary = new ImportSummary();
 
         try {
@@ -162,7 +167,10 @@ public class ImportService {
                 handleEmployee(employee, lineIdx);
             }
         } catch (Exception e) {
-            throw new IOException("Error parsing XML file: " + e.getMessage(), e);
+            summary.addError(0, new InvalidDataException(
+                0, "Error parsing XML file: " + e.getMessage()
+            ));
+            return summary;
         }
 
         return summary;
