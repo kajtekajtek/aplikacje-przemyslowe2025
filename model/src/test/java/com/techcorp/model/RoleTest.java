@@ -1,8 +1,6 @@
-package com.techcorp;
+package com.techcorp.model;
 
 import org.junit.jupiter.api.Test;
-
-import com.techcorp.model.Role;
 
 import static org.junit.jupiter.api.Assertions.*;
 

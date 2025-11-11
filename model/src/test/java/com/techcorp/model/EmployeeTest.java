@@ -1,10 +1,6 @@
-package com.techcorp;
+package com.techcorp.model;
 
 import org.junit.jupiter.api.Test;
-
-import com.techcorp.model.Employee;
-import com.techcorp.model.EmploymentStatus;
-import com.techcorp.model.Role;
 
 import org.junit.jupiter.api.Nested;
 

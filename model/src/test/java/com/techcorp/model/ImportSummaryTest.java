@@ -1,9 +1,8 @@
-package com.techcorp;
+package com.techcorp.model;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.techcorp.model.ImportSummary;
 import com.techcorp.model.exception.InvalidDataException;
 
 import java.io.FileNotFoundException;
