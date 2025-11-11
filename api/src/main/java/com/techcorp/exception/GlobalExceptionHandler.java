@@ -8,6 +8,8 @@ import com.techcorp.model.exception.FileStorageException;
 import com.techcorp.model.exception.InvalidDataException;
 import com.techcorp.model.exception.InvalidFileException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,11 +20,14 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler(EmployeeNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEmployeeNotFoundException(
         EmployeeNotFoundException ex,
         WebRequest request
     ) {
+        log.warn("Employee not found: {} | Path: {}", ex.getMessage(), request.getDescription(false));
         ErrorResponse errorResponse = new ErrorResponse(
             ex.getMessage(),
             HttpStatus.NOT_FOUND.value(),
@@ -36,6 +41,7 @@ public class GlobalExceptionHandler {
         DuplicateEmailException ex,
         WebRequest request
     ) {
+        log.warn("Duplicate email: {} | Path: {}", ex.getMessage(), request.getDescription(false));
         ErrorResponse errorResponse = new ErrorResponse(
             ex.getMessage(),
             HttpStatus.CONFLICT.value(),
@@ -49,6 +55,7 @@ public class GlobalExceptionHandler {
         InvalidDataException ex,
         WebRequest request
     ) {
+        log.warn("Invalid data: {} | Path: {}", ex.getMessage(), request.getDescription(false));
         ErrorResponse errorResponse = new ErrorResponse(
             ex.getMessage(),
             HttpStatus.BAD_REQUEST.value(),
@@ -62,6 +69,7 @@ public class GlobalExceptionHandler {
         IllegalArgumentException ex,
         WebRequest request
     ) {
+        log.warn("Illegal argument: {} | Path: {}", ex.getMessage(), request.getDescription(false));
         ErrorResponse errorResponse = new ErrorResponse(
             ex.getMessage(),
             HttpStatus.BAD_REQUEST.value(),
@@ -75,6 +83,7 @@ public class GlobalExceptionHandler {
         FileNotFoundException ex,
         WebRequest request
     ) {
+        log.warn("File not found: {} | Path: {}", ex.getMessage(), request.getDescription(false));
         ErrorResponse errorResponse = new ErrorResponse(
             ex.getMessage(),
             HttpStatus.NOT_FOUND.value(),
@@ -88,6 +97,7 @@ public class GlobalExceptionHandler {
         FileStorageException ex,
         WebRequest request
     ) {
+        log.error("File storage error: {} | Path: {}", ex.getMessage(), request.getDescription(false), ex);
         ErrorResponse errorResponse = new ErrorResponse(
             ex.getMessage(),
             HttpStatus.INTERNAL_SERVER_ERROR.value(),
@@ -101,6 +111,7 @@ public class GlobalExceptionHandler {
         InvalidFileException ex,
         WebRequest request
     ) {
+        log.warn("Invalid file: {} | Path: {}", ex.getMessage(), request.getDescription(false));
         ErrorResponse errorResponse = new ErrorResponse(
             ex.getMessage(),
             HttpStatus.BAD_REQUEST.value(),
@@ -114,6 +125,7 @@ public class GlobalExceptionHandler {
         MaxUploadSizeExceededException ex,
         WebRequest request
     ) {
+        log.warn("File too large: {} | Path: {}", ex.getMaxUploadSize(), request.getDescription(false));
         ErrorResponse errorResponse = new ErrorResponse(
             "File is too large. Maximum size: " + ex.getMaxUploadSize() + " bytes",
             HttpStatus.PAYLOAD_TOO_LARGE.value(),
@@ -127,6 +139,7 @@ public class GlobalExceptionHandler {
         Exception ex,
         WebRequest request
     ) {
+        log.error("Unexpected error: {} | Path: {}", ex.getMessage(), request.getDescription(false), ex);
         ErrorResponse errorResponse = new ErrorResponse(
             "An unexpected error occurred: " + ex.getMessage(),
             HttpStatus.INTERNAL_SERVER_ERROR.value(),
