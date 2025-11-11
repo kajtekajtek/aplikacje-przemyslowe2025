@@ -61,8 +61,8 @@ class PhotoServiceTest {
             String fileName = photoService.savePhoto("john@techcorp.com", file);
 
             assertNotNull(fileName);
-            assertTrue(fileName.contains("john@techcorp.com"));
-            assertEquals("john@techcorp.com.jpg", testEmployee.getPhotoFileName());
+            assertEquals("uuid_photo.jpg", fileName);
+            assertEquals("uuid_photo.jpg", testEmployee.getPhotoFileName());
             verify(fileStorageService, times(1)).saveFile(any(), eq("uploads/photos/john@techcorp.com"));
         }
 
@@ -203,15 +203,16 @@ class PhotoServiceTest {
             when(employeeService.getEmployeeByEmail("john@techcorp.com"))
                 .thenReturn(Optional.of(testEmployee))
                 .thenReturn(Optional.of(testEmployee));
-            doNothing().when(fileStorageService).deleteFile("old_photo.jpg");
+            doNothing().when(fileStorageService).deleteFile("photos/john@techcorp.com/old_photo.jpg");
             when(fileStorageService.saveFile(any(), eq("uploads/photos/john@techcorp.com")))
                 .thenReturn("uploads/photos/john@techcorp.com/uuid_new_photo.jpg");
 
             String fileName = photoService.savePhoto("john@techcorp.com", file);
 
             assertNotNull(fileName);
-            assertEquals("john@techcorp.com.jpg", testEmployee.getPhotoFileName());
-            verify(fileStorageService, times(1)).deleteFile("old_photo.jpg");
+            assertEquals("uuid_new_photo.jpg", fileName);
+            assertEquals("uuid_new_photo.jpg", testEmployee.getPhotoFileName());
+            verify(fileStorageService, times(1)).deleteFile("photos/john@techcorp.com/old_photo.jpg");
         }
     }
 

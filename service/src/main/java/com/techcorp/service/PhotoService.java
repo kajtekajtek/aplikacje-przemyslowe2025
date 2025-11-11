@@ -56,18 +56,17 @@ public class PhotoService {
         validatePhoto(file);
 
         String normalizedEmail = email.toLowerCase();
-        String extension = getFileExtension(file.getOriginalFilename());
-        String safeFileName = normalizedEmail.replaceAll("[^a-zA-Z0-9@._-]", "_") + "." + extension;
 
         if (employee.getPhotoFileName() != null) {
             deletePhoto(email);
         }
 
-        employee.setPhotoFileName(safeFileName);
+        String fullPath = fileStorageService.saveFile(file, this.uploadPathString + "/" + normalizedEmail);
+        
+        String fileName = fullPath.substring(fullPath.lastIndexOf('/') + 1);
+        employee.setPhotoFileName(fileName);
 
-        fileStorageService.saveFile(file, this.uploadPathString + "/" + normalizedEmail);
-
-        return safeFileName;
+        return fileName;
     }
 
     public Resource loadPhoto(String email) {
@@ -86,7 +85,9 @@ public class PhotoService {
             );
         }
 
-        return fileStorageService.loadFile(employee.getPhotoFileName());
+        String normalizedEmail = email.toLowerCase();
+        String relativePath = "photos/" + normalizedEmail + "/" + employee.getPhotoFileName();
+        return fileStorageService.loadFile(relativePath);
     }
 
     public void deletePhoto(String email) {
@@ -99,7 +100,11 @@ public class PhotoService {
                 "Employee with email " + email + " not found"
             ));
 
-        fileStorageService.deleteFile(employee.getPhotoFileName());
+        if (employee.getPhotoFileName() != null) {
+            String normalizedEmail = email.toLowerCase();
+            String relativePath = "photos/" + normalizedEmail + "/" + employee.getPhotoFileName();
+            fileStorageService.deleteFile(relativePath);
+        }
         employee.setPhotoFileName(null);
     }
 
