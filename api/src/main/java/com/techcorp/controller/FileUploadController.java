@@ -45,8 +45,12 @@ public class FileUploadController {
     }
 
     @GetMapping("/export/csv")
-    public ResponseEntity<Resource> exportCsv() {
-        String csv = raportGeneratorService.generateCsvReport();
+    public ResponseEntity<Resource> exportCsv(
+        @RequestParam(required = false) String companyName
+    ) {
+        String csv = companyName != null 
+            ? raportGeneratorService.generateCsvReport(companyName) 
+            : raportGeneratorService.generateCsvReport();
         
         byte[] csvBytes = csv.getBytes(StandardCharsets.UTF_8);
         ByteArrayResource resource = new ByteArrayResource(csvBytes);

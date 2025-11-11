@@ -320,5 +320,144 @@ class RaportGeneratorServiceTest {
         
         verify(employeeService, times(1)).getEmployees();
     }
+
+    @Test
+    @DisplayName("Should generate CSV report filtered by company name")
+    void shouldGenerateCsvReportFilteredByCompanyName() {
+        List<Employee> techCorpEmployees = Arrays.asList(testEmployee1, testEmployee3);
+        when(employeeService.getEmployeesByCompanyName("TechCorp")).thenReturn(techCorpEmployees);
+
+        String csv = raportGeneratorService.generateCsvReport("TechCorp");
+
+        assertNotNull(csv);
+        assertTrue(csv.contains("TechCorp"));
+        assertFalse(csv.contains("Innovate"));
+        assertTrue(csv.contains("john.doe@techcorp.com"));
+        assertTrue(csv.contains("bob.johnson@techcorp.com"));
+        assertFalse(csv.contains("jane.smith@innovate.com"));
+        
+        verify(employeeService, times(1)).getEmployeesByCompanyName("TechCorp");
+        verify(employeeService, never()).getEmployees();
+    }
+
+    @Test
+    @DisplayName("Should generate CSV report for specific company with multiple employees")
+    void shouldGenerateCsvReportForSpecificCompanyWithMultipleEmployees() {
+        Employee emp1 = new Employee(
+            "Smith", "Alice", "alice@innovate.com",
+            "Innovate", Role.ENGINEER, 9000, EmploymentStatus.ACTIVE
+        );
+        Employee emp2 = new Employee(
+            "Brown", "Charlie", "charlie@innovate.com",
+            "Innovate", Role.MANAGER, 13000, EmploymentStatus.ACTIVE
+        );
+        List<Employee> innovateEmployees = Arrays.asList(emp1, emp2);
+        when(employeeService.getEmployeesByCompanyName("Innovate")).thenReturn(innovateEmployees);
+
+        String csv = raportGeneratorService.generateCsvReport("Innovate");
+
+        String[] lines = csv.split("\n");
+        assertEquals(3, lines.length); // header + 2 employees
+        assertTrue(csv.contains("Innovate"));
+        assertTrue(csv.contains("alice@innovate.com"));
+        assertTrue(csv.contains("charlie@innovate.com"));
+        
+        verify(employeeService, times(1)).getEmployeesByCompanyName("Innovate");
+    }
+
+    @Test
+    @DisplayName("Should generate CSV with only header when company has no employees")
+    void shouldGenerateCsvWithOnlyHeaderWhenCompanyHasNoEmployees() {
+        List<Employee> emptyList = new ArrayList<>();
+        when(employeeService.getEmployeesByCompanyName("EmptyCompany")).thenReturn(emptyList);
+
+        String csv = raportGeneratorService.generateCsvReport("EmptyCompany");
+
+        assertNotNull(csv);
+        assertEquals("firstName,lastName,email,company,position,salary,status\n", csv);
+        
+        verify(employeeService, times(1)).getEmployeesByCompanyName("EmptyCompany");
+        verify(employeeService, never()).getEmployees();
+    }
+
+    @Test
+    @DisplayName("Should generate CSV for company with different roles")
+    void shouldGenerateCsvForCompanyWithDifferentRoles() {
+        Employee ceo = new Employee(
+            "Boss", "Big", "big.boss@startup.com",
+            "StartUp Inc", Role.CEO, 25000, EmploymentStatus.ACTIVE
+        );
+        Employee engineer = new Employee(
+            "Dev", "John", "john.dev@startup.com",
+            "StartUp Inc", Role.ENGINEER, 8000, EmploymentStatus.ACTIVE
+        );
+        Employee intern = new Employee(
+            "Junior", "Bob", "bob.junior@startup.com",
+            "StartUp Inc", Role.INTERN, 3000, EmploymentStatus.ACTIVE
+        );
+        
+        List<Employee> startupEmployees = Arrays.asList(ceo, engineer, intern);
+        when(employeeService.getEmployeesByCompanyName("StartUp Inc")).thenReturn(startupEmployees);
+
+        String csv = raportGeneratorService.generateCsvReport("StartUp Inc");
+
+        assertTrue(csv.contains("CEO"));
+        assertTrue(csv.contains("ENGINEER"));
+        assertTrue(csv.contains("INTERN"));
+        assertTrue(csv.contains("25000"));
+        assertTrue(csv.contains("8000"));
+        assertTrue(csv.contains("3000"));
+        
+        verify(employeeService, times(1)).getEmployeesByCompanyName("StartUp Inc");
+    }
+
+    @Test
+    @DisplayName("Should generate CSV for company with different employment statuses")
+    void shouldGenerateCsvForCompanyWithDifferentEmploymentStatuses() {
+        Employee active = new Employee(
+            "Active", "User", "active@company.com",
+            "Company", Role.ENGINEER, 8000, EmploymentStatus.ACTIVE
+        );
+        Employee onLeave = new Employee(
+            "Leave", "User", "leave@company.com",
+            "Company", Role.ENGINEER, 8000, EmploymentStatus.ON_LEAVE
+        );
+        
+        List<Employee> companyEmployees = Arrays.asList(active, onLeave);
+        when(employeeService.getEmployeesByCompanyName("Company")).thenReturn(companyEmployees);
+
+        String csv = raportGeneratorService.generateCsvReport("Company");
+
+        assertTrue(csv.contains("ACTIVE"));
+        assertTrue(csv.contains("ON_LEAVE"));
+        
+        verify(employeeService, times(1)).getEmployeesByCompanyName("Company");
+    }
+
+    @Test
+    @DisplayName("Should call correct service method when company name provided")
+    void shouldCallCorrectServiceMethodWhenCompanyNameProvided() {
+        List<Employee> employees = Arrays.asList(testEmployee1);
+        when(employeeService.getEmployeesByCompanyName("TechCorp")).thenReturn(employees);
+
+        raportGeneratorService.generateCsvReport("TechCorp");
+
+        verify(employeeService, times(1)).getEmployeesByCompanyName("TechCorp");
+        verify(employeeService, never()).getEmployees();
+        verifyNoMoreInteractions(employeeService);
+    }
+
+    @Test
+    @DisplayName("Should call correct service method when company name not provided")
+    void shouldCallCorrectServiceMethodWhenCompanyNameNotProvided() {
+        List<Employee> employees = Arrays.asList(testEmployee1);
+        when(employeeService.getEmployees()).thenReturn(employees);
+
+        raportGeneratorService.generateCsvReport();
+
+        verify(employeeService, times(1)).getEmployees();
+        verify(employeeService, never()).getEmployeesByCompanyName(anyString());
+        verifyNoMoreInteractions(employeeService);
+    }
 }
 

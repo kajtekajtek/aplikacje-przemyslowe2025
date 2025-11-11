@@ -551,5 +551,149 @@ class FileUploadControllerTest {
 
         verify(raportGeneratorService, times(1)).generateCsvReport();
     }
+
+    @Test
+    @DisplayName("Should export CSV filtered by company name")
+    public void shouldExportCsvFilteredByCompanyName() throws Exception {
+        String csvContent = "firstName,lastName,email,company,position,salary,status\n" +
+                           "John,Doe,john.doe@techcorp.com,TechCorp,ENGINEER,8500,ACTIVE\n" +
+                           "Bob,Johnson,bob.johnson@techcorp.com,TechCorp,INTERN,3500,ACTIVE\n";
+        
+        when(raportGeneratorService.generateCsvReport("TechCorp")).thenReturn(csvContent);
+
+        mockMvc.perform(get("/api/files/export/csv")
+                .param("companyName", "TechCorp"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(csvContent));
+
+        verify(raportGeneratorService, times(1)).generateCsvReport("TechCorp");
+        verify(raportGeneratorService, never()).generateCsvReport();
+    }
+
+    @Test
+    @DisplayName("Should export CSV for all employees when company name not provided")
+    public void shouldExportCsvForAllEmployeesWhenCompanyNameNotProvided() throws Exception {
+        String csvContent = "firstName,lastName,email,company,position,salary,status\n" +
+                           "John,Doe,john.doe@techcorp.com,TechCorp,ENGINEER,8500,ACTIVE\n" +
+                           "Jane,Smith,jane.smith@innovate.com,Innovate,MANAGER,12500,ACTIVE\n";
+        
+        when(raportGeneratorService.generateCsvReport()).thenReturn(csvContent);
+
+        mockMvc.perform(get("/api/files/export/csv"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(csvContent));
+
+        verify(raportGeneratorService, times(1)).generateCsvReport();
+    }
+
+    @Test
+    @DisplayName("Should export CSV with only header when company has no employees")
+    public void shouldExportCsvWithOnlyHeaderWhenCompanyHasNoEmployees() throws Exception {
+        String csvContent = "firstName,lastName,email,company,position,salary,status\n";
+        
+        when(raportGeneratorService.generateCsvReport("EmptyCompany")).thenReturn(csvContent);
+
+        mockMvc.perform(get("/api/files/export/csv")
+                .param("companyName", "EmptyCompany"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(csvContent));
+
+        verify(raportGeneratorService, times(1)).generateCsvReport("EmptyCompany");
+    }
+
+    @Test
+    @DisplayName("Should export CSV for specific company with correct headers")
+    public void shouldExportCsvForSpecificCompanyWithCorrectHeaders() throws Exception {
+        String csvContent = "firstName,lastName,email,company,position,salary,status\n" +
+                           "Alice,Smith,alice@innovate.com,Innovate,ENGINEER,9000,ACTIVE\n";
+        
+        when(raportGeneratorService.generateCsvReport("Innovate")).thenReturn(csvContent);
+
+        mockMvc.perform(get("/api/files/export/csv")
+                .param("companyName", "Innovate"))
+            .andExpect(status().isOk())
+            .andExpect(header().string("Content-Type", "text/csv"))
+            .andExpect(header().string("Content-Disposition", "form-data; name=\"attachment\"; filename=\"employees.csv\""))
+            .andExpect(content().string(csvContent));
+
+        verify(raportGeneratorService, times(1)).generateCsvReport("Innovate");
+    }
+
+    @Test
+    @DisplayName("Should export CSV for company with multiple employees and roles")
+    public void shouldExportCsvForCompanyWithMultipleEmployeesAndRoles() throws Exception {
+        String csvContent = "firstName,lastName,email,company,position,salary,status\n" +
+                           "Big,Boss,big.boss@startup.com,StartUp Inc,CEO,25000,ACTIVE\n" +
+                           "John,Dev,john.dev@startup.com,StartUp Inc,ENGINEER,8000,ACTIVE\n" +
+                           "Bob,Junior,bob.junior@startup.com,StartUp Inc,INTERN,3000,ACTIVE\n";
+        
+        when(raportGeneratorService.generateCsvReport("StartUp Inc")).thenReturn(csvContent);
+
+        mockMvc.perform(get("/api/files/export/csv")
+                .param("companyName", "StartUp Inc"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(csvContent));
+
+        verify(raportGeneratorService, times(1)).generateCsvReport("StartUp Inc");
+    }
+
+    @Test
+    @DisplayName("Should export CSV for different companies with same endpoint")
+    public void shouldExportCsvForDifferentCompaniesWithSameEndpoint() throws Exception {
+        String techCorpCsv = "firstName,lastName,email,company,position,salary,status\n" +
+                            "John,Doe,john.doe@techcorp.com,TechCorp,ENGINEER,8500,ACTIVE\n";
+        String innovateCsv = "firstName,lastName,email,company,position,salary,status\n" +
+                            "Jane,Smith,jane.smith@innovate.com,Innovate,MANAGER,12500,ACTIVE\n";
+        
+        when(raportGeneratorService.generateCsvReport("TechCorp")).thenReturn(techCorpCsv);
+        when(raportGeneratorService.generateCsvReport("Innovate")).thenReturn(innovateCsv);
+
+        // First request for TechCorp
+        mockMvc.perform(get("/api/files/export/csv")
+                .param("companyName", "TechCorp"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(techCorpCsv));
+
+        // Second request for Innovate
+        mockMvc.perform(get("/api/files/export/csv")
+                .param("companyName", "Innovate"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(innovateCsv));
+
+        verify(raportGeneratorService, times(1)).generateCsvReport("TechCorp");
+        verify(raportGeneratorService, times(1)).generateCsvReport("Innovate");
+    }
+
+    @Test
+    @DisplayName("Should export CSV with company name containing spaces")
+    public void shouldExportCsvWithCompanyNameContainingSpaces() throws Exception {
+        String csvContent = "firstName,lastName,email,company,position,salary,status\n" +
+                           "John,Doe,john@company.com,Tech Corp Inc,ENGINEER,8500,ACTIVE\n";
+        
+        when(raportGeneratorService.generateCsvReport("Tech Corp Inc")).thenReturn(csvContent);
+
+        mockMvc.perform(get("/api/files/export/csv")
+                .param("companyName", "Tech Corp Inc"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(csvContent));
+
+        verify(raportGeneratorService, times(1)).generateCsvReport("Tech Corp Inc");
+    }
+
+    @Test
+    @DisplayName("Should export CSV when company name parameter is empty string")
+    public void shouldExportCsvWhenCompanyNameParameterIsEmptyString() throws Exception {
+        String csvContent = "firstName,lastName,email,company,position,salary,status\n" +
+                           "John,Doe,john.doe@techcorp.com,TechCorp,ENGINEER,8500,ACTIVE\n";
+        
+        when(raportGeneratorService.generateCsvReport("")).thenReturn(csvContent);
+
+        mockMvc.perform(get("/api/files/export/csv")
+                .param("companyName", ""))
+            .andExpect(status().isOk())
+            .andExpect(content().string(csvContent));
+
+        verify(raportGeneratorService, times(1)).generateCsvReport("");
+    }
 }
 

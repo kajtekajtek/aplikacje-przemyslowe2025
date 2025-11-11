@@ -18,6 +18,10 @@ public class RaportGeneratorService {
         return generateCsvReport(employeeService.getEmployees());
     }
 
+    public String generateCsvReport(String companyName) {
+        return generateCsvReport(employeeService.getEmployeesByCompanyName(companyName));
+    }
+
     private String generateCsvReport(List<Employee> employees) {
         StringBuilder csv = new StringBuilder();
         csv.append("firstName,lastName,email,company,position,salary,status\n");
