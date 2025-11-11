@@ -11,6 +11,7 @@ public class Employee
     private Role   role;
     private int    salary;
 	private EmploymentStatus status;
+	private String photoFileName;
 
     public static Employee createEmployee(
         String lastName, 
@@ -52,6 +53,19 @@ public class Employee
 		int    salary,
 		EmploymentStatus status
 	) {
+		this(lastName, firstName, emailAddress, companyName, role, salary, status, null);
+	}
+
+	public Employee(
+		String lastName,
+		String firstName,
+		String emailAddress,
+		String companyName,
+		Role   role,
+		int    salary,
+		EmploymentStatus status,
+		String photoFileName
+	) {
 		validateParameters(lastName, firstName, emailAddress, companyName, role, salary, status);
 
 		this.lastName     = lastName;
@@ -61,6 +75,7 @@ public class Employee
 		this.role         = role;
 		this.salary       = salary;
 		this.status       = status;
+		this.photoFileName = photoFileName;
 	}
 
 	private void validateParameters(
@@ -96,12 +111,14 @@ public class Employee
     public Role   getRole()         { return this.role; }
     public int    getSalary()       { return this.salary; }
 	public EmploymentStatus getStatus() { return this.status; }
+	public String getPhotoFileName() { return this.photoFileName; }
 
     public void setSalary(int salary) { this.salary = salary; }
 	public void setStatus(EmploymentStatus status) {
 		if (status == null) throw new IllegalArgumentException("Employment status cannot be null");
 		this.status = status;
 	}
+	public void setPhotoFileName(String photoFileName) { this.photoFileName = photoFileName; }
 
 	@Override
 	public String toString() {

@@ -18,7 +18,8 @@ public class EmployeeMapper {
             employee.getCompanyName(),
             employee.getRole(),
             employee.getSalary(),
-            employee.getStatus()
+            employee.getStatus(),
+            employee.getPhotoFileName()
         );
     }
 
@@ -30,7 +31,8 @@ public class EmployeeMapper {
             employeeDTO.getCompanyName(),
             employeeDTO.getRole(),
             employeeDTO.getSalary(),
-            employeeDTO.getStatus()
+            employeeDTO.getStatus(),
+            employeeDTO.getPhotoFileName()
         );
     }
 

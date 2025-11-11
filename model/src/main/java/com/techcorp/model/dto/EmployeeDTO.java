@@ -14,6 +14,7 @@ public class EmployeeDTO {
     private Role   role;
     private int    salary;
     private EmploymentStatus status;
+    private String photoFileName;
 
     public EmployeeDTO() { }
 
@@ -25,7 +26,8 @@ public class EmployeeDTO {
         @JsonProperty("companyName")  String companyName,
         @JsonProperty("role")         Role   role,
         @JsonProperty("salary")       int    salary,
-        @JsonProperty("status") EmploymentStatus status
+        @JsonProperty("status") EmploymentStatus status,
+        @JsonProperty("photoFileName") String photoFileName
     ) {
         this.firstName    = firstName;
         this.lastName     = lastName;
@@ -34,6 +36,7 @@ public class EmployeeDTO {
         this.role         = role;
         this.salary       = salary;
         this.status       = status;
+        this.photoFileName = photoFileName;
     }
 
     public String getFirstName()        { return firstName; }
@@ -43,6 +46,7 @@ public class EmployeeDTO {
     public Role   getRole()             { return role; }
     public int    getSalary()           { return salary; }
     public EmploymentStatus getStatus() { return status; }
+    public String getPhotoFileName()    { return photoFileName; }
 
     public void setFirstName(String firstName)       { this.firstName = firstName; }
     public void setLastName(String lastName)         { this.lastName = lastName; }
@@ -51,5 +55,6 @@ public class EmployeeDTO {
     public void setRole(Role role)                   { this.role = role; }
     public void setSalary(int salary)                { this.salary = salary; }
     public void setStatus(EmploymentStatus status)   { this.status = status; }
+    public void setPhotoFileName(String photoFileName) { this.photoFileName = photoFileName; }
 
 }

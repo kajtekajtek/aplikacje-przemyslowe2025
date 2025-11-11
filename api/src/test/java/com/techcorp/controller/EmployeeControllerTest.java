@@ -56,7 +56,7 @@ class EmployeeControllerTest {
         );
         testEmployeeDTO = new EmployeeDTO(
             "John", "Doe", "john.doe@example.com",
-            "TechCorp", Role.ENGINEER, 10000, EmploymentStatus.ACTIVE
+            "TechCorp", Role.ENGINEER, 10000, EmploymentStatus.ACTIVE, null
         );
     }
 
@@ -198,7 +198,7 @@ class EmployeeControllerTest {
         );
         EmployeeDTO updatedDTO = new EmployeeDTO(
             "John", "Doe", "john.doe@example.com",
-            "TechCorp", Role.MANAGER, 12000, EmploymentStatus.ACTIVE
+            "TechCorp", Role.MANAGER, 12000, EmploymentStatus.ACTIVE, null
         );
         
         doNothing().when(employeeService).updateEmployee(eq("john.doe@example.com"), any(Employee.class));

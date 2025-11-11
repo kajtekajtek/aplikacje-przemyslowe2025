@@ -57,6 +57,12 @@ class FileUploadControllerTest {
     @MockBean
     private DocumentService documentService;
 
+    @MockBean
+    private com.techcorp.service.PhotoService photoService;
+
+    @MockBean
+    private com.techcorp.service.EmployeeService employeeService;
+
     @TempDir
     Path tempDir;
 
@@ -1131,6 +1137,226 @@ class FileUploadControllerTest {
             .andExpect(jsonPath("$.fileType").value("OTHER"));
 
         verify(documentService, times(1)).saveDocument(eq("john@techcorp.com"), any(), eq(DocumentType.OTHER));
+    }
+
+    // ========== PHOTO UPLOAD TESTS ==========
+
+    @Test
+    @DisplayName("Should upload photo successfully")
+    public void shouldUploadPhotoSuccessfully() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+            "file", "photo.jpg", "image/jpeg", "photo content".getBytes()
+        );
+
+        com.techcorp.model.Employee employee = com.techcorp.model.Employee.createEmployee(
+            "Doe", "John", "john@techcorp.com", "TechCorp", com.techcorp.model.Role.ENGINEER
+        );
+        employee.setPhotoFileName("john@techcorp.com.jpg");
+
+        when(photoService.savePhoto(eq("john@techcorp.com"), any()))
+            .thenReturn("john@techcorp.com.jpg");
+        when(employeeService.getEmployeeByEmail("john@techcorp.com"))
+            .thenReturn(Optional.of(employee));
+
+        mockMvc.perform(multipart("/api/files/photos/john@techcorp.com")
+                .file(file))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.emailAddress").value("john@techcorp.com"))
+            .andExpect(jsonPath("$.photoFileName").value("john@techcorp.com.jpg"));
+
+        verify(photoService, times(1)).savePhoto(eq("john@techcorp.com"), any());
+    }
+
+    @Test
+    @DisplayName("Should upload PNG photo")
+    public void shouldUploadPngPhoto() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+            "file", "photo.png", "image/png", "photo content".getBytes()
+        );
+
+        com.techcorp.model.Employee employee = com.techcorp.model.Employee.createEmployee(
+            "Doe", "John", "john@techcorp.com", "TechCorp", com.techcorp.model.Role.ENGINEER
+        );
+        employee.setPhotoFileName("john@techcorp.com.png");
+
+        when(photoService.savePhoto(eq("john@techcorp.com"), any()))
+            .thenReturn("john@techcorp.com.png");
+        when(employeeService.getEmployeeByEmail("john@techcorp.com"))
+            .thenReturn(Optional.of(employee));
+
+        mockMvc.perform(multipart("/api/files/photos/john@techcorp.com")
+                .file(file))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.photoFileName").value("john@techcorp.com.png"));
+
+        verify(photoService, times(1)).savePhoto(eq("john@techcorp.com"), any());
+    }
+
+    @Test
+    @DisplayName("Should return 404 when uploading photo for non-existent employee")
+    public void shouldReturn404WhenUploadingPhotoForNonExistentEmployee() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+            "file", "photo.jpg", "image/jpeg", "photo content".getBytes()
+        );
+
+        when(photoService.savePhoto(eq("notfound@techcorp.com"), any()))
+            .thenThrow(new com.techcorp.model.exception.EmployeeNotFoundException(
+                "Employee with email notfound@techcorp.com not found"
+            ));
+
+        mockMvc.perform(multipart("/api/files/photos/notfound@techcorp.com")
+                .file(file))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Should return 400 when uploading invalid photo format")
+    public void shouldReturn400WhenUploadingInvalidPhotoFormat() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+            "file", "document.pdf", "application/pdf", "pdf content".getBytes()
+        );
+
+        when(photoService.savePhoto(eq("john@techcorp.com"), any()))
+            .thenThrow(new com.techcorp.model.exception.InvalidFileException(
+                "Invalid file format. Allowed formats: JPG, PNG"
+            ));
+
+        mockMvc.perform(multipart("/api/files/photos/john@techcorp.com")
+                .file(file))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Should return 400 when uploading too large photo")
+    public void shouldReturn400WhenUploadingTooLargePhoto() throws Exception {
+        byte[] largeContent = new byte[3 * 1024 * 1024]; // 3MB
+        MockMultipartFile file = new MockMultipartFile(
+            "file", "photo.jpg", "image/jpeg", largeContent
+        );
+
+        when(photoService.savePhoto(eq("john@techcorp.com"), any()))
+            .thenThrow(new com.techcorp.model.exception.InvalidFileException(
+                "File is too large. Maximum size: 2MB"
+            ));
+
+        mockMvc.perform(multipart("/api/files/photos/john@techcorp.com")
+                .file(file))
+            .andExpect(status().isBadRequest());
+    }
+
+    // ========== GET PHOTO TESTS ==========
+
+    @Test
+    @DisplayName("Should get photo successfully")
+    public void shouldGetPhotoSuccessfully() throws Exception {
+        com.techcorp.model.Employee employee = com.techcorp.model.Employee.createEmployee(
+            "Doe", "John", "john@techcorp.com", "TechCorp", com.techcorp.model.Role.ENGINEER
+        );
+        employee.setPhotoFileName("john@techcorp.com.jpg");
+
+        Path photoPath = tempDir.resolve("john@techcorp.com.jpg");
+        Files.write(photoPath, "photo content".getBytes());
+
+        org.springframework.core.io.Resource resource = 
+            new org.springframework.core.io.FileSystemResource(photoPath.toFile());
+
+        when(photoService.loadPhoto("john@techcorp.com"))
+            .thenReturn(resource);
+        when(employeeService.getEmployeeByEmail("john@techcorp.com"))
+            .thenReturn(Optional.of(employee));
+        when(photoService.getContentType("john@techcorp.com.jpg"))
+            .thenReturn("image/jpeg");
+
+        mockMvc.perform(get("/api/files/photos/john@techcorp.com"))
+            .andExpect(status().isOk())
+            .andExpect(header().string("Content-Type", "image/jpeg"));
+
+        verify(photoService, times(1)).loadPhoto("john@techcorp.com");
+    }
+
+    @Test
+    @DisplayName("Should return 404 when photo not found")
+    public void shouldReturn404WhenPhotoNotFound() throws Exception {
+        when(photoService.loadPhoto("john@techcorp.com"))
+            .thenThrow(new com.techcorp.model.exception.FileNotFoundException(
+                "Employee john@techcorp.com has no photo"
+            ));
+
+        mockMvc.perform(get("/api/files/photos/john@techcorp.com"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Should return 404 when getting photo for non-existent employee")
+    public void shouldReturn404WhenGettingPhotoForNonExistentEmployee() throws Exception {
+        when(photoService.loadPhoto("notfound@techcorp.com"))
+            .thenThrow(new com.techcorp.model.exception.EmployeeNotFoundException(
+                "Employee with email notfound@techcorp.com not found"
+            ));
+
+        mockMvc.perform(get("/api/files/photos/notfound@techcorp.com"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Should return PNG photo with correct content type")
+    public void shouldReturnPngPhotoWithCorrectContentType() throws Exception {
+        com.techcorp.model.Employee employee = com.techcorp.model.Employee.createEmployee(
+            "Doe", "John", "john@techcorp.com", "TechCorp", com.techcorp.model.Role.ENGINEER
+        );
+        employee.setPhotoFileName("john@techcorp.com.png");
+
+        Path photoPath = tempDir.resolve("john@techcorp.com.png");
+        Files.write(photoPath, "photo content".getBytes());
+
+        org.springframework.core.io.Resource resource = 
+            new org.springframework.core.io.FileSystemResource(photoPath.toFile());
+
+        when(photoService.loadPhoto("john@techcorp.com"))
+            .thenReturn(resource);
+        when(employeeService.getEmployeeByEmail("john@techcorp.com"))
+            .thenReturn(Optional.of(employee));
+        when(photoService.getContentType("john@techcorp.com.png"))
+            .thenReturn("image/png");
+
+        mockMvc.perform(get("/api/files/photos/john@techcorp.com"))
+            .andExpect(status().isOk())
+            .andExpect(header().string("Content-Type", "image/png"));
+    }
+
+    // ========== DELETE PHOTO TESTS ==========
+
+    @Test
+    @DisplayName("Should delete photo successfully")
+    public void shouldDeletePhotoSuccessfully() throws Exception {
+        doNothing().when(photoService).deletePhoto("john@techcorp.com");
+
+        mockMvc.perform(delete("/api/files/photos/john@techcorp.com"))
+            .andExpect(status().isNoContent());
+
+        verify(photoService, times(1)).deletePhoto("john@techcorp.com");
+    }
+
+    @Test
+    @DisplayName("Should return 404 when deleting photo for non-existent employee")
+    public void shouldReturn404WhenDeletingPhotoForNonExistentEmployee() throws Exception {
+        doThrow(new com.techcorp.model.exception.EmployeeNotFoundException(
+            "Employee with email notfound@techcorp.com not found"
+        )).when(photoService).deletePhoto("notfound@techcorp.com");
+
+        mockMvc.perform(delete("/api/files/photos/notfound@techcorp.com"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Should handle deletion when no photo exists")
+    public void shouldHandleDeletionWhenNoPhotoExists() throws Exception {
+        doNothing().when(photoService).deletePhoto("john@techcorp.com");
+
+        mockMvc.perform(delete("/api/files/photos/john@techcorp.com"))
+            .andExpect(status().isNoContent());
+
+        verify(photoService, times(1)).deletePhoto("john@techcorp.com");
     }
 }
 

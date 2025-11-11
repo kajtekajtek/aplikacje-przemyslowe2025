@@ -18,11 +18,16 @@ import org.springframework.core.io.FileSystemResource;
 
 import com.techcorp.model.DocumentType;
 import com.techcorp.model.EmployeeDocument;
+import com.techcorp.model.exception.EmployeeNotFoundException;
 import com.techcorp.model.ImportSummary;
+import com.techcorp.model.dto.EmployeeDTO;
+import com.techcorp.mapper.EmployeeMapper;
 import com.techcorp.service.DocumentService;
 import com.techcorp.service.FileStorageService;
 import com.techcorp.service.ImportService;
+import com.techcorp.service.PhotoService;
 import com.techcorp.service.RaportGeneratorService;
+import com.techcorp.service.EmployeeService;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -37,17 +42,23 @@ public class FileUploadController {
     private final FileStorageService fileStorageService;
     private final RaportGeneratorService raportGeneratorService;
     private final DocumentService documentService;
+    private final PhotoService photoService;
+    private final EmployeeService employeeService;
     
     public FileUploadController(
         ImportService importService, 
         FileStorageService fileStorageService,
         RaportGeneratorService raportGeneratorService,
-        DocumentService documentService
+        DocumentService documentService,
+        PhotoService photoService,
+        EmployeeService employeeService
     ) {
         this.importService = importService;
         this.fileStorageService = fileStorageService;
         this.raportGeneratorService = raportGeneratorService;
         this.documentService = documentService;
+        this.photoService = photoService;
+        this.employeeService = employeeService;
     }
 
     @PostMapping({"/import/csv", "/import/xml"})
@@ -154,6 +165,53 @@ public class FileUploadController {
         @PathVariable String documentId
     ) {
         documentService.deleteDocument(email, documentId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/photos/{email}")
+    public ResponseEntity<EmployeeDTO> uploadPhoto(
+        @PathVariable String email,
+        @RequestParam("file") MultipartFile file
+    ) {
+        photoService.savePhoto(email, file);
+        
+        EmployeeDTO employeeDTO = employeeService.getEmployeeByEmail(email)
+            .map(EmployeeMapper::entityToDTO)
+            .orElseThrow(() -> new EmployeeNotFoundException(
+                "Employee with email " + email + " not found"
+            ));
+        
+        return ResponseEntity.ok(employeeDTO);
+    }
+
+    @GetMapping("/photos/{email}")
+    public ResponseEntity<Resource> getPhoto(
+        @PathVariable String email
+    ) {
+        Resource resource = photoService.loadPhoto(email);
+        
+        String filename = employeeService.getEmployeeByEmail(email)
+            .orElseThrow(() -> new EmployeeNotFoundException(
+                "Employee with email " + email + " not found"
+            ))
+            .getPhotoFileName();
+        
+        String contentType = photoService.getContentType(filename);
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(contentType));
+        headers.setContentDispositionFormData("inline", filename);
+        
+        return ResponseEntity.ok()
+            .headers(headers)
+            .body(resource);
+    }
+
+    @DeleteMapping("/photos/{email}")
+    public ResponseEntity<Void> deletePhoto(
+        @PathVariable String email
+    ) {
+        photoService.deletePhoto(email);
         return ResponseEntity.noContent().build();
     }
 
