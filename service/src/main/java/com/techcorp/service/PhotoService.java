@@ -4,6 +4,7 @@ import com.techcorp.model.Employee;
 import com.techcorp.model.exception.EmployeeNotFoundException;
 import com.techcorp.model.exception.InvalidFileException;
 import org.springframework.core.io.Resource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,19 +17,24 @@ import java.util.List;
 @Service
 public class PhotoService {
 
-    private static final String UPLOAD_DIR = "uploads/photos";
+    private final String uploadPathString;
     private static final List<String> ALLOWED_EXTENSIONS = Arrays.asList("jpg", "jpeg", "png");
     private static final long MAX_SIZE_BYTES = 2 * 1024 * 1024; // 2MB
     
     private final FileStorageService fileStorageService;
     private final EmployeeService employeeService;
 
-    public PhotoService(FileStorageService fileStorageService, EmployeeService employeeService) {
+    public PhotoService(
+        FileStorageService fileStorageService, 
+        EmployeeService employeeService,
+        @Value("${app.upload.directory}") String uploadPathString
+    ) {
+        this.uploadPathString = uploadPathString + "/photos";
         this.fileStorageService = fileStorageService;
         this.employeeService = employeeService;
         
         try {
-            Files.createDirectories(Paths.get(UPLOAD_DIR));
+            Files.createDirectories(Paths.get(this.uploadPathString));
         } catch (IOException e) {
             throw new RuntimeException("Could not create upload directory for photos!", e);
         }
@@ -59,7 +65,7 @@ public class PhotoService {
 
         employee.setPhotoFileName(safeFileName);
 
-        fileStorageService.saveFile(file, UPLOAD_DIR + "/" + normalizedEmail);
+        fileStorageService.saveFile(file, this.uploadPathString + "/" + normalizedEmail);
 
         return safeFileName;
     }

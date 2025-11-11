@@ -36,7 +36,7 @@ class PhotoServiceTest {
 
     @BeforeEach
     void setUp() {
-        photoService = new PhotoService(fileStorageService, employeeService);
+        photoService = new PhotoService(fileStorageService, employeeService, "uploads");
         testEmployee = Employee.createEmployee(
             "Doe", "John", "john@techcorp.com", "TechCorp", Role.ENGINEER
         );
