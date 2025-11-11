@@ -1,4 +1,4 @@
-package com.techcorp.exception;
+package com.techcorp.model.exception;
 
 public class InvalidDataException extends RuntimeException {
     private int line;

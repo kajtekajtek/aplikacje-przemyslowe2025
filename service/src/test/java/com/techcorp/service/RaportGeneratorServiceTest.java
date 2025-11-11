@@ -1,14 +1,16 @@
 package com.techcorp.service;
 
-import com.techcorp.Employee;
-import com.techcorp.EmploymentStatus;
-import com.techcorp.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.techcorp.model.CompanyStatistics;
+import com.techcorp.model.Employee;
+import com.techcorp.model.EmploymentStatus;
+import com.techcorp.model.Role;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -458,6 +460,176 @@ class RaportGeneratorServiceTest {
         verify(employeeService, times(1)).getEmployees();
         verify(employeeService, never()).getEmployeesByCompanyName(anyString());
         verifyNoMoreInteractions(employeeService);
+    }
+
+    // PDF Report Tests
+
+    @Test
+    @DisplayName("Should generate PDF report with company statistics")
+    void shouldGeneratePdfReportWithCompanyStatistics() {
+        CompanyStatistics stats = new CompanyStatistics(
+            "TechCorp", 10, 15000, 12000.0, "John Doe"
+        );
+        when(employeeService.getCompanyStatistics("TechCorp")).thenReturn(stats);
+
+        byte[] pdf = raportGeneratorService.generatePdfReport("TechCorp");
+
+        assertNotNull(pdf);
+        assertTrue(pdf.length > 0);
+        // PDF magic number check
+        assertEquals(0x25, pdf[0] & 0xFF); // %
+        assertEquals(0x50, pdf[1] & 0xFF); // P
+        assertEquals(0x44, pdf[2] & 0xFF); // D
+        assertEquals(0x46, pdf[3] & 0xFF); // F
+        
+        verify(employeeService, times(1)).getCompanyStatistics("TechCorp");
+    }
+
+    @Test
+    @DisplayName("Should generate PDF report for different companies")
+    void shouldGeneratePdfReportForDifferentCompanies() {
+        CompanyStatistics techCorpStats = new CompanyStatistics(
+            "TechCorp", 10, 15000, 12000.0, "John Doe"
+        );
+        CompanyStatistics innovateStats = new CompanyStatistics(
+            "Innovate", 5, 20000, 15000.0, "Jane Smith"
+        );
+        
+        when(employeeService.getCompanyStatistics("TechCorp")).thenReturn(techCorpStats);
+        when(employeeService.getCompanyStatistics("Innovate")).thenReturn(innovateStats);
+
+        byte[] techCorpPdf = raportGeneratorService.generatePdfReport("TechCorp");
+        byte[] innovatePdf = raportGeneratorService.generatePdfReport("Innovate");
+
+        assertNotNull(techCorpPdf);
+        assertNotNull(innovatePdf);
+        assertTrue(techCorpPdf.length > 0);
+        assertTrue(innovatePdf.length > 0);
+        assertNotEquals(techCorpPdf.length, innovatePdf.length);
+        
+        verify(employeeService, times(1)).getCompanyStatistics("TechCorp");
+        verify(employeeService, times(1)).getCompanyStatistics("Innovate");
+    }
+
+    @Test
+    @DisplayName("Should generate valid PDF with statistics data")
+    void shouldGenerateValidPdfWithStatisticsData() {
+        CompanyStatistics stats = new CompanyStatistics(
+            "StartUp Inc", 3, 25000, 12000.0, "Big Boss"
+        );
+        when(employeeService.getCompanyStatistics("StartUp Inc")).thenReturn(stats);
+
+        byte[] pdf = raportGeneratorService.generatePdfReport("StartUp Inc");
+
+        assertNotNull(pdf);
+        assertTrue(pdf.length > 100); // PDF should be reasonably sized
+        // Verify it starts with PDF header
+        String header = new String(Arrays.copyOfRange(pdf, 0, 4));
+        assertEquals("%PDF", header);
+        
+        verify(employeeService, times(1)).getCompanyStatistics("StartUp Inc");
+    }
+
+    @Test
+    @DisplayName("Should generate PDF with different employee counts")
+    void shouldGeneratePdfWithDifferentEmployeeCounts() {
+        CompanyStatistics smallCompany = new CompanyStatistics(
+            "SmallCo", 2, 10000, 8000.0, "Alice"
+        );
+        CompanyStatistics largeCompany = new CompanyStatistics(
+            "LargeCo", 100, 30000, 15000.0, "Bob"
+        );
+        
+        when(employeeService.getCompanyStatistics("SmallCo")).thenReturn(smallCompany);
+        when(employeeService.getCompanyStatistics("LargeCo")).thenReturn(largeCompany);
+
+        byte[] smallPdf = raportGeneratorService.generatePdfReport("SmallCo");
+        byte[] largePdf = raportGeneratorService.generatePdfReport("LargeCo");
+
+        assertNotNull(smallPdf);
+        assertNotNull(largePdf);
+        assertTrue(smallPdf.length > 0);
+        assertTrue(largePdf.length > 0);
+        
+        verify(employeeService, times(1)).getCompanyStatistics("SmallCo");
+        verify(employeeService, times(1)).getCompanyStatistics("LargeCo");
+    }
+
+    @Test
+    @DisplayName("Should generate PDF with different salary ranges")
+    void shouldGeneratePdfWithDifferentSalaryRanges() {
+        CompanyStatistics stats = new CompanyStatistics(
+            "Company", 5, 50000, 25000.5, "Top Employee"
+        );
+        when(employeeService.getCompanyStatistics("Company")).thenReturn(stats);
+
+        byte[] pdf = raportGeneratorService.generatePdfReport("Company");
+
+        assertNotNull(pdf);
+        assertTrue(pdf.length > 0);
+        
+        verify(employeeService, times(1)).getCompanyStatistics("Company");
+    }
+
+    @Test
+    @DisplayName("Should call getCompanyStatistics exactly once when generating PDF")
+    void shouldCallGetCompanyStatisticsExactlyOnceWhenGeneratingPdf() {
+        CompanyStatistics stats = new CompanyStatistics(
+            "TechCorp", 10, 15000, 12000.0, "John Doe"
+        );
+        when(employeeService.getCompanyStatistics("TechCorp")).thenReturn(stats);
+
+        raportGeneratorService.generatePdfReport("TechCorp");
+
+        verify(employeeService, times(1)).getCompanyStatistics("TechCorp");
+        verifyNoMoreInteractions(employeeService);
+    }
+
+    @Test
+    @DisplayName("Should generate PDF with company name containing special characters")
+    void shouldGeneratePdfWithCompanyNameContainingSpecialCharacters() {
+        CompanyStatistics stats = new CompanyStatistics(
+            "Tech-Corp & Co.", 5, 15000, 12000.0, "John O'Brien"
+        );
+        when(employeeService.getCompanyStatistics("Tech-Corp & Co.")).thenReturn(stats);
+
+        byte[] pdf = raportGeneratorService.generatePdfReport("Tech-Corp & Co.");
+
+        assertNotNull(pdf);
+        assertTrue(pdf.length > 0);
+        
+        verify(employeeService, times(1)).getCompanyStatistics("Tech-Corp & Co.");
+    }
+
+    @Test
+    @DisplayName("Should generate PDF with zero employee count")
+    void shouldGeneratePdfWithZeroEmployeeCount() {
+        CompanyStatistics stats = new CompanyStatistics(
+            "EmptyCompany", 0, 0, 0.0, "N/A"
+        );
+        when(employeeService.getCompanyStatistics("EmptyCompany")).thenReturn(stats);
+
+        byte[] pdf = raportGeneratorService.generatePdfReport("EmptyCompany");
+
+        assertNotNull(pdf);
+        assertTrue(pdf.length > 0);
+        
+        verify(employeeService, times(1)).getCompanyStatistics("EmptyCompany");
+    }
+
+    @Test
+    @DisplayName("Should throw RuntimeException when PDF generation fails")
+    void shouldThrowRuntimeExceptionWhenPdfGenerationFails() {
+        when(employeeService.getCompanyStatistics("FailCompany"))
+            .thenThrow(new RuntimeException("Database error"));
+
+        RuntimeException exception = assertThrows(
+            RuntimeException.class,
+            () -> raportGeneratorService.generatePdfReport("FailCompany")
+        );
+
+        assertTrue(exception.getMessage().contains("Database error"));
+        verify(employeeService, times(1)).getCompanyStatistics("FailCompany");
     }
 }
 

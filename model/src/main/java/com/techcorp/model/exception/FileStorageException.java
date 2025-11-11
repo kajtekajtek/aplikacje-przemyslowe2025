@@ -1,4 +1,4 @@
-package com.techcorp.exception;
+package com.techcorp.model.exception;
 
 public class FileStorageException extends RuntimeException {
     public FileStorageException(String message) {

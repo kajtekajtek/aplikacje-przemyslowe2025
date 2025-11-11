@@ -1,4 +1,4 @@
-package com.techcorp.exception;
+package com.techcorp.model.exception;
 
 public class FileNotFoundException extends RuntimeException {
     public FileNotFoundException(String message) {

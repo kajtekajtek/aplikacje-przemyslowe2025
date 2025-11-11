@@ -1,9 +1,9 @@
-package com.techcorp.dto;
+package com.techcorp.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.techcorp.EmploymentStatus;
-import com.techcorp.Role;
+import com.techcorp.model.EmploymentStatus;
+import com.techcorp.model.Role;
 
 public class EmployeeDTO {
 

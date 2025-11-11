@@ -1,6 +1,9 @@
 package com.techcorp;
 
 import org.junit.jupiter.api.Test;
+
+import com.techcorp.model.CompanyStatistics;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CompanyStatisticsTest {

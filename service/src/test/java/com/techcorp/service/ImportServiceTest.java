@@ -7,10 +7,10 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.techcorp.Employee;
-import com.techcorp.ImportSummary;
-import com.techcorp.Role;
-import com.techcorp.exception.FileNotFoundException;
+import com.techcorp.model.Employee;
+import com.techcorp.model.ImportSummary;
+import com.techcorp.model.Role;
+import com.techcorp.model.exception.FileNotFoundException;
 import com.techcorp.service.EmployeeService;
 import com.techcorp.service.ImportService;
 

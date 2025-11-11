@@ -1,4 +1,4 @@
-package com.techcorp.exception;
+package com.techcorp.model.exception;
 
 public class DuplicateEmailException extends RuntimeException {
 

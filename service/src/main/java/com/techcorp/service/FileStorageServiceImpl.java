@@ -1,13 +1,13 @@
 package com.techcorp.service;
 
-import com.techcorp.exception.FileStorageException;
-import com.techcorp.exception.InvalidFileException;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.techcorp.model.exception.FileStorageException;
+import com.techcorp.model.exception.InvalidFileException;
 
 import java.io.IOException;
 import java.net.MalformedURLException;

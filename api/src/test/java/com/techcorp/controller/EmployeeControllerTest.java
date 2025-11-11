@@ -1,13 +1,13 @@
 package com.techcorp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.techcorp.Employee;
-import com.techcorp.EmploymentStatus;
-import com.techcorp.Role;
-import com.techcorp.dto.EmployeeDTO;
-import com.techcorp.exception.DuplicateEmailException;
-import com.techcorp.exception.EmployeeNotFoundException;
 import com.techcorp.exception.GlobalExceptionHandler;
+import com.techcorp.model.Employee;
+import com.techcorp.model.EmploymentStatus;
+import com.techcorp.model.Role;
+import com.techcorp.model.dto.EmployeeDTO;
+import com.techcorp.model.exception.DuplicateEmailException;
+import com.techcorp.model.exception.EmployeeNotFoundException;
 import com.techcorp.service.EmployeeService;
 
 import org.junit.jupiter.api.BeforeAll;

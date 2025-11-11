@@ -9,6 +9,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ImportResource;
 
+import com.techcorp.model.Employee;
 import com.techcorp.service.EmployeeService;
 
 @SpringBootApplication

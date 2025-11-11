@@ -1,4 +1,4 @@
-package com.techcorp;
+package com.techcorp.model;
 
 import java.util.Map;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package com.techcorp.exception;
+package com.techcorp.model.exception;
 
 public class EmployeeNotFoundException extends RuntimeException {
 

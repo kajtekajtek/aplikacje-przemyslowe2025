@@ -1,4 +1,4 @@
-package com.techcorp;
+package com.techcorp.model;
 
 public enum Role {
     CEO(1, 25000),

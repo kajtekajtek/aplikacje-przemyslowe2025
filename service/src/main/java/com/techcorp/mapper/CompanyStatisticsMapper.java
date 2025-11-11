@@ -1,7 +1,7 @@
 package com.techcorp.mapper;
 
-import com.techcorp.CompanyStatistics;
-import com.techcorp.dto.CompanyStatisticsDTO;
+import com.techcorp.model.CompanyStatistics;
+import com.techcorp.model.dto.CompanyStatisticsDTO;
 
 public class CompanyStatisticsMapper {
 

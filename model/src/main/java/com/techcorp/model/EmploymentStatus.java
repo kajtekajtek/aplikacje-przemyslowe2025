@@ -1,4 +1,4 @@
-package com.techcorp;
+package com.techcorp.model;
 
 public enum EmploymentStatus {
     ACTIVE,

@@ -1,4 +1,4 @@
-package com.techcorp.exception;
+package com.techcorp.model.exception;
 
 public class InvalidFileException extends RuntimeException {
     public InvalidFileException(String message) {

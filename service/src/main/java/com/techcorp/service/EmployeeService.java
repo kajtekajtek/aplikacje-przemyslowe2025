@@ -9,12 +9,12 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.techcorp.exception.EmployeeNotFoundException;
-import com.techcorp.CompanyStatistics;
-import com.techcorp.Employee;
-import com.techcorp.EmploymentStatus;
-import com.techcorp.Role;
-import com.techcorp.exception.DuplicateEmailException;
+import com.techcorp.model.CompanyStatistics;
+import com.techcorp.model.Employee;
+import com.techcorp.model.EmploymentStatus;
+import com.techcorp.model.Role;
+import com.techcorp.model.exception.DuplicateEmailException;
+import com.techcorp.model.exception.EmployeeNotFoundException;
 
 @Service
 public class EmployeeService 
@@ -34,7 +34,7 @@ public class EmployeeService
             );
 
         if (emailExists) {
-            throw new com.techcorp.exception.DuplicateEmailException(
+            throw new com.techcorp.model.exception.DuplicateEmailException(
                 "Employee with email " + employee.getEmailAddress() + " already exists."
             );
         }

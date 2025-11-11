@@ -1,6 +1,13 @@
 package com.techcorp.exception;
 
-import com.techcorp.dto.ErrorResponse;
+import com.techcorp.model.dto.ErrorResponse;
+import com.techcorp.model.exception.DuplicateEmailException;
+import com.techcorp.model.exception.EmployeeNotFoundException;
+import com.techcorp.model.exception.FileNotFoundException;
+import com.techcorp.model.exception.FileStorageException;
+import com.techcorp.model.exception.InvalidDataException;
+import com.techcorp.model.exception.InvalidFileException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;

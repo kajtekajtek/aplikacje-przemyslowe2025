@@ -1,6 +1,13 @@
 package com.techcorp.exception;
 
-import com.techcorp.dto.ErrorResponse;
+import com.techcorp.model.dto.ErrorResponse;
+import com.techcorp.model.exception.DuplicateEmailException;
+import com.techcorp.model.exception.EmployeeNotFoundException;
+import com.techcorp.model.exception.FileNotFoundException;
+import com.techcorp.model.exception.FileStorageException;
+import com.techcorp.model.exception.InvalidDataException;
+import com.techcorp.model.exception.InvalidFileException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

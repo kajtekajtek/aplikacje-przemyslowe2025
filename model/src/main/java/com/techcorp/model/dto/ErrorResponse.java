@@ -1,4 +1,4 @@
-package com.techcorp.dto;
+package com.techcorp.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.techcorp.CompanyStatistics;
-import com.techcorp.Employee;
-import com.techcorp.Role;
-import com.techcorp.exception.DuplicateEmailException;
+import com.techcorp.model.CompanyStatistics;
+import com.techcorp.model.Employee;
+import com.techcorp.model.Role;
+import com.techcorp.model.exception.DuplicateEmailException;
 import com.techcorp.service.EmployeeService;
 
 public class EmployeeServiceTest

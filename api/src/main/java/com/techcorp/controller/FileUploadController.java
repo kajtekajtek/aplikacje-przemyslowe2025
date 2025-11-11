@@ -1,6 +1,7 @@
 package com.techcorp.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,7 +12,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ByteArrayResource;
-import com.techcorp.ImportSummary;
+
+import com.techcorp.model.ImportSummary;
 import com.techcorp.service.FileStorageService;
 import com.techcorp.service.ImportService;
 import com.techcorp.service.RaportGeneratorService;
@@ -59,6 +61,23 @@ public class FileUploadController {
         headers.setContentType(MediaType.parseMediaType("text/csv"));
         headers.setContentDispositionFormData("attachment", "employees.csv");
         headers.setContentLength(csvBytes.length);
+        
+        return ResponseEntity.ok()
+            .headers(headers)
+            .body(resource);
+    }
+
+    @GetMapping("/reports/statistics/{companyName}")
+    public ResponseEntity<Resource> getStatisticsReport(
+        @PathVariable String companyName
+    ) {
+        byte[] pdfBytes = raportGeneratorService.generatePdfReport(companyName);
+        ByteArrayResource resource = new ByteArrayResource(pdfBytes);
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "statistics_" + companyName + ".pdf");
+        headers.setContentLength(pdfBytes.length);
         
         return ResponseEntity.ok()
             .headers(headers)
