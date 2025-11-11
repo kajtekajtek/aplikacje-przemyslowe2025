@@ -61,12 +61,13 @@ public class FileUploadController {
         this.employeeService = employeeService;
     }
 
-    @PostMapping({"/import/csv", "/import/xml"})
+    @PostMapping(value = {"/import/csv", "/import/xml"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ImportSummary> uploadFile(
         @RequestParam("file") MultipartFile file
     ) {
-        String filePath = fileStorageService.saveFile(file);
-        ImportSummary summary = importService.importFromFile(filePath);
+        String filename = fileStorageService.saveFile(file);
+        String fullPath = fileStorageService.getFullPath(filename);
+        ImportSummary summary = importService.importFromFile(fullPath);
         return ResponseEntity.ok(summary);
     }
 
@@ -108,7 +109,7 @@ public class FileUploadController {
             .body(resource);
     }
 
-    @PostMapping("/documents/{email}")
+    @PostMapping(value = "/documents/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EmployeeDocument> uploadDocument(
         @PathVariable String email,
         @RequestParam("file") MultipartFile file,
@@ -168,7 +169,7 @@ public class FileUploadController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/photos/{email}")
+    @PostMapping(value = "/photos/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EmployeeDTO> uploadPhoto(
         @PathVariable String email,
         @RequestParam("file") MultipartFile file

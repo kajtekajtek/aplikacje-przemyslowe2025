@@ -154,6 +154,11 @@ public class FileStorageServiceImpl extends FileStorageService {
         }
     }
 
+    @Override
+    public String getFullPath(String filename) {
+        return uploadPath.resolve(filename).normalize().toString();
+    }
+
     private void isValidFileCheck(String name, String extension, long fileSize) {
         if (name == null) {
             throw new InvalidFileException("File name is required");

@@ -14,5 +14,7 @@ public abstract class FileStorageService {
     public abstract Resource loadFile(String filename);
     
     public abstract void deleteFile(String filename);
+    
+    public abstract String getFullPath(String filename);
 
 }

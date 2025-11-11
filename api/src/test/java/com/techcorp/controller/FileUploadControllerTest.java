@@ -114,6 +114,9 @@ class FileUploadControllerTest {
         summaryWithErrors = new ImportSummary();
         summaryWithErrors.addSuccessfullImport();
         summaryWithErrors.addError(2, new InvalidDataException(2, "Invalid role"));
+        
+        // Default mock for getFullPath - return the same path as input
+        when(fileStorageService.getFullPath(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
     }
 
     @Test
