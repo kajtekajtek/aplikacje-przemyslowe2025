@@ -1,11 +1,18 @@
 package com.techcorp;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import com.techcorp.exception.InvalidDataException;
 import com.techcorp.exception.DuplicateEmailException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import org.springframework.stereotype.Service;
 
@@ -26,36 +33,19 @@ public class ImportService {
         throw new IllegalArgumentException("Employee service cannot be null");
     }
 
-    public ImportSummary importFromCsv(String filePath) throws IOException {
+    public ImportSummary importFromFile(String filePath) throws IOException {
         validateFilePath(filePath);
         validateFileExists(filePath);
 
-        summary = new ImportSummary();
-
-        try (BufferedReader reader = Files.newBufferedReader(Path.of(filePath))) {
-            String line;
-            int    lineIdx  = 0;
-            while ((line = reader.readLine()) != null) {
-                lineIdx++;
-
-                Employee employee = parseCsvLine(line, lineIdx);
-
-                if (employee == null) continue;
-
-                try {
-                    employeeService.addEmployee(employee);
-                } catch (IllegalArgumentException | DuplicateEmailException e) {
-                    summary.addError(lineIdx, new InvalidDataException(
-                        lineIdx, e.getMessage()
-                    ));
-                    continue;
-                }
-
-                summary.addSuccessfullImport();
-            }
+        String extension = getFileExtension(filePath);
+        
+        if (extension.equalsIgnoreCase("csv")) {
+            return importFromCsv(filePath);
+        } else if (extension.equalsIgnoreCase("xml")) {
+            return importFromXml(filePath);
+        } else {
+            throw new IllegalArgumentException("Unsupported file format: " + extension);
         }
-
-        return summary;
     }
 
     private void validateFilePath(String filePath) throws IOException {
@@ -70,8 +60,36 @@ public class ImportService {
 
     private void validateFileExists(String filePath) throws IOException {
         if (!Files.exists(Path.of(filePath))) {
-            throw new IOException("File does not exist");
+            throw new FileNotFoundException("File does not exist");
         }
+    }
+
+    private String getFileExtension(String filePath) {
+        int lastDotIndex = filePath.lastIndexOf('.');
+        if (lastDotIndex == -1 || lastDotIndex == filePath.length() - 1) {
+            return "";
+        }
+        return filePath.substring(lastDotIndex + 1);
+    }
+
+    private ImportSummary importFromCsv(String filePath) throws IOException {
+        summary = new ImportSummary();
+
+        try (BufferedReader reader = Files.newBufferedReader(Path.of(filePath))) {
+            String line;
+            int    lineIdx  = 0;
+            while ((line = reader.readLine()) != null) {
+                lineIdx++;
+
+                Employee employee = parseCsvLine(line, lineIdx);
+
+                if (employee == null) continue;
+
+                handleEmployee(employee, lineIdx);
+            }
+        }
+
+        return summary;
     }
 
     private Employee parseCsvLine(String line, int lineIdx) {
@@ -98,20 +116,9 @@ public class ImportService {
             return null;
         }
 
-        Role role;
-        switch (fields[4].trim().toUpperCase()) {
-            case "CEO":         role = Role.CEO; break;
-            case "VP":          role = Role.VP; break;
-            case "MANAGER":     role = Role.MANAGER; break;
-            case "ENGINEER":    role = Role.ENGINEER; break;
-            case "PROGRAMISTA": role = Role.ENGINEER; break;
-            case "INTERN":      role = Role.INTERN; break;
-            default: {
-                summary.addError(lineIdx, new InvalidDataException(
-                    lineIdx, "Invalid role"
-                ));
-                return null;
-            }
+        Role role = parseRole(fields[4], lineIdx);
+        if (role == null) {
+            return null;
         }
 
         int salary;
@@ -130,11 +137,125 @@ public class ImportService {
             return null;
         }
 
-        Employee employee = new Employee(
-            lastName, firstName, email, company, role, salary
-        );
-
-   
-        return employee;
+        return new Employee(lastName, firstName, email, company, role, salary);
     }
+
+    private ImportSummary importFromXml(String filePath) throws IOException {
+        summary = new ImportSummary();
+
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(Path.of(filePath).toFile());
+            document.getDocumentElement().normalize();
+
+            NodeList employeeNodes = document.getElementsByTagName("employee");
+            
+            for (int i = 0; i < employeeNodes.getLength(); i++) {
+                Element employeeElement = (Element) employeeNodes.item(i);
+                int lineIdx = i + 1;
+                
+                Employee employee = parseXmlElement(employeeElement, lineIdx);
+                
+                if (employee == null) continue;
+                
+                handleEmployee(employee, lineIdx);
+            }
+        } catch (Exception e) {
+            throw new IOException("Error parsing XML file: " + e.getMessage(), e);
+        }
+
+        return summary;
+    }
+
+    private Employee parseXmlElement(Element element, int lineIdx) {
+        try {
+            String firstName = getTextContent(element, "firstName");
+            String lastName = getTextContent(element, "lastName");
+            String email = getTextContent(element, "email");
+            String company = getTextContent(element, "company");
+            String positionStr = getTextContent(element, "position");
+            String salaryStr = getTextContent(element, "salary");
+
+            if (firstName.isEmpty() || lastName.isEmpty() || 
+                email.isEmpty() || company.isEmpty()) {
+                summary.addError(lineIdx, new InvalidDataException(
+                    lineIdx, "Required fields cannot be empty"
+                ));
+                return null;
+            }
+
+            Role role = parseRole(positionStr, lineIdx);
+            if (role == null) {
+                return null;
+            }
+
+            int salary;
+            try {
+                salary = Integer.parseInt(salaryStr);
+                if (salary <= 0) {
+                    summary.addError(lineIdx, new InvalidDataException(
+                        lineIdx, "Salary must be positive"
+                    ));
+                    return null;
+                }
+            } catch (NumberFormatException e) {
+                summary.addError(lineIdx, new InvalidDataException(
+                    lineIdx, "Invalid salary: " + salaryStr
+                ));
+                return null;
+            }
+
+            return new Employee(lastName, firstName, email, company, role, salary);
+        } catch (Exception e) {
+            summary.addError(lineIdx, new InvalidDataException(
+                lineIdx, "Error parsing employee data: " + e.getMessage()
+            ));
+            return null;
+        }
+    }
+
+    private String getTextContent(Element element, String tagName) {
+        NodeList nodeList = element.getElementsByTagName(tagName);
+        if (nodeList.getLength() > 0) {
+            String content = nodeList.item(0).getTextContent();
+            return content != null ? content.trim() : "";
+        }
+        return "";
+    }
+
+    private void handleEmployee(Employee employee, int lineIdx) {
+        try {
+            employeeService.addEmployee(employee);
+            summary.addSuccessfullImport();
+        } catch (IllegalArgumentException | DuplicateEmailException e) {
+            summary.addError(lineIdx, new InvalidDataException(
+                lineIdx, e.getMessage()
+            ));
+        }
+    }
+
+    private Role parseRole(String roleStr, int lineIdx) {
+        if (roleStr == null || roleStr.isEmpty()) {
+            summary.addError(lineIdx, new InvalidDataException(
+                lineIdx, "Role cannot be empty"
+            ));
+            return null;
+        }
+
+        switch (roleStr.trim().toUpperCase()) {
+            case "CEO":         return Role.CEO;
+            case "VP":          return Role.VP;
+            case "MANAGER":     return Role.MANAGER;
+            case "ENGINEER":    return Role.ENGINEER;
+            case "PROGRAMISTA": return Role.ENGINEER;
+            case "INTERN":      return Role.INTERN;
+            default:
+                summary.addError(lineIdx, new InvalidDataException(
+                    lineIdx, "Invalid role: " + roleStr
+                ));
+                return null;
+        }
+    }
+
 }

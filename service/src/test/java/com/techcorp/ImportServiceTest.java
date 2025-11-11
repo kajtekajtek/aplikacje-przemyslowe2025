@@ -72,7 +72,7 @@ public class ImportServiceTest
             "Bob,Johnson,bob.johnson@techcorp.com,TechCorp,INTERN,3500\n";
         csvPath = writeStringToFile(csvPath, csvContent);
 
-        ImportSummary summary = importService.importFromCsv(csvPath);
+        ImportSummary summary = importService.importFromFile(csvPath);
 
         assertEquals(3, summary.getSuccessCount());
         assertEquals(0, summary.getErrors().size());
@@ -89,7 +89,7 @@ public class ImportServiceTest
             "Jan,Kowalski,jan.kowalski@techcorp.com,TechCorp,PROGRAMISTA,8500\n";
         csvPath = writeStringToFile(csvPath, csvContent);
 
-        ImportSummary summary = importService.importFromCsv(csvPath);
+        ImportSummary summary = importService.importFromFile(csvPath);
 
         assertEquals(1, summary.getSuccessCount());
         assertEquals(0, summary.getErrors().size());
@@ -112,7 +112,7 @@ public class ImportServiceTest
             "Jane,Smith,jane.smith@innovate.com,Innovate,MANAGER,12500\n";
         csvPath = writeStringToFile(csvPath, csvContent);
 
-        ImportSummary summary = importService.importFromCsv(csvPath);
+        ImportSummary summary = importService.importFromFile(csvPath);
 
         assertEquals(1, summary.getSuccessCount());
         assertEquals(1, summary.getErrors().size());
@@ -132,7 +132,7 @@ public class ImportServiceTest
             "Jane,Smith,jane.smith@innovate.com,Innovate,MANAGER,12500\n";
         csvPath = writeStringToFile(csvPath, csvContent);
 
-        ImportSummary summary = importService.importFromCsv(csvPath);
+        ImportSummary summary = importService.importFromFile(csvPath);
 
         assertEquals(1, summary.getSuccessCount());
         assertEquals(1, summary.getErrors().size());
@@ -151,7 +151,7 @@ public class ImportServiceTest
             "Jane,Smith,jane.smith@innovate.com,Innovate,MANAGER,12500\n";
         csvPath = writeStringToFile(csvPath, csvContent);
 
-        ImportSummary summary = importService.importFromCsv(csvPath);
+        ImportSummary summary = importService.importFromFile(csvPath);
 
         assertEquals(1, summary.getSuccessCount());
         assertEquals(1, summary.getErrors().size());
@@ -169,7 +169,7 @@ public class ImportServiceTest
             "Jane,Smith,jane.smith@innovate.com,Innovate,MANAGER,12500\n";
         csvPath = writeStringToFile(csvPath, csvContent);
 
-        ImportSummary summary = importService.importFromCsv(csvPath);
+        ImportSummary summary = importService.importFromFile(csvPath);
 
         assertEquals(1, summary.getSuccessCount());
         assertEquals(1, summary.getErrors().size());
@@ -187,7 +187,7 @@ public class ImportServiceTest
             "Jane,Smith,jane.smith@innovate.com,Innovate,MANAGER,12500\n";
         csvPath = writeStringToFile(csvPath, csvContent);
 
-        ImportSummary summary = importService.importFromCsv(csvPath);
+        ImportSummary summary = importService.importFromFile(csvPath);
 
         assertEquals(1, summary.getSuccessCount());
         assertEquals(1, summary.getErrors().size());
@@ -208,7 +208,7 @@ public class ImportServiceTest
             "\n";
         csvPath = writeStringToFile(csvPath, csvContent);
 
-        ImportSummary summary = importService.importFromCsv(csvPath);
+        ImportSummary summary = importService.importFromFile(csvPath);
 
         assertEquals(2, summary.getSuccessCount());
         assertEquals(0, summary.getErrors().size());
@@ -223,7 +223,7 @@ public class ImportServiceTest
         String csvContent = "firstName,lastName,email,company,position,salary\n";
         csvPath = writeStringToFile(csvPath, csvContent);
 
-        ImportSummary summary = importService.importFromCsv(csvPath);
+        ImportSummary summary = importService.importFromFile(csvPath);
 
         assertEquals(0, summary.getSuccessCount());
         assertEquals(0, summary.getErrors().size());
@@ -237,7 +237,7 @@ public class ImportServiceTest
         String csvPath = "empty.csv";
         csvPath = writeStringToFile(csvPath, "");
 
-        ImportSummary summary = importService.importFromCsv(csvPath);
+        ImportSummary summary = importService.importFromFile(csvPath);
 
         assertEquals(0, summary.getSuccessCount());
         assertEquals(0, summary.getErrors().size());
@@ -251,7 +251,7 @@ public class ImportServiceTest
         String nonExistentPath = "nonexistent.csv";
         IOException exception = assertThrows(
             IOException.class,
-            () -> importService.importFromCsv(nonExistentPath)
+            () -> importService.importFromFile(nonExistentPath)
         );
         assertTrue(exception.getMessage().contains(FILE_DOES_NOT_EXIST_EXCEPTION_MESSAGE));
     }
@@ -262,7 +262,7 @@ public class ImportServiceTest
     {
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> importService.importFromCsv((String) null)
+            () -> importService.importFromFile((String) null)
         );
         
         assertTrue(exception.getMessage().contains("cannot be null"));
@@ -274,7 +274,7 @@ public class ImportServiceTest
     {
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> importService.importFromCsv("")
+            () -> importService.importFromFile("")
         );
         
         assertTrue(exception.getMessage().contains("cannot be empty"));
@@ -291,7 +291,7 @@ public class ImportServiceTest
             "Jane,Doe,john.doe@techcorp.com,TechCorp,MANAGER,12500\n";
         csvPath = writeStringToFile(csvPath, csvContent);
 
-        ImportSummary summary = importService.importFromCsv(csvPath);
+        ImportSummary summary = importService.importFromFile(csvPath);
 
         assertEquals(1, summary.getSuccessCount());
         assertEquals(1, summary.getErrors().size());
@@ -313,7 +313,7 @@ public class ImportServiceTest
             "Bob,Johnson,bob.johnson@techcorp.com,TechCorp,INTERN,3500\n";
         csvPath = writeStringToFile(csvPath, csvContent);
 
-        ImportSummary summary = importService.importFromCsv(csvPath);
+        ImportSummary summary = importService.importFromFile(csvPath);
 
         assertEquals(3, summary.getSuccessCount());
         assertEquals(2, summary.getErrors().size());
@@ -334,7 +334,7 @@ public class ImportServiceTest
             "Bob,Johnson,bob.johnson@techcorp.com,TechCorp,ENGINEER,8500\n";
         csvPath = writeStringToFile(csvPath, csvContent);
 
-        ImportSummary summary = importService.importFromCsv(csvPath);
+        ImportSummary summary = importService.importFromFile(csvPath);
 
         assertEquals(1, summary.getSuccessCount());
         assertEquals(2, summary.getErrors().size());
@@ -357,7 +357,7 @@ public class ImportServiceTest
             "Tom,Intern,tom.intern@techcorp.com,TechCorp,INTERN,3000\n";
         csvPath = writeStringToFile(csvPath, csvContent);
 
-        ImportSummary summary = importService.importFromCsv(csvPath);
+        ImportSummary summary = importService.importFromFile(csvPath);
 
         assertEquals(5, summary.getSuccessCount());
         assertEquals(0, summary.getErrors().size());
@@ -381,7 +381,7 @@ public class ImportServiceTest
             " John , Doe , john.doe@techcorp.com , TechCorp , ENGINEER , 8500 \n";
         csvPath = writeStringToFile(csvPath, csvContent);
 
-        ImportSummary summary = importService.importFromCsv(csvPath);
+        ImportSummary summary = importService.importFromFile(csvPath);
 
         assertEquals(1, summary.getSuccessCount());
         assertEquals(0, summary.getErrors().size());
@@ -406,7 +406,7 @@ public class ImportServiceTest
             "John,Doe,john.doe@techcorp.com,TechCorp,ENGINEER,8500,extra,fields\n";
         csvPath = writeStringToFile(csvPath, csvContent);
 
-        ImportSummary summary = importService.importFromCsv(csvPath);
+        ImportSummary summary = importService.importFromFile(csvPath);
 
         assertEquals(1, summary.getSuccessCount());
         assertEquals(0, summary.getErrors().size());
@@ -429,7 +429,7 @@ public class ImportServiceTest
             "John,Doe,john.doe@techcorp.com,TechCorp,ENGINEER,8500\n";
         Files.writeString(csvFile, csvContent);
 
-        ImportSummary summary = importService.importFromCsv(csvFile.toString());
+        ImportSummary summary = importService.importFromFile(csvFile.toString());
 
         assertEquals(1, summary.getSuccessCount());
         assertEquals(0, summary.getErrors().size());
@@ -449,7 +449,7 @@ public class ImportServiceTest
             "Bob,Johnson,bob.johnson@techcorp.com,TechCorp,Manager,12000\n";
         csvPath = writeStringToFile(csvPath, csvContent);
 
-        ImportSummary summary = importService.importFromCsv(csvPath);
+        ImportSummary summary = importService.importFromFile(csvPath);
 
         assertEquals(3, summary.getSuccessCount());
         assertEquals(0, summary.getErrors().size());
@@ -467,7 +467,7 @@ public class ImportServiceTest
             "Jane,Smith,jane.smith@innovate.com,Innovate,MANAGER,-100\n";
         csvPath = writeStringToFile(csvPath, csvContent);
 
-        ImportSummary summary = importService.importFromCsv(csvPath);
+        ImportSummary summary = importService.importFromFile(csvPath);
 
         assertEquals(0, summary.getSuccessCount());
         assertEquals(2, summary.getErrors().size());
@@ -492,7 +492,7 @@ public class ImportServiceTest
             "Jane,Smith,jane.smith@innovate.com,Innovate,MANAGER,12500\n";
         csvPath = writeStringToFile(csvPath, csvContent);
 
-        ImportSummary summary = importService.importFromCsv(csvPath);
+        ImportSummary summary = importService.importFromFile(csvPath);
 
         assertEquals(1, summary.getSuccessCount());
         assertEquals(1, summary.getErrors().size());
@@ -511,12 +511,547 @@ public class ImportServiceTest
         String csvPath = "empty_names.csv";
         csvPath = writeStringToFile(csvPath, csvContent);
         
-        ImportSummary summary = importService.importFromCsv(csvPath);
+        ImportSummary summary = importService.importFromFile(csvPath);
 
         assertEquals(1, summary.getSuccessCount());
         assertEquals(2, summary.getErrors().size());
         assertTrue(summary.getErrors().containsKey(2));
         assertTrue(summary.getErrors().containsKey(3));
+    }
+
+    @Test
+    @DisplayName("Should import from XML with valid data")
+    public void shouldImportFromXmlWithValidData() throws IOException
+    {
+        String xmlPath = "valid_employees.xml";
+        String xmlContent = 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<employees>\n" +
+            "    <employee>\n" +
+            "        <firstName>John</firstName>\n" +
+            "        <lastName>Doe</lastName>\n" +
+            "        <email>john.doe@techcorp.com</email>\n" +
+            "        <company>TechCorp</company>\n" +
+            "        <position>ENGINEER</position>\n" +
+            "        <salary>8500</salary>\n" +
+            "    </employee>\n" +
+            "    <employee>\n" +
+            "        <firstName>Jane</firstName>\n" +
+            "        <lastName>Smith</lastName>\n" +
+            "        <email>jane.smith@innovate.com</email>\n" +
+            "        <company>Innovate</company>\n" +
+            "        <position>MANAGER</position>\n" +
+            "        <salary>12500</salary>\n" +
+            "    </employee>\n" +
+            "</employees>";
+        xmlPath = writeStringToFile(xmlPath, xmlContent);
+
+        ImportSummary summary = importService.importFromFile(xmlPath);
+
+        assertEquals(2, summary.getSuccessCount());
+        assertEquals(0, summary.getErrors().size());
+        assertEquals(2, employeeService.getEmployees().size());
+    }
+
+    @Test
+    @DisplayName("Should import from XML with role mapping")
+    public void shouldImportFromXmlWithRoleMapping() throws IOException
+    {
+        String xmlPath = "role_mapping.xml";
+        String xmlContent = 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<employees>\n" +
+            "    <employee>\n" +
+            "        <firstName>Jan</firstName>\n" +
+            "        <lastName>Kowalski</lastName>\n" +
+            "        <email>jan.kowalski@techcorp.com</email>\n" +
+            "        <company>TechCorp</company>\n" +
+            "        <position>PROGRAMISTA</position>\n" +
+            "        <salary>8500</salary>\n" +
+            "    </employee>\n" +
+            "</employees>";
+        xmlPath = writeStringToFile(xmlPath, xmlContent);
+
+        ImportSummary summary = importService.importFromFile(xmlPath);
+
+        assertEquals(1, summary.getSuccessCount());
+        assertEquals(0, summary.getErrors().size());
+        assertEquals(1, employeeService.getEmployees().size());
+        
+        Employee employee = employeeService.getEmployees().get(0);
+        assertEquals(Role.ENGINEER, employee.getRole());
+        assertEquals("Jan", employee.getFirstName());
+        assertEquals("Kowalski", employee.getLastName());
+    }
+
+    @Test
+    @DisplayName("Should import from XML with invalid role")
+    public void shouldImportFromXmlWithInvalidRole() throws IOException
+    {
+        String xmlPath = "invalid_role.xml";
+        String xmlContent = 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<employees>\n" +
+            "    <employee>\n" +
+            "        <firstName>John</firstName>\n" +
+            "        <lastName>Doe</lastName>\n" +
+            "        <email>john.doe@techcorp.com</email>\n" +
+            "        <company>TechCorp</company>\n" +
+            "        <position>INVALID_ROLE</position>\n" +
+            "        <salary>8500</salary>\n" +
+            "    </employee>\n" +
+            "    <employee>\n" +
+            "        <firstName>Jane</firstName>\n" +
+            "        <lastName>Smith</lastName>\n" +
+            "        <email>jane.smith@innovate.com</email>\n" +
+            "        <company>Innovate</company>\n" +
+            "        <position>MANAGER</position>\n" +
+            "        <salary>12500</salary>\n" +
+            "    </employee>\n" +
+            "</employees>";
+        xmlPath = writeStringToFile(xmlPath, xmlContent);
+
+        ImportSummary summary = importService.importFromFile(xmlPath);
+
+        assertEquals(1, summary.getSuccessCount());
+        assertEquals(1, summary.getErrors().size());
+        assertTrue(summary.getErrors().containsKey(1));
+        assertEquals(1, employeeService.getEmployees().size());
+        assertEquals("Jane", employeeService.getEmployees().get(0).getFirstName());
+    }
+
+    @Test
+    @DisplayName("Should import from XML with negative salary")
+    public void shouldImportFromXmlWithNegativeSalary() throws IOException
+    {
+        String xmlPath = "negative_salary.xml";
+        String xmlContent = 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<employees>\n" +
+            "    <employee>\n" +
+            "        <firstName>John</firstName>\n" +
+            "        <lastName>Doe</lastName>\n" +
+            "        <email>john.doe@techcorp.com</email>\n" +
+            "        <company>TechCorp</company>\n" +
+            "        <position>ENGINEER</position>\n" +
+            "        <salary>-1000</salary>\n" +
+            "    </employee>\n" +
+            "    <employee>\n" +
+            "        <firstName>Jane</firstName>\n" +
+            "        <lastName>Smith</lastName>\n" +
+            "        <email>jane.smith@innovate.com</email>\n" +
+            "        <company>Innovate</company>\n" +
+            "        <position>MANAGER</position>\n" +
+            "        <salary>12500</salary>\n" +
+            "    </employee>\n" +
+            "</employees>";
+        xmlPath = writeStringToFile(xmlPath, xmlContent);
+
+        ImportSummary summary = importService.importFromFile(xmlPath);
+
+        assertEquals(1, summary.getSuccessCount());
+        assertEquals(1, summary.getErrors().size());
+        assertTrue(summary.getErrors().containsKey(1));
+        assertEquals(1, employeeService.getEmployees().size());
+    }
+
+    @Test
+    @DisplayName("Should import from XML with zero salary")
+    public void shouldImportFromXmlWithZeroSalary() throws IOException
+    {
+        String xmlPath = "zero_salary.xml";
+        String xmlContent = 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<employees>\n" +
+            "    <employee>\n" +
+            "        <firstName>John</firstName>\n" +
+            "        <lastName>Doe</lastName>\n" +
+            "        <email>john.doe@techcorp.com</email>\n" +
+            "        <company>TechCorp</company>\n" +
+            "        <position>ENGINEER</position>\n" +
+            "        <salary>0</salary>\n" +
+            "    </employee>\n" +
+            "    <employee>\n" +
+            "        <firstName>Jane</firstName>\n" +
+            "        <lastName>Smith</lastName>\n" +
+            "        <email>jane.smith@innovate.com</email>\n" +
+            "        <company>Innovate</company>\n" +
+            "        <position>MANAGER</position>\n" +
+            "        <salary>12500</salary>\n" +
+            "    </employee>\n" +
+            "</employees>";
+        xmlPath = writeStringToFile(xmlPath, xmlContent);
+
+        ImportSummary summary = importService.importFromFile(xmlPath);
+
+        assertEquals(1, summary.getSuccessCount());
+        assertEquals(1, summary.getErrors().size());
+        assertTrue(summary.getErrors().containsKey(1));
+    }
+
+    @Test
+    @DisplayName("Should import from XML with non-numeric salary")
+    public void shouldImportFromXmlWithNonNumericSalary() throws IOException
+    {
+        String xmlPath = "non_numeric_salary.xml";
+        String xmlContent = 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<employees>\n" +
+            "    <employee>\n" +
+            "        <firstName>John</firstName>\n" +
+            "        <lastName>Doe</lastName>\n" +
+            "        <email>john.doe@techcorp.com</email>\n" +
+            "        <company>TechCorp</company>\n" +
+            "        <position>ENGINEER</position>\n" +
+            "        <salary>invalid</salary>\n" +
+            "    </employee>\n" +
+            "    <employee>\n" +
+            "        <firstName>Jane</firstName>\n" +
+            "        <lastName>Smith</lastName>\n" +
+            "        <email>jane.smith@innovate.com</email>\n" +
+            "        <company>Innovate</company>\n" +
+            "        <position>MANAGER</position>\n" +
+            "        <salary>12500</salary>\n" +
+            "    </employee>\n" +
+            "</employees>";
+        xmlPath = writeStringToFile(xmlPath, xmlContent);
+
+        ImportSummary summary = importService.importFromFile(xmlPath);
+
+        assertEquals(1, summary.getSuccessCount());
+        assertEquals(1, summary.getErrors().size());
+        assertTrue(summary.getErrors().containsKey(1));
+    }
+
+    @Test
+    @DisplayName("Should import from XML with missing fields")
+    public void shouldImportFromXmlWithMissingFields() throws IOException
+    {
+        String xmlPath = "missing_fields.xml";
+        String xmlContent = 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<employees>\n" +
+            "    <employee>\n" +
+            "        <firstName>John</firstName>\n" +
+            "        <lastName>Doe</lastName>\n" +
+            "        <email>john.doe@techcorp.com</email>\n" +
+            "    </employee>\n" +
+            "    <employee>\n" +
+            "        <firstName>Jane</firstName>\n" +
+            "        <lastName>Smith</lastName>\n" +
+            "        <email>jane.smith@innovate.com</email>\n" +
+            "        <company>Innovate</company>\n" +
+            "        <position>MANAGER</position>\n" +
+            "        <salary>12500</salary>\n" +
+            "    </employee>\n" +
+            "</employees>";
+        xmlPath = writeStringToFile(xmlPath, xmlContent);
+
+        ImportSummary summary = importService.importFromFile(xmlPath);
+
+        assertEquals(1, summary.getSuccessCount());
+        assertEquals(1, summary.getErrors().size());
+        assertTrue(summary.getErrors().containsKey(1));
+    }
+
+    @Test
+    @DisplayName("Should import from XML with empty elements")
+    public void shouldImportFromXmlWithEmptyElements() throws IOException
+    {
+        String xmlPath = "empty_elements.xml";
+        String xmlContent = 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<employees>\n" +
+            "    <employee>\n" +
+            "        <firstName></firstName>\n" +
+            "        <lastName>Doe</lastName>\n" +
+            "        <email>john.doe@techcorp.com</email>\n" +
+            "        <company>TechCorp</company>\n" +
+            "        <position>ENGINEER</position>\n" +
+            "        <salary>8500</salary>\n" +
+            "    </employee>\n" +
+            "    <employee>\n" +
+            "        <firstName>Jane</firstName>\n" +
+            "        <lastName>Smith</lastName>\n" +
+            "        <email>jane.smith@innovate.com</email>\n" +
+            "        <company>Innovate</company>\n" +
+            "        <position>MANAGER</position>\n" +
+            "        <salary>12500</salary>\n" +
+            "    </employee>\n" +
+            "</employees>";
+        xmlPath = writeStringToFile(xmlPath, xmlContent);
+
+        ImportSummary summary = importService.importFromFile(xmlPath);
+
+        assertEquals(1, summary.getSuccessCount());
+        assertEquals(1, summary.getErrors().size());
+        assertTrue(summary.getErrors().containsKey(1));
+    }
+
+    @Test
+    @DisplayName("Should import from XML with all roles")
+    public void shouldImportFromXmlWithAllRoles() throws IOException
+    {
+        String xmlPath = "all_roles.xml";
+        String xmlContent = 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<employees>\n" +
+            "    <employee>\n" +
+            "        <firstName>John</firstName>\n" +
+            "        <lastName>Ceo</lastName>\n" +
+            "        <email>john.ceo@techcorp.com</email>\n" +
+            "        <company>TechCorp</company>\n" +
+            "        <position>CEO</position>\n" +
+            "        <salary>25000</salary>\n" +
+            "    </employee>\n" +
+            "    <employee>\n" +
+            "        <firstName>Jane</firstName>\n" +
+            "        <lastName>Vp</lastName>\n" +
+            "        <email>jane.vp@techcorp.com</email>\n" +
+            "        <company>TechCorp</company>\n" +
+            "        <position>VP</position>\n" +
+            "        <salary>18000</salary>\n" +
+            "    </employee>\n" +
+            "    <employee>\n" +
+            "        <firstName>Bob</firstName>\n" +
+            "        <lastName>Manager</lastName>\n" +
+            "        <email>bob.manager@techcorp.com</email>\n" +
+            "        <company>TechCorp</company>\n" +
+            "        <position>MANAGER</position>\n" +
+            "        <salary>12000</salary>\n" +
+            "    </employee>\n" +
+            "    <employee>\n" +
+            "        <firstName>Alice</firstName>\n" +
+            "        <lastName>Engineer</lastName>\n" +
+            "        <email>alice.engineer@techcorp.com</email>\n" +
+            "        <company>TechCorp</company>\n" +
+            "        <position>ENGINEER</position>\n" +
+            "        <salary>8000</salary>\n" +
+            "    </employee>\n" +
+            "    <employee>\n" +
+            "        <firstName>Tom</firstName>\n" +
+            "        <lastName>Intern</lastName>\n" +
+            "        <email>tom.intern@techcorp.com</email>\n" +
+            "        <company>TechCorp</company>\n" +
+            "        <position>INTERN</position>\n" +
+            "        <salary>3000</salary>\n" +
+            "    </employee>\n" +
+            "</employees>";
+        xmlPath = writeStringToFile(xmlPath, xmlContent);
+
+        ImportSummary summary = importService.importFromFile(xmlPath);
+
+        assertEquals(5, summary.getSuccessCount());
+        assertEquals(0, summary.getErrors().size());
+        assertEquals(5, employeeService.getEmployees().size());
+        
+        Map<Role, Long> countByRole = employeeService.getEmployeeCountByRole();
+        assertEquals(1L, countByRole.get(Role.CEO));
+        assertEquals(1L, countByRole.get(Role.VP));
+        assertEquals(1L, countByRole.get(Role.MANAGER));
+        assertEquals(1L, countByRole.get(Role.ENGINEER));
+        assertEquals(1L, countByRole.get(Role.INTERN));
+    }
+
+    @Test
+    @DisplayName("Should import from XML with whitespace in elements")
+    public void shouldImportFromXmlWithWhitespaceInElements() throws IOException
+    {
+        String xmlPath = "whitespace_elements.xml";
+        String xmlContent = 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<employees>\n" +
+            "    <employee>\n" +
+            "        <firstName> John </firstName>\n" +
+            "        <lastName> Doe </lastName>\n" +
+            "        <email> john.doe@techcorp.com </email>\n" +
+            "        <company> TechCorp </company>\n" +
+            "        <position> ENGINEER </position>\n" +
+            "        <salary> 8500 </salary>\n" +
+            "    </employee>\n" +
+            "</employees>";
+        xmlPath = writeStringToFile(xmlPath, xmlContent);
+
+        ImportSummary summary = importService.importFromFile(xmlPath);
+
+        assertEquals(1, summary.getSuccessCount());
+        assertEquals(0, summary.getErrors().size());
+        assertEquals(1, employeeService.getEmployees().size());
+        
+        Employee employee = employeeService.getEmployees().get(0);
+        assertEquals("John", employee.getFirstName());
+        assertEquals("Doe", employee.getLastName());
+        assertEquals("john.doe@techcorp.com", employee.getEmailAddress());
+        assertEquals("TechCorp", employee.getCompanyName());
+        assertEquals(Role.ENGINEER, employee.getRole());
+        assertEquals(8500, employee.getSalary());
+    }
+
+    @Test
+    @DisplayName("Should import from XML with duplicate email")
+    public void shouldImportFromXmlWithDuplicateEmail() throws IOException
+    {
+        String xmlPath = "duplicate_email.xml";
+        String xmlContent = 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<employees>\n" +
+            "    <employee>\n" +
+            "        <firstName>John</firstName>\n" +
+            "        <lastName>Doe</lastName>\n" +
+            "        <email>john.doe@techcorp.com</email>\n" +
+            "        <company>TechCorp</company>\n" +
+            "        <position>ENGINEER</position>\n" +
+            "        <salary>8500</salary>\n" +
+            "    </employee>\n" +
+            "    <employee>\n" +
+            "        <firstName>Jane</firstName>\n" +
+            "        <lastName>Doe</lastName>\n" +
+            "        <email>john.doe@techcorp.com</email>\n" +
+            "        <company>TechCorp</company>\n" +
+            "        <position>MANAGER</position>\n" +
+            "        <salary>12500</salary>\n" +
+            "    </employee>\n" +
+            "</employees>";
+        xmlPath = writeStringToFile(xmlPath, xmlContent);
+
+        ImportSummary summary = importService.importFromFile(xmlPath);
+
+        assertEquals(1, summary.getSuccessCount());
+        assertEquals(1, summary.getErrors().size());
+        assertTrue(summary.getErrors().containsKey(2));
+        assertEquals(1, employeeService.getEmployees().size());
+    }
+
+    @Test
+    @DisplayName("Should import from XML and continue on errors")
+    public void shouldImportFromXmlAndContinueOnErrors() throws IOException
+    {
+        String xmlPath = "mixed_data.xml";
+        String xmlContent = 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<employees>\n" +
+            "    <employee>\n" +
+            "        <firstName>John</firstName>\n" +
+            "        <lastName>Doe</lastName>\n" +
+            "        <email>john.doe@techcorp.com</email>\n" +
+            "        <company>TechCorp</company>\n" +
+            "        <position>ENGINEER</position>\n" +
+            "        <salary>8500</salary>\n" +
+            "    </employee>\n" +
+            "    <employee>\n" +
+            "        <firstName>Invalid</firstName>\n" +
+            "        <lastName>Line</lastName>\n" +
+            "        <email>invalid@test.com</email>\n" +
+            "        <company>Test</company>\n" +
+            "        <position>INVALID</position>\n" +
+            "        <salary>9000</salary>\n" +
+            "    </employee>\n" +
+            "    <employee>\n" +
+            "        <firstName>Jane</firstName>\n" +
+            "        <lastName>Smith</lastName>\n" +
+            "        <email>jane.smith@innovate.com</email>\n" +
+            "        <company>Innovate</company>\n" +
+            "        <position>MANAGER</position>\n" +
+            "        <salary>12500</salary>\n" +
+            "    </employee>\n" +
+            "    <employee>\n" +
+            "        <firstName>Bad</firstName>\n" +
+            "        <lastName>Salary</lastName>\n" +
+            "        <email>bad@test.com</email>\n" +
+            "        <company>Test</company>\n" +
+            "        <position>ENGINEER</position>\n" +
+            "        <salary>-500</salary>\n" +
+            "    </employee>\n" +
+            "    <employee>\n" +
+            "        <firstName>Bob</firstName>\n" +
+            "        <lastName>Johnson</lastName>\n" +
+            "        <email>bob.johnson@techcorp.com</email>\n" +
+            "        <company>TechCorp</company>\n" +
+            "        <position>INTERN</position>\n" +
+            "        <salary>3500</salary>\n" +
+            "    </employee>\n" +
+            "</employees>";
+        xmlPath = writeStringToFile(xmlPath, xmlContent);
+
+        ImportSummary summary = importService.importFromFile(xmlPath);
+
+        assertEquals(3, summary.getSuccessCount());
+        assertEquals(2, summary.getErrors().size());
+        assertTrue(summary.getErrors().containsKey(2));
+        assertTrue(summary.getErrors().containsKey(4));
+        assertEquals(3, employeeService.getEmployees().size());
+    }
+
+    @Test
+    @DisplayName("Should import from XML with case insensitive roles")
+    public void shouldImportFromXmlWithCaseInsensitiveRoles() throws IOException
+    {
+        String xmlPath = "case_insensitive_roles.xml";
+        String xmlContent = 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<employees>\n" +
+            "    <employee>\n" +
+            "        <firstName>John</firstName>\n" +
+            "        <lastName>Doe</lastName>\n" +
+            "        <email>john.doe@techcorp.com</email>\n" +
+            "        <company>TechCorp</company>\n" +
+            "        <position>engineer</position>\n" +
+            "        <salary>8500</salary>\n" +
+            "    </employee>\n" +
+            "    <employee>\n" +
+            "        <firstName>Jane</firstName>\n" +
+            "        <lastName>Smith</lastName>\n" +
+            "        <email>jane.smith@techcorp.com</email>\n" +
+            "        <company>TechCorp</company>\n" +
+            "        <position>MANAGER</position>\n" +
+            "        <salary>12500</salary>\n" +
+            "    </employee>\n" +
+            "    <employee>\n" +
+            "        <firstName>Bob</firstName>\n" +
+            "        <lastName>Johnson</lastName>\n" +
+            "        <email>bob.johnson@techcorp.com</email>\n" +
+            "        <company>TechCorp</company>\n" +
+            "        <position>Manager</position>\n" +
+            "        <salary>12000</salary>\n" +
+            "    </employee>\n" +
+            "</employees>";
+        xmlPath = writeStringToFile(xmlPath, xmlContent);
+
+        ImportSummary summary = importService.importFromFile(xmlPath);
+
+        assertEquals(3, summary.getSuccessCount());
+        assertEquals(0, summary.getErrors().size());
+        assertEquals(3, employeeService.getEmployees().size());
+    }
+
+    @Test
+    @DisplayName("Should throw IllegalArgumentException for unsupported file format")
+    public void shouldThrowIllegalArgumentExceptionForUnsupportedFileFormat() throws IOException
+    {
+        String jsonContent = "{\"employees\": []}";
+        final String jsonPath = writeStringToFile("employees.json", jsonContent);
+
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> importService.importFromFile(jsonPath)
+        );
+        
+        assertTrue(exception.getMessage().contains("Unsupported file format"));
+    }
+
+    @Test
+    @DisplayName("Should throw IllegalArgumentException for file without extension")
+    public void shouldThrowIllegalArgumentExceptionForFileWithoutExtension() throws IOException
+    {
+        String content = "some content";
+        final String noExtPath = writeStringToFile("employees", content);
+
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> importService.importFromFile(noExtPath)
+        );
+        
+        assertTrue(exception.getMessage().contains("Unsupported file format"));
     }
 
     private String writeStringToFile(String filePath, String content) throws IOException {
