@@ -7,6 +7,7 @@ import com.techcorp.service.FileStorageService;
 import com.techcorp.service.ImportService;
 import com.techcorp.exception.FileStorageException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -19,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -34,6 +36,9 @@ class FileUploadControllerTest {
 
     @MockBean
     private FileStorageService fileStorageService;
+
+    @MockBean
+    private com.techcorp.service.RaportGeneratorService raportGeneratorService;
 
     private MockMultipartFile validCsvFile;
     private MockMultipartFile validXmlFile;
@@ -376,6 +381,175 @@ class FileUploadControllerTest {
 
         verify(fileStorageService, times(1)).saveFile(any());
         verify(importService, times(1)).importFromFile(anyString());
+    }
+
+    @Test
+    @DisplayName("Should export CSV file with correct headers and content type")
+    public void shouldExportCsvFileWithCorrectHeadersAndContentType() throws Exception {
+        String csvContent = "firstName,lastName,email,company,position,salary,status\n" +
+                           "John,Doe,john.doe@techcorp.com,TechCorp,ENGINEER,8500,ACTIVE\n";
+        
+        when(raportGeneratorService.generateCsvReport()).thenReturn(csvContent);
+
+        mockMvc.perform(get("/api/files/export/csv"))
+            .andExpect(status().isOk())
+            .andExpect(header().string("Content-Type", "text/csv"))
+            .andExpect(header().string("Content-Disposition", "form-data; name=\"attachment\"; filename=\"employees.csv\""))
+            .andExpect(header().exists("Content-Length"))
+            .andExpect(content().string(csvContent));
+
+        verify(raportGeneratorService, times(1)).generateCsvReport();
+    }
+
+    @Test
+    @DisplayName("Should export CSV file with employee data")
+    public void shouldExportCsvFileWithEmployeeData() throws Exception {
+        String csvContent = "firstName,lastName,email,company,position,salary,status\n" +
+                           "John,Doe,john.doe@techcorp.com,TechCorp,ENGINEER,8500,ACTIVE\n" +
+                           "Jane,Smith,jane.smith@innovate.com,Innovate,MANAGER,12500,ACTIVE\n";
+        
+        when(raportGeneratorService.generateCsvReport()).thenReturn(csvContent);
+
+        mockMvc.perform(get("/api/files/export/csv"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(csvContent));
+
+        verify(raportGeneratorService, times(1)).generateCsvReport();
+    }
+
+    @Test
+    @DisplayName("Should export CSV file with empty employee list")
+    public void shouldExportCsvFileWithEmptyEmployeeList() throws Exception {
+        String csvContent = "firstName,lastName,email,company,position,salary,status\n";
+        
+        when(raportGeneratorService.generateCsvReport()).thenReturn(csvContent);
+
+        mockMvc.perform(get("/api/files/export/csv"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(csvContent));
+
+        verify(raportGeneratorService, times(1)).generateCsvReport();
+    }
+
+    @Test
+    @DisplayName("Should export CSV file with correct content length")
+    public void shouldExportCsvFileWithCorrectContentLength() throws Exception {
+        String csvContent = "firstName,lastName,email,company,position,salary,status\n" +
+                           "John,Doe,john.doe@techcorp.com,TechCorp,ENGINEER,8500,ACTIVE\n";
+        
+        when(raportGeneratorService.generateCsvReport()).thenReturn(csvContent);
+
+        int expectedLength = csvContent.getBytes(java.nio.charset.StandardCharsets.UTF_8).length;
+
+        mockMvc.perform(get("/api/files/export/csv"))
+            .andExpect(status().isOk())
+            .andExpect(header().string("Content-Length", String.valueOf(expectedLength)));
+
+        verify(raportGeneratorService, times(1)).generateCsvReport();
+    }
+
+    @Test
+    @DisplayName("Should export CSV file with multiple employees")
+    public void shouldExportCsvFileWithMultipleEmployees() throws Exception {
+        String csvContent = "firstName,lastName,email,company,position,salary,status\n" +
+                           "John,Doe,john.doe@techcorp.com,TechCorp,ENGINEER,8500,ACTIVE\n" +
+                           "Jane,Smith,jane.smith@innovate.com,Innovate,MANAGER,12500,ACTIVE\n" +
+                           "Bob,Johnson,bob.johnson@techcorp.com,TechCorp,INTERN,3500,ON_LEAVE\n";
+        
+        when(raportGeneratorService.generateCsvReport()).thenReturn(csvContent);
+
+        mockMvc.perform(get("/api/files/export/csv"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(csvContent));
+
+        verify(raportGeneratorService, times(1)).generateCsvReport();
+    }
+
+    @Test
+    @DisplayName("Should export CSV file with Polish characters")
+    public void shouldExportCsvFileWithPolishCharacters() throws Exception {
+        String csvContent = "firstName,lastName,email,company,position,salary,status\n" +
+                           "Jan,Kowalski,jan.kowalski@techcorp.com,TechCorp,ENGINEER,8500,ACTIVE\n";
+        
+        when(raportGeneratorService.generateCsvReport()).thenReturn(csvContent);
+
+        mockMvc.perform(get("/api/files/export/csv"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(csvContent));
+
+        verify(raportGeneratorService, times(1)).generateCsvReport();
+    }
+
+    @Test
+    @DisplayName("Should export CSV file as attachment")
+    public void shouldExportCsvFileAsAttachment() throws Exception {
+        String csvContent = "firstName,lastName,email,company,position,salary,status\n";
+        
+        when(raportGeneratorService.generateCsvReport()).thenReturn(csvContent);
+
+        mockMvc.perform(get("/api/files/export/csv"))
+            .andExpect(status().isOk())
+            .andExpect(header().string("Content-Disposition", 
+                org.hamcrest.Matchers.containsString("attachment")))
+            .andExpect(header().string("Content-Disposition", 
+                org.hamcrest.Matchers.containsString("employees.csv")));
+
+        verify(raportGeneratorService, times(1)).generateCsvReport();
+    }
+
+    @Test
+    @DisplayName("Should export CSV file with all role types")
+    public void shouldExportCsvFileWithAllRoleTypes() throws Exception {
+        String csvContent = "firstName,lastName,email,company,position,salary,status\n" +
+                           "John,Ceo,john.ceo@techcorp.com,TechCorp,CEO,25000,ACTIVE\n" +
+                           "Jane,Vp,jane.vp@techcorp.com,TechCorp,VP,18000,ACTIVE\n" +
+                           "Bob,Manager,bob.manager@techcorp.com,TechCorp,MANAGER,12000,ACTIVE\n" +
+                           "Alice,Engineer,alice.engineer@techcorp.com,TechCorp,ENGINEER,8000,ACTIVE\n" +
+                           "Tom,Intern,tom.intern@techcorp.com,TechCorp,INTERN,3000,ACTIVE\n";
+        
+        when(raportGeneratorService.generateCsvReport()).thenReturn(csvContent);
+
+        mockMvc.perform(get("/api/files/export/csv"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(csvContent));
+
+        verify(raportGeneratorService, times(1)).generateCsvReport();
+    }
+
+    @Test
+    @DisplayName("Should export CSV file when raport generator throws exception")
+    public void shouldHandleExceptionWhenRaportGeneratorFails() throws Exception {
+        when(raportGeneratorService.generateCsvReport())
+            .thenThrow(new RuntimeException("Failed to generate report"));
+
+        mockMvc.perform(get("/api/files/export/csv"))
+            .andExpect(status().isInternalServerError())
+            .andExpect(jsonPath("$.message").value("An unexpected error occurred: Failed to generate report"))
+            .andExpect(jsonPath("$.status").value(500));
+
+        verify(raportGeneratorService, times(1)).generateCsvReport();
+    }
+
+    @Test
+    @DisplayName("Should export CSV file with large dataset")
+    public void shouldExportCsvFileWithLargeDataset() throws Exception {
+        StringBuilder csvBuilder = new StringBuilder();
+        csvBuilder.append("firstName,lastName,email,company,position,salary,status\n");
+        for (int i = 0; i < 50; i++) {
+            csvBuilder.append("Employee").append(i).append(",");
+            csvBuilder.append("LastName").append(i).append(",");
+            csvBuilder.append("employee").append(i).append("@techcorp.com,");
+            csvBuilder.append("TechCorp,ENGINEER,8000,ACTIVE\n");
+        }
+        String csvContent = csvBuilder.toString();
+        
+        when(raportGeneratorService.generateCsvReport()).thenReturn(csvContent);
+
+        mockMvc.perform(get("/api/files/export/csv"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(csvContent));
+
+        verify(raportGeneratorService, times(1)).generateCsvReport();
     }
 }
 
