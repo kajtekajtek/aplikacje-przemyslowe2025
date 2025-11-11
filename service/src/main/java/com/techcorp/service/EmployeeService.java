@@ -1,4 +1,4 @@
-package com.techcorp;
+package com.techcorp.service;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -10,6 +10,10 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.techcorp.exception.EmployeeNotFoundException;
+import com.techcorp.CompanyStatistics;
+import com.techcorp.Employee;
+import com.techcorp.EmploymentStatus;
+import com.techcorp.Role;
 import com.techcorp.exception.DuplicateEmailException;
 
 @Service

@@ -1,7 +1,9 @@
-package com.techcorp;
+package com.techcorp.service;
 
 import com.techcorp.exception.FileStorageException;
 import com.techcorp.exception.InvalidFileException;
+import com.techcorp.service.FileStorageServiceImpl;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;

@@ -1,6 +1,8 @@
-package com.techcorp;
+package com.techcorp.mapper;
 
 import com.google.gson.JsonObject;
+import com.techcorp.Employee;
+import com.techcorp.Role;
 import com.techcorp.dto.EmployeeDTO;
 import java.util.List;
 import java.util.stream.Collectors;

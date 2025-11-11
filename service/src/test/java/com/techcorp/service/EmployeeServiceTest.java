@@ -1,4 +1,4 @@
-package com.techcorp;
+package com.techcorp.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +10,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import com.techcorp.CompanyStatistics;
+import com.techcorp.Employee;
+import com.techcorp.Role;
 import com.techcorp.exception.DuplicateEmailException;
+import com.techcorp.service.EmployeeService;
 
 public class EmployeeServiceTest
 {

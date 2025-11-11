@@ -1,7 +1,8 @@
-package com.techcorp;
+package com.techcorp.service;
 
 import com.techcorp.exception.FileStorageException;
 import com.techcorp.exception.InvalidFileException;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.core.io.Resource;

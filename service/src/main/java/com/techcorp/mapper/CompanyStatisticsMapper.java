@@ -1,4 +1,4 @@
-package com.techcorp;
+package com.techcorp.mapper;
 
 import com.techcorp.CompanyStatistics;
 import com.techcorp.dto.CompanyStatisticsDTO;
