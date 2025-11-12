@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<employees>
+    <employee>
+        <lastName>Doe</lastName>
+        <firstName>John</firstName>
+        <email>john.doe@ImportXML.com</email>
+        <company>ImportXML</company>
+        <position>ENGINEER</position>
+        <salary>10000</salary>
+    </employee>
+    <employee>
+        <lastName>Smith</lastName>
+        <firstName>Jane</firstName>
+        <email>jane.smith@ImportXML.com</email>
+        <company>ImportXML</company>
+        <position>MANAGER</position>
+        <salary>15000</salary>
+    </employee>
+    <employee>
+        <lastName>Brown</lastName>
+        <firstName>Michael</firstName>
+        <email>michael.brown@ImportXML.com</email>
+        <company>ImportXML</company>
+        <position>CEO</position>
+        <salary>25000</salary>
+    </employee>
+    <employee>
+        <lastName>Garcia</lastName>
+        <firstName>Maria</firstName>
+        <email>maria.garcia@ImportXML.com</email>
+        <company>ImportXML</company>
+        <position>VP</position>
+        <salary>18000</salary>
+    </employee>
+    <employee>
+        <lastName>Davis</lastName>
+        <firstName>David</firstName>
+        <email>david.davis@ImportXML.com</email>
+        <company>ImportXML</company>
+        <position>MANAGER</position>
+        <salary>16000</salary>
+    </employee>
+    <employee>
+        <lastName>Nowak</lastName>
+        <firstName>Anna</firstName>
+        <email>anna.nowak@ImportXML.com</email>
+        <company>ImportXML</company>
+        <position>INTERN</position>
+        <salary>3500</salary>
+    </employee>
+</employees>
+

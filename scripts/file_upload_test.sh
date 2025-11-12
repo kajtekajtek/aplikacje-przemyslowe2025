@@ -1,11 +1,10 @@
 #!/bin/bash
 
-# Kolory dla lepszej czytelności
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 CSV_IN="data/sample_in/employees.csv"
 XML_IN="data/sample_in/employees.xml"
@@ -20,7 +19,6 @@ EMPLOYEE_EMAIL="john.smith@csvinc.com"
 BASE_URL="http://localhost:8080"
 DOCUMENT_ID=""
 
-# Sprawdź czy pliki wejściowe istnieją
 echo -e "${BLUE}=== Sprawdzanie plików wejściowych ===${NC}"
 for file in "$CSV_IN" "$XML_IN" "$PDF_IN" "$PHOTO_IN"; do
     if [ -f "$file" ]; then
@@ -31,7 +29,6 @@ for file in "$CSV_IN" "$XML_IN" "$PDF_IN" "$PHOTO_IN"; do
     fi
 done
 
-# Utwórz katalog wyjściowy jeśli nie istnieje
 mkdir -p data/sample_out
 
 echo -e "\n${BLUE}=== 1. Upload pliku CSV ===${NC}"
@@ -82,7 +79,6 @@ body=$(echo "$response" | sed '$d')
 if [ "$http_code" = "201" ]; then
     echo -e "${GREEN}✓ Sukces (HTTP $http_code)${NC}"
     echo "$body" | python3 -m json.tool 2>/dev/null || echo "$body"
-    # Wyciągnij ID dokumentu z odpowiedzi
     DOCUMENT_ID=$(echo "$body" | python3 -c "import sys, json; print(json.load(sys.stdin)['id'])" 2>/dev/null)
 else
     echo -e "${RED}✗ Błąd (HTTP $http_code)${NC}"
@@ -97,7 +93,6 @@ body=$(echo "$response" | sed '$d')
 if [ "$http_code" = "200" ]; then
     echo -e "${GREEN}✓ Sukces (HTTP $http_code)${NC}"
     echo "$body" | python3 -m json.tool 2>/dev/null || echo "$body"
-    # Jeśli DOCUMENT_ID nie został jeszcze ustawiony, weź pierwszy dokument
     if [ -z "$DOCUMENT_ID" ]; then
         DOCUMENT_ID=$(echo "$body" | python3 -c "import sys, json; docs = json.load(sys.stdin); print(docs[0]['id'] if docs else '')" 2>/dev/null)
     fi
