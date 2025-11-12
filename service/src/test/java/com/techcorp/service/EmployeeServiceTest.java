@@ -14,8 +14,9 @@ import java.util.Optional;
 import com.techcorp.model.CompanyStatistics;
 import com.techcorp.model.Employee;
 import com.techcorp.model.Role;
+import com.techcorp.model.EmploymentStatus;
 import com.techcorp.model.exception.DuplicateEmailException;
-import com.techcorp.service.EmployeeService;
+import com.techcorp.model.exception.EmployeeNotFoundException;
 
 public class EmployeeServiceTest
 {
@@ -244,6 +245,31 @@ public class EmployeeServiceTest
             assertTrue(employeeService.getEmployees().contains(employee2));
         }
 
+        @Nested
+        @DisplayName("Remove Employee by Email Tests")
+        class RemoveEmployeeByEmailTest {
+
+            @Test
+            @DisplayName("Should remove employee by email successfully")
+            public void shouldRemoveEmployeeByEmail() {
+                Employee employee = new Employee(
+                    LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1
+                );
+                employeeService.addEmployee(employee);
+
+                employeeService.removeEmployeeByEmail(EMAIL_1);
+
+                assertEquals(0, employeeService.getEmployees().size());
+            }
+
+            @Test
+            @DisplayName("Should throw EmployeeNotFoundException when employee with email does not exist")
+            public void shouldThrowEmployeeNotFoundExceptionWhenEmailDoesNotExist() {
+                assertThrows(EmployeeNotFoundException.class, () -> {
+                    employeeService.removeEmployeeByEmail(EMAIL_1);
+                });
+            }
+        }
     }
 
     @Nested
@@ -518,6 +544,32 @@ public class EmployeeServiceTest
                 assertEquals(employee, highestPaid.get());
             }
 
+            @Test
+            @DisplayName("Should return employee with highest salary for a specific company")
+            public void shouldReturnEmployeeWithHighestSalaryForCompany() {
+                Employee employee1 = new Employee(LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, 10000);
+                Employee employee2 = new Employee(LAST_NAME_2, FIRST_NAME_2, EMAIL_2, COMPANY_NAME_1, ROLE_2, 12000);
+                Employee employee3 = new Employee(LAST_NAME_3, FIRST_NAME_3, EMAIL_3, COMPANY_NAME_3, ROLE_3, 15000);
+
+                employeeService.addEmployee(employee1);
+                employeeService.addEmployee(employee2);
+                employeeService.addEmployee(employee3);
+
+                Optional<Employee> highestPaid = employeeService.getEmployeeWithHighestSalary(COMPANY_NAME_1);
+
+                assertTrue(highestPaid.isPresent());
+                assertEquals(employee2, highestPaid.get());
+            }
+
+            @Test
+            @DisplayName("Should return empty Optional when company name is null or empty")
+            public void shouldReturnEmptyWhenCompanyNameIsNullOrEmpty() {
+                Optional<Employee> highestPaid = employeeService.getEmployeeWithHighestSalary(null);
+                assertFalse(highestPaid.isPresent());
+
+                highestPaid = employeeService.getEmployeeWithHighestSalary("");
+                assertFalse(highestPaid.isPresent());
+            }
         }
 
         @Nested
@@ -545,6 +597,45 @@ public class EmployeeServiceTest
                 Double averageSalary = employeeService.getAverageSalary();
                 
                 assertEquals(8000.0, averageSalary, 0.01);
+            }
+
+            @Test
+            @DisplayName("Should return average salary for a specific company")
+            public void shouldReturnAverageSalaryForCompany() {
+                Employee employee1 = new Employee(LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, 10000);
+                Employee employee2 = new Employee(LAST_NAME_2, FIRST_NAME_2, EMAIL_2, COMPANY_NAME_1, ROLE_2, 12000);
+                Employee employee3 = new Employee(LAST_NAME_3, FIRST_NAME_3, EMAIL_3, COMPANY_NAME_3, ROLE_3, 15000);
+
+                employeeService.addEmployee(employee1);
+                employeeService.addEmployee(employee2);
+                employeeService.addEmployee(employee3);
+
+                double averageSalary = employeeService.getAverageSalary(COMPANY_NAME_1);
+
+                assertEquals(11000.0, averageSalary, 0.01);
+            }
+
+            @Test
+            @DisplayName("Should return average salary of all employees when company name is null or empty")
+            public void shouldReturnGlobalAverageSalaryWhenCompanyNameIsNullOrEmpty() {
+                Employee employee1 = new Employee(LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, 10000);
+                Employee employee2 = new Employee(LAST_NAME_3, FIRST_NAME_3, EMAIL_3, COMPANY_NAME_3, ROLE_3, 15000);
+
+                employeeService.addEmployee(employee1);
+                employeeService.addEmployee(employee2);
+
+                double averageSalaryNull = employeeService.getAverageSalary(null);
+                assertEquals(12500.0, averageSalaryNull, 0.01);
+
+                double averageSalaryEmpty = employeeService.getAverageSalary("");
+                assertEquals(12500.0, averageSalaryEmpty, 0.01);
+            }
+
+            @Test
+            @DisplayName("Should return 0.0 when no employees for a specific company")
+            public void shouldReturnZeroAverageSalaryForCompanyWithNoEmployees() {
+                double averageSalary = employeeService.getAverageSalary(COMPANY_NAME_1);
+                assertEquals(0.0, averageSalary, 0.01);
             }
 
             @Test
@@ -730,6 +821,173 @@ public class EmployeeServiceTest
                 assertEquals(20000.0, stats.get("Apple").getAverageSalary(), 0.01);
                 assertEquals(9000.0, stats.get("Nvidia").getAverageSalary(), 0.01);
             }
+
+            @Test
+            @DisplayName("Should return statistics for a specific company")
+            public void shouldReturnStatisticsForSpecificCompany() {
+                Employee employee1 = new Employee(LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, 10000);
+                Employee employee2 = new Employee(LAST_NAME_2, FIRST_NAME_2, EMAIL_2, COMPANY_NAME_1, ROLE_2, 12000);
+                employeeService.addEmployee(employee1);
+                employeeService.addEmployee(employee2);
+
+                CompanyStatistics stats = employeeService.getCompanyStatistics(COMPANY_NAME_1);
+
+                assertEquals(COMPANY_NAME_1, stats.getCompanyName());
+                assertEquals(2, stats.getEmployeesCount());
+                assertEquals(12000, stats.getHighestSalary());
+                assertEquals(11000.0, stats.getAverageSalary(), 0.01);
+                assertEquals(employee2.getFullName(), stats.getTopEarnerName());
+            }
+
+            @Test
+            @DisplayName("Should return empty statistics for a company that does not exist")
+            public void shouldReturnEmptyStatisticsForNonExistentCompany() {
+                CompanyStatistics stats = employeeService.getCompanyStatistics("NonExistent");
+
+                assertEquals("NonExistent", stats.getCompanyName());
+                assertEquals(0, stats.getEmployeesCount());
+                assertEquals(0, stats.getHighestSalary());
+                assertEquals(0.0, stats.getAverageSalary(), 0.01);
+                assertEquals("N/A", stats.getTopEarnerName());
+            }
+
+            @Test
+            @DisplayName("Should return empty statistics when company name is null or empty")
+            public void shouldReturnEmptyStatisticsWhenCompanyNameIsNullOrEmpty() {
+                CompanyStatistics nullStats = employeeService.getCompanyStatistics(null);
+                assertEquals("", nullStats.getCompanyName());
+                assertEquals(0, nullStats.getEmployeesCount());
+
+                CompanyStatistics emptyStats = employeeService.getCompanyStatistics("");
+                assertEquals("", emptyStats.getCompanyName());
+                assertEquals(0, emptyStats.getEmployeesCount());
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("Get Employee By Email Tests")
+    class GetEmployeeByEmailTest {
+
+        @Test
+        @DisplayName("Should return employee when email exists")
+        public void shouldReturnEmployeeWhenEmailExists() {
+            Employee employee = new Employee(LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1);
+            employeeService.addEmployee(employee);
+
+            Optional<Employee> foundEmployee = employeeService.getEmployeeByEmail(EMAIL_1);
+
+            assertTrue(foundEmployee.isPresent());
+            assertEquals(employee, foundEmployee.get());
+        }
+
+        @Test
+        @DisplayName("Should return empty Optional when email does not exist")
+        public void shouldReturnEmptyOptionalWhenEmailDoesNotExist() {
+            Optional<Employee> foundEmployee = employeeService.getEmployeeByEmail(EMAIL_1);
+            assertFalse(foundEmployee.isPresent());
+        }
+
+        @Test
+        @DisplayName("Should return employee when email exists (case insensitive)")
+        public void shouldReturnEmployeeWhenEmailExistsCaseInsensitive() {
+            Employee employee = new Employee(LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1);
+            employeeService.addEmployee(employee);
+
+            Optional<Employee> foundEmployee = employeeService.getEmployeeByEmail(EMAIL_1.toUpperCase());
+
+            assertTrue(foundEmployee.isPresent());
+            assertEquals(employee, foundEmployee.get());
+        }
+    }
+
+    @Nested
+    @DisplayName("Get Employees By Status Tests")
+    class GetEmployeesByStatusTest {
+
+        @Test
+        @DisplayName("Should return employees with the given status")
+        public void shouldReturnEmployeesByStatus() {
+            Employee employee1 = new Employee(LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1);
+            employee1.setStatus(EmploymentStatus.ACTIVE);
+            Employee employee2 = new Employee(LAST_NAME_2, FIRST_NAME_2, EMAIL_2, COMPANY_NAME_2, ROLE_2, SALARY_2);
+            employee2.setStatus(EmploymentStatus.ON_LEAVE);
+             Employee employee3 = new Employee(LAST_NAME_3, FIRST_NAME_3, EMAIL_3, COMPANY_NAME_3, ROLE_3, SALARY_3);
+            employee3.setStatus(EmploymentStatus.ACTIVE);
+            employeeService.addEmployee(employee1);
+            employeeService.addEmployee(employee2);
+            employeeService.addEmployee(employee3);
+
+            List<Employee> activeEmployees = employeeService.getEmployeesByStatus(EmploymentStatus.ACTIVE);
+
+            assertEquals(2, activeEmployees.size());
+            assertTrue(activeEmployees.contains(employee1));
+            assertTrue(activeEmployees.contains(employee3));
+        }
+
+        @Test
+        @DisplayName("Should return empty list if no employees have the given status")
+        public void shouldReturnEmptyListForStatusWithNoEmployees() {
+            List<Employee> terminatedEmployees = employeeService.getEmployeesByStatus(EmploymentStatus.TERMINATED);
+            assertTrue(terminatedEmployees.isEmpty());
+        }
+    }
+
+    @Nested
+    @DisplayName("Get Status Distribution Tests")
+    class GetStatusDistributionTest {
+
+        @Test
+        @DisplayName("Should return the distribution of employees by status")
+        public void shouldReturnStatusDistribution() {
+            Employee employee1 = new Employee(LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1);
+            employee1.setStatus(EmploymentStatus.ACTIVE);
+            Employee employee2 = new Employee(LAST_NAME_2, FIRST_NAME_2, EMAIL_2, COMPANY_NAME_2, ROLE_2, SALARY_2);
+            employee2.setStatus(EmploymentStatus.ON_LEAVE);
+            Employee employee3 = new Employee(LAST_NAME_3, FIRST_NAME_3, EMAIL_3, COMPANY_NAME_3, ROLE_3, SALARY_3);
+            employee3.setStatus(EmploymentStatus.ACTIVE);
+            employeeService.addEmployee(employee1);
+            employeeService.addEmployee(employee2);
+            employeeService.addEmployee(employee3);
+
+            Map<EmploymentStatus, Long> distribution = employeeService.getStatusDistribution();
+
+            assertEquals(2, distribution.size());
+            assertEquals(2L, distribution.get(EmploymentStatus.ACTIVE));
+            assertEquals(1L, distribution.get(EmploymentStatus.ON_LEAVE));
+        }
+
+        @Test
+        @DisplayName("Should return an empty map when there are no employees")
+        public void shouldReturnEmptyMapForStatusDistributionWithNoEmployees() {
+            Map<EmploymentStatus, Long> distribution = employeeService.getStatusDistribution();
+            assertTrue(distribution.isEmpty());
+        }
+    }
+
+    @Nested
+    @DisplayName("Update Employee Status Tests")
+    class UpdateEmployeeStatusTest {
+
+        @Test
+        @DisplayName("Should update the employee's status")
+        public void shouldUpdateEmployeeStatus() {
+            Employee employee = new Employee(LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1);
+            employeeService.addEmployee(employee);
+
+            employeeService.updateEmployeeStatus(EMAIL_1, EmploymentStatus.TERMINATED);
+
+            Optional<Employee> updatedEmployee = employeeService.getEmployeeByEmail(EMAIL_1);
+            assertTrue(updatedEmployee.isPresent());
+            assertEquals(EmploymentStatus.TERMINATED, updatedEmployee.get().getStatus());
+        }
+
+        @Test
+        @DisplayName("Should throw EmployeeNotFoundException when updating status for a non-existent employee")
+        public void shouldThrowExceptionWhenUpdatingStatusForNonExistentEmployee() {
+            assertThrows(EmployeeNotFoundException.class, () -> {
+                employeeService.updateEmployeeStatus("non.existent@email.com", EmploymentStatus.ACTIVE);
+            });
         }
     }
 
@@ -854,5 +1112,49 @@ public class EmployeeServiceTest
         assertDoesNotThrow(() -> employeeService.printEmployees());
     }
 
+    @Nested
+    @DisplayName("Update Employee Tests")
+    class UpdateEmployeeTest {
+
+        @Test
+        @DisplayName("Should update employee details successfully")
+        public void shouldUpdateEmployee() {
+            Employee originalEmployee = new Employee(LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1);
+            employeeService.addEmployee(originalEmployee);
+
+            Employee updatedEmployee = new Employee("Baggins", "Frodo", "new.frodo.baggins@techcorp.com", "NewTechCorp", Role.MANAGER, 9500);
+            employeeService.updateEmployee(EMAIL_1, updatedEmployee);
+
+            Optional<Employee> retrievedEmployee = employeeService.getEmployeeByEmail("new.frodo.baggins@techcorp.com");
+            assertTrue(retrievedEmployee.isPresent());
+            assertEquals("NewTechCorp", retrievedEmployee.get().getCompanyName());
+            assertEquals(Role.MANAGER, retrievedEmployee.get().getRole());
+            assertEquals(9500, retrievedEmployee.get().getSalary());
+        }
+
+        @Test
+        @DisplayName("Should throw EmployeeNotFoundException when updating non-existent employee")
+        public void shouldThrowExceptionWhenUpdatingNonExistentEmployee() {
+            Employee updatedEmployee = new Employee(LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1);
+            assertThrows(EmployeeNotFoundException.class, () -> {
+                employeeService.updateEmployee("non.existent@email.com", updatedEmployee);
+            });
+        }
+
+        @Test
+        @DisplayName("Should throw DuplicateEmailException when updating to an existing email")
+        public void shouldThrowExceptionWhenUpdatingToExistingEmail() {
+            Employee employee1 = new Employee(LAST_NAME_1, FIRST_NAME_1, EMAIL_1, COMPANY_NAME_1, ROLE_1, SALARY_1);
+            Employee employee2 = new Employee(LAST_NAME_2, FIRST_NAME_2, EMAIL_2, COMPANY_NAME_2, ROLE_2, SALARY_2);
+            employeeService.addEmployee(employee1);
+            employeeService.addEmployee(employee2);
+
+            Employee updatedEmployee = new Employee(LAST_NAME_1, FIRST_NAME_1, EMAIL_2, COMPANY_NAME_1, ROLE_1, SALARY_1);
+
+            assertThrows(DuplicateEmailException.class, () -> {
+                employeeService.updateEmployee(EMAIL_1, updatedEmployee);
+            });
+        }
+    }
 }
 

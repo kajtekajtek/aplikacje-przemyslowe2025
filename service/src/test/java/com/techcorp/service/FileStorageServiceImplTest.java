@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Nested;
 
 class FileStorageServiceImplTest {
 
@@ -333,6 +334,63 @@ class FileStorageServiceImplTest {
         String savedFilename = fileStorageService.saveFile(file);
 
         assertNotNull(savedFilename);
+    }
+
+    @Test
+    void getFullPath_ShouldReturnCorrectFullPath() {
+        String filename = "test.jpg";
+        String expectedPath = Paths.get(uploadDirectory, filename).toString();
+
+        String actualPath = fileStorageService.getFullPath(filename);
+
+        assertEquals(expectedPath, actualPath);
+    }
+
+    @Nested
+    class SaveFileWithCustomDirectory {
+        @Test
+        void saveFile_ShouldSaveToCustomDirectory() throws IOException {
+            Path customDir = tempDir.resolve("custom");
+            Files.createDirectory(customDir);
+
+            MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "content".getBytes());
+            String savedFilePath = fileStorageService.saveFile(file, customDir.toString());
+
+            assertNotNull(savedFilePath);
+            assertTrue(Files.exists(Paths.get(savedFilePath)));
+            assertTrue(savedFilePath.startsWith(customDir.toString()));
+        }
+
+        @Test
+        void saveFile_ShouldThrowException_WhenCustomDirectoryIsNull() {
+            MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "content".getBytes());
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                    () -> fileStorageService.saveFile(file, null));
+
+            assertEquals("Custom directory cannot be null or empty", exception.getMessage());
+        }
+
+        @Test
+        void saveFile_ShouldThrowException_WhenCustomDirectoryIsEmpty() {
+            MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "content".getBytes());
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                    () -> fileStorageService.saveFile(file, ""));
+
+            assertEquals("Custom directory cannot be null or empty", exception.getMessage());
+        }
+
+        @Test
+        void saveFile_ShouldThrowException_WhenFileIsTooLargeForCustomDirectory() {
+            byte[] largeContent = new byte[11 * 1024 * 1024];
+            MockMultipartFile largeFile = new MockMultipartFile("file", "large.jpg", "image/jpeg", largeContent);
+
+            InvalidFileException exception = assertThrows(InvalidFileException.class,
+                    () -> fileStorageService.saveFile(largeFile, "some_directory"));
+            
+            assertTrue(exception.getMessage().contains("File is too large. Maximum size:"));
+        }
     }
 }
 
