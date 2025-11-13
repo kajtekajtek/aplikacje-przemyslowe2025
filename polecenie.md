@@ -1,77 +1,98 @@
-# Zadanie 5
+# Zadanie: Obsługa plików w aplikacji
 
-System zarządzania pracownikami wymaga udostępnienia funkcjonalności poprzez interfejs programistyczny (API)zwracający dane w formacie JSON. Zadaniem jest stworzenie kontrolerów REST, które umożliwią innym aplikacjom konsumowanie danych systemu.
+## Kontekst
+
+System zarządzania pracownikami wymaga możliwości przesyłania i pobierania plików przez API. Użytkownicy muszą móc importować dane z plików CSV i XML bez dostępu do serwera, generować raporty do pobrania oraz przesyłać dokumenty związane z pracownikami. Zadaniem jest rozszerzenie API o endpointy obsługujące upload i download plików z odpowiednią walidacją i obsługą błędów.
 
 ## Wymagania funkcjonalne
 
-### 1. Konfiguracja Spring Web
+### 1. Konfiguracja obsługi plików
 
-Dodać zależność spring-boot-starter-web do pom.xml lub build.gradle. Konfiguracja w application.properties:
+W pliku application.properties należy skonfigurować parametry związane z uploadem plików oraz określić katalog, w którym będą przechowywane przesłane pliki. Konfiguracja powinna obejmować maksymalny rozmiar pojedynczego pliku oraz maksymalny rozmiar całego żądania, aby zapobiec przeciążeniu serwera przez zbyt duże przesyłki. Należy również określić katalog roboczy, w którym aplikacja będzie zapisywać przesłane pliki oraz generować raporty do pobrania.
+
 ```
-server.port=8080
-spring.application.name=employee-management-api
-spring.jackson.serialization.write-dates-as-timestamps=false
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=10MB
+spring.servlet.multipart.enabled=true
+app.upload.directory=uploads/
+app.reports.directory=reports/
 ```
 
-### 2. Obiekty transferu danych (DTO)
+Katalogi uploads/ i reports/ powinny być tworzone automatycznie przy starcie aplikacji, jeśli nie istnieją. Można to zrealizować w klasie z adnotacją @Component implementującej interfejs CommandLineRunner lub w dedykowanej klasie konfiguracyjnej.
 
-Utworzyć klasy DTO oddzielające model wewnętrzny od reprezentacji API:
-- EmployeeDTO - uniwersalna reprezentacja pracownika w API używana we wszystkich operacjach (GET, POST, PUT). Zawiera pola: firstName, lastName, email, company, position, salary, status.
-- CompanyStatisticsDTO - statystyki firmy z polami: companyName, employeeCount, averageSalary, highestSalary, topEarnerName.
-- ErrorResponse - standardowa odpowiedź błędu z polami: message, timestamp, status, path.
+### 2. Serwis do zarządzania plikami
 
-### 3. Kontroler REST dla pracowników
+Należy utworzyć serwis FileStorageService z adnotacją @Service, który będzie odpowiedzialny za operacje na plikach. Serwis powinien enkapsulować logikę zapisywania plików na dysku, generowania unikalnych nazw plików aby uniknąć konfliktów, walidacji typów i rozmiarów plików oraz obsługi błędów związanych z operacjami na systemie plików.
 
-Klasa EmployeeController z adnotacją @RestController i @RequestMapping("/api/employees") implementuje endpointy:
-- GET /api/employees - zwraca listę wszystkich pracowników jako List<EmployeeDTO> ze statusem 200 OK.
-- GET /api/employees/{email} - zwraca konkretnego pracownika po emailu jako EmployeeDTO. Zwraca 200 OK jeśli istnieje, 404 Not Found jeśli nie.
-- GET /api/employees?company=X - filtruje pracowników po nazwie firmy używając @RequestParam(required = false). Jeśli parametr nie podany, zwraca wszystkich.
-- POST /api/employees - tworzy nowego pracownika przyjmując @RequestBody EmployeeDTO. Zwraca 201 Created z nagłówkiem Location oraz utworzonym obiektem w ciele.
-- PUT /api/employees/{email} - aktualizuje dane pracownika przyjmując email w ścieżce i @RequestBody EmployeeDTO. Zwraca 200 OK z zaktualizowanym obiektem lub 404 Not Found.
-- DELETE /api/employees/{email} - usuwa pracownika. Zwraca 204 No Content przy sukcesie lub 404 Not Found jeśli nie istnieje.
-- Wszystkie metody zwracają ResponseEntity<T> dla pełnej kontroli nad odpowiedzią HTTP.
+Serwis powinien oferować metody do zapisywania pliku przyjmującego obiekt MultipartFile i zwracającego nazwę zapisanego pliku, metodę do odczytywania pliku z dysku zwracającą obiekt Resource, metodę do usuwania pliku oraz metodę walidującą czy plik spełnia wymagania dotyczące rozszerzenia i rozmiaru. Ścieżki do katalogów powinny być wstrzykiwane z application.properties używając adnotacji @Value.
 
-### 4. Kontroler REST dla statystyk
+### 3. Upload plików CSV i XML
 
-Klasa StatisticsController z @RestController i @RequestMapping("/api/statistics") implementuje:
-- GET /api/statistics/salary/average - zwraca średnie wynagrodzenie jako Map<String, Double> gdzie klucz to "averageSalary".
-- GET /api/statistics/salary/average?company=X - średnie wynagrodzenie w konkretnej firmie (parametr opcjonalny).
-- GET /api/statistics/company/{companyName} - szczegółowe statystyki firmy jako CompanyStatisticsDTO.
-- GET /api/statistics/positions - liczba pracowników na każdym stanowisku jako Map<String, Integer>.
-- GET /api/statistics/status - rozkład pracowników według statusu zatrudnienia jako Map<String, Integer>.
+Należy utworzyć kontroler FileUploadController z mapowaniem @RequestMapping("/api/files") obsługujący przesyłanie plików przez API. Kontroler powinien przyjmować pliki używając typu MultipartFile z adnotacją @RequestParam("file"), która automatycznie mapuje przesłany plik z formularza multipart.
 
-### 5. Obsługa błędów
+Endpoint POST /api/files/import/csv przyjmuje plik CSV, waliduje jego rozszerzenie i rozmiar, zapisuje go w katalogu uploads, a następnie przekazuje ścieżkę do ImportService który wykonuje import danych. Metoda zwraca obiekt ImportSummary ze szczegółami importu oraz statusem 200 OK przy sukcesie lub odpowiedni kod błędu przy niepowodzeniu.
 
-Klasa GlobalExceptionHandler z @RestControllerAdvice zawiera metody z @ExceptionHandler dla:
-- EmployeeNotFoundException - zwraca 403 Not Found z obiektem ErrorResponse.
-- DuplicateEmailException - zwraca 409 Conflict gdy próbujemy utworzyć pracownika z istniejącym emailem.
-- InvalidDataException - zwraca 400 Bad Request dla błędów walidacji danych.
-- IllegalArgumentException - zwraca 400 Bad Request dla nieprawidłowych argumentów.
-- Exception - catch-all zwracający 500 Internal Server Error dla nieobsłużonych wyjątków.
+Analogiczny endpoint POST /api/files/import/xml obsługuje pliki XML. Oba endpointy powinny zwracać szczegółowe informacje o wyniku importu, włączając liczbę zaimportowanych rekordów, liczbę błędów oraz listę konkretnych błędów z numerami linii lub elementów, które nie zostały przetworzone.
 
-### 6. Nowa funkcjonalność: Status zatrudnienia
+### 4. Generowanie i download raportów
 
-Dodać do modelu Employee pole status typu enum EmploymentStatus z wartościami: ACTIVE, ON_LEAVE, TERMINATED.
+Kontroler powinien oferować endpointy do generowania i pobierania raportów w różnych formatach. Kluczowe jest prawidłowe ustawienie nagłówków HTTP, które informują przeglądarkę jak obsłużyć plik - czy wyświetlić go inline czy pobrać jako załącznik.
 
-Dodatkowe endpointy:
-- PATCH /api/employees/{email}/status - zmienia tylko status pracownika przyjmując @RequestBody z polem status. Zwraca 200 OK z zaktualizowanym pracownikiem.
-- GET /api/employees/status/{status} - zwraca listę pracowników o danym statusie ze statusem 200 OK.
-- Metody w serwisie powinny umożliwiać filtrowanie po statusie oraz zwracać statystyki rozkładu statusów.
+Endpoint GET /api/files/export/csv generuje plik CSV zawierający wszystkich pracowników i zwraca go jako ResponseEntity<Resource>. Należy ustawić nagłówek Content-Type: text/csv oraz Content-Disposition: attachment; filename="employees.csv", który wymusza pobranie pliku przez przeglądarkę zamiast wyświetlenia go w oknie.
 
-### 7. Testy API z MockMvc
+Endpoint GET /api/files/export/csv?company=X generuje raport CSV tylko dla wybranej firmy, co pokazuje jak łączyć parametry query z generowaniem plików.
 
-Napisać testy używające @WebMvcTest i MockMvc:
-- Test GET wszystkich - weryfikacja statusu 200 i zawartości JSON
-- Test GET po emailu - weryfikacja zwróconych danych
-- Test GET nieistniejącego - weryfikacja 404
-- Test POST - weryfikacja 201 i nagłówka Location
-- Test POST z duplikatem - weryfikacja 409
-- Test DELETE - weryfikacja 204
-- Test filtrowania po firmie
-- Test PATCH zmiany statusu
-Serwisy mockować przez @MockBean. Do weryfikacji JSON używać jsonPath().
+Endpoint GET /api/files/reports/statistics/{companyName} generuje raport PDF ze statystykami wybranej firmy. Do generowania PDF można użyć biblioteki takiej jak iText lub Apache PDFBox, którą należy dodać do zależności projektu. Raport powinien zawierać sformatowane tabele ze statystykami, wykresy lub inne wizualizacje danych. Nagłówek Content-Type ustawiony na application/pdf informuje przeglądarkę o typie pliku.
 
-### Struktura projektu
+### 5. Upload dokumentów pracowniczych
+
+System powinien umożliwiać przesyłanie i przechowywanie dokumentów związanych z konkretnym pracownikiem, takich jak umowy o pracę, certyfikaty, zaświadczenia czy dokumenty tożsamości. Każdy dokument powinien być powiązany z konkretnym pracownikiem przez email oraz posiadać metadane opisujące typ dokumentu i datę przesłania.
+
+Należy utworzyć model EmployeeDocument z polami: id, employeeEmail, fileName, originalFileName, fileType(enum: CONTRACT, CERTIFICATE, ID_CARD, OTHER), uploadDate, filePath. Model powinien być prostą klasą Java bez adnotacji JPA, ponieważ na tym etapie nie używamy jeszcze bazy danych - metadane dokumentów będą przechowywane w pamięci w mapie w serwisie.
+
+Endpoint POST /api/files/documents/{email} przyjmuje email pracownika w ścieżce, plik przez @RequestParam("file") oraz typ dokumentu przez @RequestParam("type"). Metoda waliduje czy pracownik istnieje, zapisuje plik w podkatalogu uploads/documents/{email}/ zachowując organizację plików, tworzy obiekt metadanych i zwraca go użytkownikowi ze statusem 201 Created.
+
+Endpoint GET /api/files/documents/{email} zwraca listę wszystkich dokumentów przypisanych do pracownika jako List<EmployeeDocument> bez samych plików, tylko metadane.
+
+Endpoint GET /api/files/documents/{email}/{documentId} umożliwia pobranie konkretnego dokumentu. Zwraca plik jako Resource z odpowiednimi nagłówkami Content-Type i Content-Disposition.
+
+Endpoint DELETE /api/files/documents/{email}/{documentId} usuwa dokument z dysku i z rejestru metadanych, zwracając status 204 No Content.
+
+### 6. Upload i wyświetlanie zdjęć pracowników
+
+Pracownicy powinni mieć możliwość posiadania zdjęcia profilowego. Zdjęcia wymagają specjalnej walidacji - muszą być w formacie graficznym (JPG, PNG) oraz mieć ograniczony rozmiar aby nie zajmować zbyt dużo miejsca na serwerze.
+
+Endpoint POST /api/files/photos/{email} przyjmuje zdjęcie i zapisuje je w katalogu uploads/photos/ z nazwą odpowiadającą emailowi pracownika. Należy przeprowadzić walidację sprawdzającą czy plik jest obrazem poprzez weryfikację rozszerzenia oraz opcjonalnie analizę nagłówków pliku. Maksymalny rozmiar zdjęcia powinien być ograniczony do 2MB.
+
+Do modelu Employee należy dodać pole photoFileName przechowujące nazwę pliku ze zdjęciem. Po przesłaniu zdjęcia, pole to powinno być aktualizowane w obiekcie pracownika.
+
+Endpoint GET /api/files/photos/{email} zwraca zdjęcie pracownika jako Resource z nagłówkiem Content-Type: image/jpeg lub image/png. Jeśli pracownik nie ma zdjęcia, można zwrócić domyślny placeholder lub status 404 Not Found.
+
+### 7. Walidacja i obsługa błędów plików
+
+Należy utworzyć dedykowane wyjątki dla operacji na plikach: FileStorageException rzucany przy problemach z zapisem pliku na dysku, InvalidFileException rzucany gdy plik nie spełnia wymagań dotyczących typu lub rozmiaru, FileNotFoundException rzucany gdy żądany plik nie istnieje. Wszystkie te wyjątki powinny dziedziczyć po RuntimeException.
+
+W klasie GlobalExceptionHandler należy dodać handlery dla tych wyjątków zwracające odpowiednie kody HTTP. FileStorageException zwraca 500 Internal Server Error ponieważ wskazuje na problem po stronie serwera, InvalidFileException zwraca 400 Bad Request informując że żądanie było niepoprawne, FileNotFoundExceptionzwraca 404 Not Found.
+
+Dodatkowo należy obsłużyć wyjątek MaxUploadSizeExceededException rzucany przez Spring gdy plik przekracza skonfigurowany limit. Handler powinien zwracać 413 Payload Too Large z komunikatem informującym o maksymalnym dozwolonym rozmiarze.
+
+Metoda walidująca pliki w FileStorageService powinna sprawdzać rozszerzenie pliku porównując je z dozwoloną listą, sprawdzać rozmiar pliku przez MultipartFile.getSize() oraz opcjonalnie weryfikować typ MIME przez MultipartFile.getContentType() ponieważ rozszerzenie można łatwo sfałszować ale typ MIME jest trudniejszy do manipulacji.
+
+### 8. Testy z MockMultipartFile
+
+Testy kontrolera obsługującego pliki wymagają specjalnego podejścia ponieważ musimy symulować przesyłanie plików multipart. Spring dostarcza klasę MockMultipartFile która pozwala tworzyć symulowane pliki do testów.
+
+Test uploadu CSV powinien tworzyć MockMultipartFile z przykładową zawartością CSV, wykonywać żądanie multipart() przez MockMvc, mockować metodę serwisu importującego dane i weryfikować status 200 OK oraz zawartość zwróconego ImportSummary.
+
+Test uploadu zbyt dużego pliku powinien tworzyć MockMultipartFile z rozmiarem przekraczającym limit, wykonywać żądanie i weryfikować status 413 Payload Too Large.
+
+Test uploadu pliku z nieprawidłowym rozszerzeniem powinien tworzyć plik z rozszerzeniem .txt podczas gdy endpoint oczekuje .csv, wykonywać żądanie i weryfikować status 400 Bad Request oraz odpowiedni komunikat błędu.
+
+Test downloadu raportu CSV powinien mockować metodę generującą raport, wykonywać żądanie GET, weryfikować status 200 OK, nagłówek Content-Type zawierający text/csv oraz że odpowiedź zawiera spodziewaną zawartość CSV.
+
+Test uploadu dokumentu pracownika powinien weryfikować czy plik jest zapisywany z właściwymi metadanymi oraz czy zwracany jest status 201 Created z obiektem EmployeeDocument.
+
+## Struktura projektu
 
 ```
 src/
@@ -80,93 +101,98 @@ src/
 │   │   ├── EmployeeManagementApplication.java
 │   │   ├── controller/
 │   │   │   ├── EmployeeController.java
-│   │   │   └── StatisticsController.java
-│   │   ├── dto/
-│   │   │   ├── EmployeeDTO.java
-│   │   │   ├── CompanyStatisticsDTO.java
-│   │   │   └── ErrorResponse.java
+│   │   │   ├── StatisticsController.java
+│   │   │   └── FileUploadController.java (nowy)
 │   │   ├── service/
 │   │   │   ├── EmployeeService.java
-│   │   │   └── (pozostałe z poprzednich zadań)
+│   │   │   ├── ImportService.java
+│   │   │   ├── FileStorageService.java (nowy)
+│   │   │   └── ReportGeneratorService.java (nowy)
+│   │   ├── model/
+│   │   │   ├── Employee.java (z nowym polem photoFileName)
+│   │   │   ├── EmployeeDocument.java (nowy)
+│   │   │   └── DocumentType.java (nowy enum)
 │   │   ├── exception/
 │   │   │   ├── GlobalExceptionHandler.java
-│   │   │   ├── EmployeeNotFoundException.java
-│   │   │   ├── DuplicateEmailException.java
-│   │   │   └── InvalidDataException.java
-│   │   └── model/
-│   │       ├── Employee.java
-│   │       ├── Position.java
-│   │       └── EmploymentStatus.java (nowy)
+│   │   │   ├── FileStorageException.java (nowy)
+│   │   │   ├── InvalidFileException.java (nowy)
+│   │   │   └── FileNotFoundException.java (nowy)
+│   │   └── dto/
+│   │       └── (DTO z poprzedniego zadania)
 │   └── resources/
 │       └── application.properties
 └── test/
     └── java/com.techcorp.employee/
-        └── controller/
-            ├── EmployeeControllerTest.java
-            └── StatisticsControllerTest.java
+        ├── controller/
+        │   └── FileUploadControllerTest.java (nowy)
+        └── service/
+            └── FileStorageServiceTest.java (nowy)
 ```
 
 ## Wymagania techniczne
 
-- Kontrolery używają @RestController co łączy @Controller i @ResponseBody. Metody oznaczane przez @GetMapping, @PostMapping, @PutMapping, @DeleteMapping, @PatchMapping dla odpowiednich operacji HTTP. Parametry ścieżki przez @PathVariable, query parameters przez @RequestParam, ciało żądania przez @RequestBody.
-- Wszystkie metody kontrolerów zwracają ResponseEntity<T> dla kontroli nad kodem HTTP i nagłówkami. DTO są oddzielone od modelu domenowego i mapowane w kontrolerze lub dedykowanym mapperze. Jackson automatycznie serializuje obiekty Java do JSON i deserializuje JSON do obiektów.
-- Testy używają @WebMvcTest(NazwaKontrolera.class) do załadowania tylko warstwy web. Serwisy mockowane przez @MockBean. MockMvc wstrzykiwany przez @Autowired służy do wykonywania żądań HTTP.
+- Kontroler przyjmuje pliki przez parametr metody z adnotacją @RequestParam("file") MultipartFile file, gdzie Spring automatycznie mapuje przesłany plik z żądania multipart. Metody zwracające pliki używają typu ResponseEntity<Resource> gdzie Resource jest interfejsem reprezentującym źródło danych, najczęściej implementowanym przez UrlResource lub ByteArrayResource.
+- Nagłówki HTTP ustawiane przez HttpHeaders obiekt dodawany do ResponseEntity. Nagłówek Content-Dispositionokreśla czy plik ma być wyświetlony inline czy pobrany jako attachment. Nagłówek Content-Type informuje przeglądarkę o typie MIME pliku, co jest kluczowe dla prawidłowego wyświetlania lub pobierania.
+- Zapis plików na dysku przez Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING) z obsługą IOException. Odczyt plików przez new UrlResource(filePath.toUri()) który tworzy zasób wskazujący na plik w systemie plików.
+- Testy używają MockMultipartFile do tworzenia symulowanych plików oraz metody multipart() zamiast post() w MockMvc do wykonywania żądań multipart. Przy testowaniu downloadów należy weryfikować zarówno status HTTP jak i zawartość oraz nagłówki odpowiedzi.
 
 ## Przykłady testowania
 
-Uruchomienie: mvn spring-boot:run
+Upload pliku CSV:
 
-### GET wszystkich
-curl http://localhost:8080/api/employees
+```
+curl -X POST http://localhost:8080/api/files/import/csv \
+  -F "file=@employees.csv"
+```
 
-### POST nowy pracownik
-curl -X POST http://localhost:8080/api/employees \
-  -H "Content-Type: application/json" \
-  -d '{"firstName":"Jan","lastName":"Kowalski","email":"jan@example.com","company":"TechCorp","position":"PROGRAMISTA","salary":8000,"status":"ACTIVE"}'
+Download raportu CSV:
 
-### PUT aktualizacja
-curl -X PUT http://localhost:8080/api/employees/jan@example.com \
-  -H "Content-Type: application/json" \
-  -d '{"firstName":"Jan","lastName":"Kowalski","email":"jan@example.com","company":"TechCorp","position":"MANAGER","salary":12000,"status":"ACTIVE"}'
+```
+curl http://localhost:8080/api/files/export/csv \
+  --output employees_export.csv
+```
 
-### PATCH zmiana statusu
-curl -X PATCH http://localhost:8080/api/employees/jan@example.com/status \
-  -H "Content-Type: application/json" \
-  -d '{"status":"ON_LEAVE"}'
+Upload dokumentu pracownika:
 
-### DELETE
-curl -X DELETE http://localhost:8080/api/employees/jan@example.com
+```
+curl -X POST http://localhost:8080/api/files/documents/jan@example.com \
+  -F "file=@contract.pdf" \
+  -F "type=CONTRACT"
+```
 
-### GET statystyki
-curl http://localhost:8080/api/statistics/company/TechCorp
+Lista dokumentów pracownika:
 
-## Kryteria oceny
+```
+curl http://localhost:8080/api/files/documents/jan@example.com
+```
 
-### Kontrolery REST z operacjami CRUD
+Upload zdjęcia:
 
-- Wszystkie endpointy (GET, POST, PUT, DELETE, PATCH) zaimplementowane z poprawnymi adnotacjami. Używanie @PathVariable, @RequestParam, @RequestBody. Zwracanie ResponseEntity z odpowiednimi kodami HTTP (200, 201, 204, 404). Kontroler statystyk zwraca zagregowane dane.
-- 35%
+```
+curl -X POST http://localhost:8080/api/files/photos/jan@example.com \
+  -F "file=@photo.jpg"
+```
 
-### DTO i mapowanie
+Pobranie zdjęcia:
 
-- Klasy EmployeeDTO, CompanyStatisticsDTO, ErrorResponse poprawnie zdefiniowane. DTO oddzielone od modelu domenowego. Mapowanie między Employee a EmployeeDTO działa w obu kierunkach. Jackson automatycznie serializuje/deserializuje JSON.
-- 20%
-
-### Obsługa błędów
-
-- @RestControllerAdvice z metodami @ExceptionHandler dla różnych wyjątków. Spójne obiekty ErrorResponse zwracane z właściwymi kodami HTTP (400, 404, 409, 500).
-- 20%
-
-### Status zatrudnienia i endpointy
-	
-- Enum EmploymentStatus dodany do modelu i DTO. Endpoint PATCH do zmiany statusu. Endpoint GET do filtrowania po statusie. Statystyki uwzględniają rozkład statusów zatrudnienia.
-- 10%
-
-### Testy z MockMvc
-
-- Testy używają @WebMvcTest i MockMvc. Pokryte scenariusze pozytywne i negatywne (success i error cases). Weryfikacja kodów HTTP i zawartości JSON przez jsonPath(). Mockowanie serwisów przez @MockBean.
-- 15%
+```
+curl http://localhost:8080/api/files/photos/jan@example.com \
+  --output photo.jpg
+```
 
 ## Oddanie
 
-Link do repozytorium z kodem, testami oraz README zawierającym listę wszystkich endpointów z przykładami żądań curl lub Postman oraz instrukcję uruchomienia.
+Link do repozytorium z kodem, testami, przykładowymi plikami CSV i XML oraz README zawierającym listę endpointów do obsługi plików z przykładami curl, instrukcję konfiguracji katalogów oraz opis architektury przechowywania plików.
+
+## Kryteria recenzji:
+
+- Upload plików CSV/XML i import danych (25%)
+Endpointy POST /api/files/import/csv i /api/files/import/xml przyjmują MultipartFile, zapisują plik, wywołują import i zwracają ImportSummary. Walidacja formatu i rozmiaru pliku. Obsługa błędów importu.
+- Generowanie i download raportów (25%)
+Endpointy generujące raporty CSV i PDF. Poprawne ustawienie nagłówków Content-Type i Content-Disposition. Zwracanie ResponseEntity. Parametryzacja raportów (filtrowanie po firmie).
+- Dokumenty pracownicze (20%)
+System uploadowania, przechowywania i pobierania dokumentów przypisanych do pracowników. Model EmployeeDocument z metadanymi. Endpointy CRUD dla dokumentów. Organizacja plików w katalogach per pracownik.
+- Zdjęcia pracowników i walidacja (15%)
+Upload zdjęć z walidacją formatu (JPG, PNG) i rozmiaru (max 2MB). Pole photoFileName w modelu Employee. Endpoint do pobierania zdjęć. Obsługa braku zdjęcia. Dedykowane wyjątki (FileStorageException, InvalidFileException) z odpowiednimi handlerami.
+- Testy z MockMultipartFile (15%)
+Testy używające MockMultipartFile do symulowania uploadów. Testy downloadu raportów z weryfikacją nagłówków i zawartości. Testy błędów (zbyt duży plik, nieprawidłowe rozszerzenie). Mockowanie serwisów.

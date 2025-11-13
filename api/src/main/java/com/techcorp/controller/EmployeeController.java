@@ -10,13 +10,15 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
-import com.techcorp.dto.EmployeeDTO;
-import com.techcorp.EmployeeService;
-import com.techcorp.EmployeeMapper;
-import com.techcorp.Employee;
-import com.techcorp.EmploymentStatus;
-import com.techcorp.exception.EmployeeNotFoundException;
-import com.techcorp.exception.DuplicateEmailException;
+
+import com.techcorp.mapper.EmployeeMapper;
+import com.techcorp.model.Employee;
+import com.techcorp.model.EmploymentStatus;
+import com.techcorp.model.dto.EmployeeDTO;
+import com.techcorp.model.exception.DuplicateEmailException;
+import com.techcorp.model.exception.EmployeeNotFoundException;
+import com.techcorp.service.EmployeeService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;

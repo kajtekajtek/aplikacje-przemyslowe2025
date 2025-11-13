@@ -6,12 +6,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.http.ResponseEntity;
-import com.techcorp.EmployeeService;
-import com.techcorp.CompanyStatistics;
-import com.techcorp.dto.CompanyStatisticsDTO;
-import com.techcorp.CompanyStatisticsMapper;
-import com.techcorp.EmploymentStatus;
-import com.techcorp.Role;
+
+import com.techcorp.mapper.CompanyStatisticsMapper;
+import com.techcorp.model.CompanyStatistics;
+import com.techcorp.model.EmploymentStatus;
+import com.techcorp.model.Role;
+import com.techcorp.model.dto.CompanyStatisticsDTO;
+import com.techcorp.service.EmployeeService;
+
 import java.util.Map;
 import java.util.HashMap;
 import java.util.stream.Collectors;

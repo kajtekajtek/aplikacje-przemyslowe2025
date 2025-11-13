@@ -1,9 +1,5 @@
 package com.techcorp.controller;
 
-import com.techcorp.CompanyStatistics;
-import com.techcorp.EmployeeService;
-import com.techcorp.Role;
-import com.techcorp.dto.CompanyStatisticsDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +9,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import com.techcorp.exception.GlobalExceptionHandler;
+import com.techcorp.model.CompanyStatistics;
+import com.techcorp.model.Role;
+import com.techcorp.model.dto.CompanyStatisticsDTO;
+import com.techcorp.service.EmployeeService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -104,10 +104,10 @@ class StatisticsControllerTest {
 
     @Test
     void getStatusDistribution_ShouldReturn200AndStatusDistribution() throws Exception {
-        Map<com.techcorp.EmploymentStatus, Long> statusCount = new HashMap<>();
-        statusCount.put(com.techcorp.EmploymentStatus.ACTIVE, 8L);
-        statusCount.put(com.techcorp.EmploymentStatus.ON_LEAVE, 2L);
-        statusCount.put(com.techcorp.EmploymentStatus.TERMINATED, 1L);
+        Map<com.techcorp.model.EmploymentStatus, Long> statusCount = new HashMap<>();
+        statusCount.put(com.techcorp.model.EmploymentStatus.ACTIVE, 8L);
+        statusCount.put(com.techcorp.model.EmploymentStatus.ON_LEAVE, 2L);
+        statusCount.put(com.techcorp.model.EmploymentStatus.TERMINATED, 1L);
         when(employeeService.getStatusDistribution()).thenReturn(statusCount);
 
         mockMvc.perform(get("/api/statistics/status"))

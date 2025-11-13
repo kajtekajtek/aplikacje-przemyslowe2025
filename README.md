@@ -52,7 +52,7 @@ app.api.url=https://jsonplaceholder.typicode.com/users
 
 ### employees-beans.xml
 Definicje pracowników w XML:
-- 6 pracowników firmy XMLCorp
+- 6 pracowników firmy XMLBEAN
 - Różne role: CEO, VP, Manager, Engineer, Intern
 - Automatyczne ładowanie przy starcie aplikacji
 
@@ -81,8 +81,8 @@ curl -X GET http://localhost:8080/api/employees
   {
     "firstName": "Thomas",
     "lastName": "Anderson",
-    "emailAddress": "thomas.anderson@xmlcorp.com",
-    "companyName": "XMLCorp",
+    "emailAddress": "thomas.anderson@XMLBEAN.com",
+    "companyName": "XMLBEAN",
     "role": "CEO",
     "salary": 30000,
     "status": "ACTIVE"
@@ -90,8 +90,8 @@ curl -X GET http://localhost:8080/api/employees
   {
     "firstName": "Sofia",
     "lastName": "Martinez",
-    "emailAddress": "sofia.martinez@xmlcorp.com",
-    "companyName": "XMLCorp",
+    "emailAddress": "sofia.martinez@XMLBEAN.com",
+    "companyName": "XMLBEAN",
     "role": "VP",
     "salary": 20000,
     "status": "ACTIVE"
@@ -104,7 +104,7 @@ Pobiera listę pracowników filtrowaną po nazwie firmy.
 
 **Żądanie:**
 ```bash
-curl -X GET "http://localhost:8080/api/employees?company=XMLCorp"
+curl -X GET "http://localhost:8080/api/employees?company=XMLBEAN"
 ```
 
 **Odpowiedź 200 OK:** Lista pracowników danej firmy (format jak powyżej)
@@ -114,7 +114,7 @@ Pobiera pojedynczego pracownika po adresie email.
 
 **Żądanie:**
 ```bash
-curl -X GET http://localhost:8080/api/employees/thomas.anderson@xmlcorp.com
+curl -X GET http://localhost:8080/api/employees/thomas.anderson@XMLBEAN.com
 ```
 
 **Odpowiedź 200 OK:**
@@ -122,8 +122,8 @@ curl -X GET http://localhost:8080/api/employees/thomas.anderson@xmlcorp.com
 {
   "firstName": "Thomas",
   "lastName": "Anderson",
-  "emailAddress": "thomas.anderson@xmlcorp.com",
-  "companyName": "XMLCorp",
+  "emailAddress": "thomas.anderson@XMLBEAN.com",
+  "companyName": "XMLBEAN",
   "role": "CEO",
   "salary": 30000,
   "status": "ACTIVE"
@@ -274,7 +274,7 @@ curl -X GET http://localhost:8080/api/statistics/salary/average
 
 **Żądanie (dla konkretnej firmy):**
 ```bash
-curl -X GET "http://localhost:8080/api/statistics/salary/average?company=XMLCorp"
+curl -X GET "http://localhost:8080/api/statistics/salary/average?company=XMLBEAN"
 ```
 
 **Odpowiedź 200 OK:**
@@ -289,13 +289,13 @@ Pobiera statystyki dla konkretnej firmy.
 
 **Żądanie:**
 ```bash
-curl -X GET http://localhost:8080/api/statistics/company/XMLCorp
+curl -X GET http://localhost:8080/api/statistics/company/XMLBEAN
 ```
 
 **Odpowiedź 200 OK:**
 ```json
 {
-  "companyName": "XMLCorp",
+  "companyName": "XMLBEAN",
   "employeeCount": 6,
   "averageSalary": 14666.67,
   "highestSalary": 30000,

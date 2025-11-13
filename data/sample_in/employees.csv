@@ -1,0 +1,8 @@
+firstName,lastName,email,company,position,salary
+John,Smith,john.smith@csvinc.com,CSVINC,CEO,35000
+Emma,Johnson,emma.johnson@csvinc.com,CSVINC,VP,22000
+Michael,Brown,michael.brown@csvinc.com,CSVINC,MANAGER,15000
+Sarah,Davis,sarah.davis@csvinc.com,CSVINC,ENGINEER,10000
+David,Wilson,david.wilson@csvinc.com,CSVINC,ENGINEER,9500
+Lisa,Taylor,lisa.taylor@csvinc.com,CSVINC,INTERN,4000
+
