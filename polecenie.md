@@ -1,96 +1,75 @@
-# Zadanie: Obsługa plików w aplikacji
+# Zadanie 7: Interfejs użytkownika webowego
 
 ## Kontekst
 
-System zarządzania pracownikami wymaga możliwości przesyłania i pobierania plików przez API. Użytkownicy muszą móc importować dane z plików CSV i XML bez dostępu do serwera, generować raporty do pobrania oraz przesyłać dokumenty związane z pracownikami. Zadaniem jest rozszerzenie API o endpointy obsługujące upload i download plików z odpowiednią walidacją i obsługą błędów.
+System zarządzania pracownikami posiada API REST umożliwiające programistyczną integrację, ale wymaga również interfejsu graficznego dla użytkowników końcowych. Zadaniem jest stworzenie aplikacji webowej z dynamicznymi widokami HTML, formularzami oraz kontrolerami MVC, które będą renderować strony zamiast zwracać JSON.
 
 ## Wymagania funkcjonalne
 
-### 1. Konfiguracja obsługi plików
+### 1. Konfiguracja Thymeleaf
 
-W pliku application.properties należy skonfigurować parametry związane z uploadem plików oraz określić katalog, w którym będą przechowywane przesłane pliki. Konfiguracja powinna obejmować maksymalny rozmiar pojedynczego pliku oraz maksymalny rozmiar całego żądania, aby zapobiec przeciążeniu serwera przez zbyt duże przesyłki. Należy również określić katalog roboczy, w którym aplikacja będzie zapisywać przesłane pliki oraz generować raporty do pobrania.
+- Dodać zależność spring-boot-starter-thymeleaf do projektu.
+
+Konfiguracja w application.properties:
 
 ```
-spring.servlet.multipart.max-file-size=10MB
-spring.servlet.multipart.max-request-size=10MB
-spring.servlet.multipart.enabled=true
-app.upload.directory=uploads/
-app.reports.directory=reports/
+spring.thymeleaf.cache=false
+spring.thymeleaf.prefix=classpath:/templates/
+spring.thymeleaf.suffix=.html
+spring.thymeleaf.mode=HTML
 ```
 
-Katalogi uploads/ i reports/ powinny być tworzone automatycznie przy starcie aplikacji, jeśli nie istnieją. Można to zrealizować w klasie z adnotacją @Component implementującej interfejs CommandLineRunner lub w dedykowanej klasie konfiguracyjnej.
+Wyłączenie cache pozwala na widoczność zmian w widokach bez restartu aplikacji podczas developmentu. W produkcji cache powinien być włączony dla wydajności.
 
-### 2. Serwis do zarządzania plikami
+### 2. Struktura widoków i wspólny layout
 
-Należy utworzyć serwis FileStorageService z adnotacją @Service, który będzie odpowiedzialny za operacje na plikach. Serwis powinien enkapsulować logikę zapisywania plików na dysku, generowania unikalnych nazw plików aby uniknąć konfliktów, walidacji typów i rozmiarów plików oraz obsługi błędów związanych z operacjami na systemie plików.
+- Utworzyć katalog src/main/resources/templates/ zawierający szablony HTML. Wszystkie widoki powinny dziedziczyć ze wspólnego layoutu zawierającego nawigację i podstawową strukturę strony.
+- Plik layout.html powinien zawierać sekcję <head> z linkami do stylów CSS, nawigację z linkami do głównych sekcji aplikacji (Pracownicy, Departamenty, Statystyki, Pliki) oraz sekcję <main> gdzie będzie wstawiany konkretny widok. Można użyć Thymeleaf Layout Dialect lub prostych fragmentów.
+- Podstawowy plik style.css w katalogu src/main/resources/static/css/ powinien zawierać style dla tabel z obramowaniem i efektem hover, style dla formularzy z wyraźnymi polami input i przyciskami, style dla komunikatów sukcesu i błędów oraz podstawowy układ strony z centrowaniem contentu.
 
-Serwis powinien oferować metody do zapisywania pliku przyjmującego obiekt MultipartFile i zwracającego nazwę zapisanego pliku, metodę do odczytywania pliku z dysku zwracającą obiekt Resource, metodę do usuwania pliku oraz metodę walidującą czy plik spełnia wymagania dotyczące rozszerzenia i rozmiaru. Ścieżki do katalogów powinny być wstrzykiwane z application.properties używając adnotacji @Value.
+### 3. Kontroler MVC dla pracowników
 
-### 3. Upload plików CSV i XML
+- Klasa EmployeeViewController z adnotacją @Controller i @RequestMapping("/employees") obsługuje widoki dla pracowników. Różnica między @Controller a @RestController polega na tym, że metody zwracają nazwy widoków zamiast danych JSON, a Spring renderuje odpowiedni szablon Thymeleaf.
+- Endpoint GET /employees zwraca widok z listą wszystkich pracowników. Metoda przyjmuje obiekt Model do którego dodaje listę pracowników przez model.addAttribute("employees", employeeService.getAllEmployees()) i zwraca String "employees/list" wskazujący na szablon templates/employees/list.html.
+- Endpoint GET /employees/add zwraca formularz dodawania nowego pracownika. Metoda dodaje do modelu pusty obiekt Employee przez model.addAttribute("employee", new Employee()) który będzie bindowany do formularza, oraz listę wszystkich możliwych wartości enum Position i EmploymentStatus potrzebnych do wypełnienia selectów w formularzu.
+- Endpoint POST /employees/add przetwarza formularz używając @ModelAttribute Employee employee co automatycznie binduje pola z formularza do obiektu. Metoda zapisuje pracownika przez serwis, dodaje komunikat sukcesu do RedirectAttributes używając redirectAttributes.addFlashAttribute("message", "Pracownik dodany pomyślnie") i wykonuje przekierowanie return "redirect:/employees". Wzorzec Post-Redirect-Get zapobiega ponownemu wysłaniu formularza przy odświeżeniu strony.
+- Endpoint GET /employees/edit/{email} zwraca formularz edycji pracownika. Metoda pobiera pracownika po emailu, dodaje go do modelu oraz listy enumów i zwraca widok formularza edycji.
+- Endpoint POST /employees/edit przetwarza aktualizację danych używając @ModelAttribute i przekierowuje po zapisie.
+- Endpoint GET /employees/delete/{email} usuwa pracownika i przekierowuje do listy z komunikatem. Dla operacji DELETE można użyć formularza z ukrytym polem _method i filtra HiddenHttpMethodFilter, ale prostsza implementacja przez GET jest akceptowalna w tym zadaniu.
+- Endpoint GET /employees/search wyświetla formularz wyszukiwania po firmie z polem tekstowym.
+- Endpoint POST /employees/search przetwarza wyszukiwanie przyjmując @RequestParam("company") String company, filtruje pracowników i zwraca widok z wynikami.
 
-Należy utworzyć kontroler FileUploadController z mapowaniem @RequestMapping("/api/files") obsługujący przesyłanie plików przez API. Kontroler powinien przyjmować pliki używając typu MultipartFile z adnotacją @RequestParam("file"), która automatycznie mapuje przesłany plik z formularza multipart.
+### 4. Widoki Thymeleaf dla pracowników
 
-Endpoint POST /api/files/import/csv przyjmuje plik CSV, waliduje jego rozszerzenie i rozmiar, zapisuje go w katalogu uploads, a następnie przekazuje ścieżkę do ImportService który wykonuje import danych. Metoda zwraca obiekt ImportSummary ze szczegółami importu oraz statusem 200 OK przy sukcesie lub odpowiedni kod błędu przy niepowodzeniu.
+- Plik templates/employees/list.html wyświetla tabelę z pracownikami. Nagłówek zawiera link do formularza dodawania oraz ewentualny komunikat flash. Tabela używa th:each="employee : ${employees}" do iteracji po kolekcji pracowników, th:text="${employee.firstName}" do wyświetlania wartości pól oraz th:href="@{/employees/edit/{email}(email=${employee.email})}" do generowania dynamicznych linków. Kolumna akcji zawiera linki do edycji i usuwania.
+- Plik templates/employees/add-form.html zawiera formularz z atrybutami th:action="@{/employees/add}", th:object="${employee}" bindującym formularz do obiektu oraz th:field="*{firstName}" dla każdego pola co automatycznie generuje atrybuty name, id i value oraz binduje wartości w obie strony. Select dla Position używa th:each="pos : ${positions}" do iteracji po enumie i th:value="${pos}" oraz th:text="${pos}" do wypełnienia opcji.
+- Plik templates/employees/edit-form.html jest analogiczny do add-form ale action wskazuje na /employees/edit a pola są wypełnione wartościami edytowanego pracownika.
+- Plik templates/employees/search-form.html zawiera prosty formularz z jednym polem tekstowym dla nazwy firmy.
+- Plik templates/employees/search-results.html wyświetla wyniki wyszukiwania w analogicznej tabeli jak list.html ale z dodatkową informacją o kryterium wyszukiwania.
 
-Analogiczny endpoint POST /api/files/import/xml obsługuje pliki XML. Oba endpointy powinny zwracać szczegółowe informacje o wyniku importu, włączając liczbę zaimportowanych rekordów, liczbę błędów oraz listę konkretnych błędów z numerami linii lub elementów, które nie zostały przetworzone.
+### 5. Nowa funkcjonalność: Departamenty
 
-### 4. Generowanie i download raportów
+- Wprowadzić nową encję domenową reprezentującą departament w firmie. Klasa Department powinna zawierać pola: id jako Long, name jako String, location jako String opisujący lokalizację biura departamentu, budget jako double reprezentujący budżet departamentu oraz managerEmail jako String wskazujący na pracownika będącego managerem departamentu.
+- Serwis DepartmentService zarządza departamentami przechowując je w pamięci w mapie gdzie kluczem jest id. Serwis oferuje metody CRUD analogiczne do EmployeeService: dodawanie nowego departamentu z automatycznym generowaniem id, pobieranie wszystkich departamentów, pobieranie po id, aktualizację oraz usuwanie.
+- Kontroler DepartmentViewController z mapowaniem /departments obsługuje widoki dla departamentów implementując analogiczne endpointy jak dla pracowników: listę, formularz dodawania, formularz edycji oraz usuwanie. Formularz departamentu zawiera select do wyboru managera z listy wszystkich pracowników na stanowisku MANAGER lub wyższym.
+- Widoki w katalogu templates/departments/ zawierają list.html z tabelą departamentów pokazującą nazwę, lokalizację, budżet i nazwisko managera (pobrane z EmployeeService po emailu), form.html z polami dla wszystkich atrybutów departamentu oraz selectem dla managera oraz details.html pokazujący szczegóły departamentu wraz z listą pracowników przypisanych do tego departamentu (rozszerzenie modelu Employee o pole departmentId).
 
-Kontroler powinien oferować endpointy do generowania i pobierania raportów w różnych formatach. Kluczowe jest prawidłowe ustawienie nagłówków HTTP, które informują przeglądarkę jak obsłużyć plik - czy wyświetlić go inline czy pobrać jako załącznik.
+### 6. Upload plików przez formularz HTML
 
-Endpoint GET /api/files/export/csv generuje plik CSV zawierający wszystkich pracowników i zwraca go jako ResponseEntity<Resource>. Należy ustawić nagłówek Content-Type: text/csv oraz Content-Disposition: attachment; filename="employees.csv", który wymusza pobranie pliku przez przeglądarkę zamiast wyświetlenia go w oknie.
+- Rozszerzyć kontroler o endpoint GET /employees/import zwracający formularz z polem input typu file do wyboru pliku CSV lub XML oraz radio buttons lub select do wyboru typu pliku. Atrybut enctype="multipart/form-data" w tagu form jest wymagany dla uploadów plików.
+- Endpoint POST /employees/import przyjmuje @RequestParam("file") MultipartFile file oraz @RequestParam("fileType") String fileType, wywołuje odpowiednią metodę ImportService i przekierowuje do listy pracowników z komunikatem zawierającym ImportSummary (liczba zaimportowanych, liczba błędów). W przypadku błędów można wyświetlić szczegółową listę błędów w osobnym widoku.
+- Analogicznie endpoint GET /departments/documents/{id} wyświetla listę dokumentów związanych z departamentem z możliwością uploadu nowych plików oraz downloadu istniejących. Upload wykorzystuje endpoint z poprzedniego zadania ale wywołany z formularza HTML zamiast przez API.
 
-Endpoint GET /api/files/export/csv?company=X generuje raport CSV tylko dla wybranej firmy, co pokazuje jak łączyć parametry query z generowaniem plików.
+### 7. Wyświetlanie statystyk
 
-Endpoint GET /api/files/reports/statistics/{companyName} generuje raport PDF ze statystykami wybranej firmy. Do generowania PDF można użyć biblioteki takiej jak iText lub Apache PDFBox, którą należy dodać do zależności projektu. Raport powinien zawierać sformatowane tabele ze statystykami, wykresy lub inne wizualizacje danych. Nagłówek Content-Type ustawiony na application/pdf informuje przeglądarkę o typie pliku.
+- Kontroler StatisticsViewController z mapowaniem /statistics oferuje endpoint GET /statistics wyświetlający dashboard ze statystykami. Widok zawiera sekcję z ogólnymi statystykami (liczba pracowników, średnie wynagrodzenie, liczba departamentów), sekcję z tabelą statystyk per firma (wykorzystanie CompanyStatistics z serwisu) oraz sekcję z rozkładem pracowników po stanowiskach wyświetlaną jako lista lub prosta wizualizacja tekstowa.
+- Można dodać endpoint GET /statistics/company/{name} wyświetlający szczegółową stronę ze statystykami konkretnej firmy zawierającą wykresy lub bardziej rozbudowane analizy. Na tym etapie wystarczą proste tabele bez JavaScript, ale można wspomnieć w README o możliwości rozszerzenia o wykresy używając bibliotek jak Chart.js.
 
-### 5. Upload dokumentów pracowniczych
+### 8. Walidacja formularzy i wyświetlanie błędów
 
-System powinien umożliwiać przesyłanie i przechowywanie dokumentów związanych z konkretnym pracownikiem, takich jak umowy o pracę, certyfikaty, zaświadczenia czy dokumenty tożsamości. Każdy dokument powinien być powiązany z konkretnym pracownikiem przez email oraz posiadać metadane opisujące typ dokumentu i datę przesłania.
-
-Należy utworzyć model EmployeeDocument z polami: id, employeeEmail, fileName, originalFileName, fileType(enum: CONTRACT, CERTIFICATE, ID_CARD, OTHER), uploadDate, filePath. Model powinien być prostą klasą Java bez adnotacji JPA, ponieważ na tym etapie nie używamy jeszcze bazy danych - metadane dokumentów będą przechowywane w pamięci w mapie w serwisie.
-
-Endpoint POST /api/files/documents/{email} przyjmuje email pracownika w ścieżce, plik przez @RequestParam("file") oraz typ dokumentu przez @RequestParam("type"). Metoda waliduje czy pracownik istnieje, zapisuje plik w podkatalogu uploads/documents/{email}/ zachowując organizację plików, tworzy obiekt metadanych i zwraca go użytkownikowi ze statusem 201 Created.
-
-Endpoint GET /api/files/documents/{email} zwraca listę wszystkich dokumentów przypisanych do pracownika jako List<EmployeeDocument> bez samych plików, tylko metadane.
-
-Endpoint GET /api/files/documents/{email}/{documentId} umożliwia pobranie konkretnego dokumentu. Zwraca plik jako Resource z odpowiednimi nagłówkami Content-Type i Content-Disposition.
-
-Endpoint DELETE /api/files/documents/{email}/{documentId} usuwa dokument z dysku i z rejestru metadanych, zwracając status 204 No Content.
-
-### 6. Upload i wyświetlanie zdjęć pracowników
-
-Pracownicy powinni mieć możliwość posiadania zdjęcia profilowego. Zdjęcia wymagają specjalnej walidacji - muszą być w formacie graficznym (JPG, PNG) oraz mieć ograniczony rozmiar aby nie zajmować zbyt dużo miejsca na serwerze.
-
-Endpoint POST /api/files/photos/{email} przyjmuje zdjęcie i zapisuje je w katalogu uploads/photos/ z nazwą odpowiadającą emailowi pracownika. Należy przeprowadzić walidację sprawdzającą czy plik jest obrazem poprzez weryfikację rozszerzenia oraz opcjonalnie analizę nagłówków pliku. Maksymalny rozmiar zdjęcia powinien być ograniczony do 2MB.
-
-Do modelu Employee należy dodać pole photoFileName przechowujące nazwę pliku ze zdjęciem. Po przesłaniu zdjęcia, pole to powinno być aktualizowane w obiekcie pracownika.
-
-Endpoint GET /api/files/photos/{email} zwraca zdjęcie pracownika jako Resource z nagłówkiem Content-Type: image/jpeg lub image/png. Jeśli pracownik nie ma zdjęcia, można zwrócić domyślny placeholder lub status 404 Not Found.
-
-### 7. Walidacja i obsługa błędów plików
-
-Należy utworzyć dedykowane wyjątki dla operacji na plikach: FileStorageException rzucany przy problemach z zapisem pliku na dysku, InvalidFileException rzucany gdy plik nie spełnia wymagań dotyczących typu lub rozmiaru, FileNotFoundException rzucany gdy żądany plik nie istnieje. Wszystkie te wyjątki powinny dziedziczyć po RuntimeException.
-
-W klasie GlobalExceptionHandler należy dodać handlery dla tych wyjątków zwracające odpowiednie kody HTTP. FileStorageException zwraca 500 Internal Server Error ponieważ wskazuje na problem po stronie serwera, InvalidFileException zwraca 400 Bad Request informując że żądanie było niepoprawne, FileNotFoundExceptionzwraca 404 Not Found.
-
-Dodatkowo należy obsłużyć wyjątek MaxUploadSizeExceededException rzucany przez Spring gdy plik przekracza skonfigurowany limit. Handler powinien zwracać 413 Payload Too Large z komunikatem informującym o maksymalnym dozwolonym rozmiarze.
-
-Metoda walidująca pliki w FileStorageService powinna sprawdzać rozszerzenie pliku porównując je z dozwoloną listą, sprawdzać rozmiar pliku przez MultipartFile.getSize() oraz opcjonalnie weryfikować typ MIME przez MultipartFile.getContentType() ponieważ rozszerzenie można łatwo sfałszować ale typ MIME jest trudniejszy do manipulacji.
-
-### 8. Testy z MockMultipartFile
-
-Testy kontrolera obsługującego pliki wymagają specjalnego podejścia ponieważ musimy symulować przesyłanie plików multipart. Spring dostarcza klasę MockMultipartFile która pozwala tworzyć symulowane pliki do testów.
-
-Test uploadu CSV powinien tworzyć MockMultipartFile z przykładową zawartością CSV, wykonywać żądanie multipart() przez MockMvc, mockować metodę serwisu importującego dane i weryfikować status 200 OK oraz zawartość zwróconego ImportSummary.
-
-Test uploadu zbyt dużego pliku powinien tworzyć MockMultipartFile z rozmiarem przekraczającym limit, wykonywać żądanie i weryfikować status 413 Payload Too Large.
-
-Test uploadu pliku z nieprawidłowym rozszerzeniem powinien tworzyć plik z rozszerzeniem .txt podczas gdy endpoint oczekuje .csv, wykonywać żądanie i weryfikować status 400 Bad Request oraz odpowiedni komunikat błędu.
-
-Test downloadu raportu CSV powinien mockować metodę generującą raport, wykonywać żądanie GET, weryfikować status 200 OK, nagłówek Content-Type zawierający text/csv oraz że odpowiedź zawiera spodziewaną zawartość CSV.
-
-Test uploadu dokumentu pracownika powinien weryfikować czy plik jest zapisywany z właściwymi metadanymi oraz czy zwracany jest status 201 Created z obiektem EmployeeDocument.
+- Kontrolery powinny sprawdzać poprawność danych z formularzy. W metodach POST można używać BindingResult zaraz po parametrze @ModelAttribute do przechwytywania błędów bindowania. Jeśli bindingResult.hasErrors() jest true, metoda zwraca ponownie widok formularza zachowując wprowadzone dane i wyświetlając błędy.
+- W widokach Thymeleaf błędy wyświetlane są przez th:if="${#fields.hasErrors('firstName')}" sprawdzający czy dane pole ma błąd oraz th:errors="*{firstName}" wyświetlający komunikat błędu. Ogólne komunikaty błędów wyświetlane są przez th:if="${#fields.hasAnyErrors()}".
+- Flash messages przekazywane przez RedirectAttributes wyświetlane są w layoutcie lub na początku każdej strony używając th:if="${message}" i th:text="${message}" z odpowiednim stylowaniem CSS dla komunikatów sukcesu (zielone tło) i błędów (czerwone tło).
 
 ## Struktura projektu
 
@@ -98,101 +77,79 @@ Test uploadu dokumentu pracownika powinien weryfikować czy plik jest zapisywany
 src/
 ├── main/
 │   ├── java/com.techcorp.employee/
-│   │   ├── EmployeeManagementApplication.java
 │   │   ├── controller/
-│   │   │   ├── EmployeeController.java
-│   │   │   ├── StatisticsController.java
-│   │   │   └── FileUploadController.java (nowy)
+│   │   │   ├── EmployeeController.java (REST z zadania 5)
+│   │   │   ├── FileUploadController.java (z zadania 6)
+│   │   │   ├── EmployeeViewController.java (nowy MVC)
+│   │   │   ├── DepartmentViewController.java (nowy MVC)
+│   │   │   └── StatisticsViewController.java (nowy MVC)
 │   │   ├── service/
 │   │   │   ├── EmployeeService.java
-│   │   │   ├── ImportService.java
-│   │   │   ├── FileStorageService.java (nowy)
-│   │   │   └── ReportGeneratorService.java (nowy)
-│   │   ├── model/
-│   │   │   ├── Employee.java (z nowym polem photoFileName)
-│   │   │   ├── EmployeeDocument.java (nowy)
-│   │   │   └── DocumentType.java (nowy enum)
-│   │   ├── exception/
-│   │   │   ├── GlobalExceptionHandler.java
-│   │   │   ├── FileStorageException.java (nowy)
-│   │   │   ├── InvalidFileException.java (nowy)
-│   │   │   └── FileNotFoundException.java (nowy)
-│   │   └── dto/
-│   │       └── (DTO z poprzedniego zadania)
+│   │   │   └── DepartmentService.java (nowy)
+│   │   └── model/
+│   │       ├── Employee.java (z polem departmentId)
+│   │       └── Department.java (nowy)
 │   └── resources/
+│       ├── templates/
+│       │   ├── layout.html
+│       │   ├── index.html (strona główna)
+│       │   ├── employees/
+│       │   │   ├── list.html
+│       │   │   ├── add-form.html
+│       │   │   ├── edit-form.html
+│       │   │   ├── search-form.html
+│       │   │   ├── search-results.html
+│       │   │   └── import-form.html
+│       │   ├── departments/
+│       │   │   ├── list.html
+│       │   │   ├── form.html
+│       │   │   └── details.html
+│       │   └── statistics/
+│       │       └── index.html
+│       ├── static/
+│       │   └── css/
+│       │       └── style.css
 │       └── application.properties
 └── test/
     └── java/com.techcorp.employee/
-        ├── controller/
-        │   └── FileUploadControllerTest.java (nowy)
-        └── service/
-            └── FileStorageServiceTest.java (nowy)
+        └── controller/
+            ├── EmployeeViewControllerTest.java (nowy)
+            └── DepartmentViewControllerTest.java (nowy)
 ```
 
 ## Wymagania techniczne
 
-- Kontroler przyjmuje pliki przez parametr metody z adnotacją @RequestParam("file") MultipartFile file, gdzie Spring automatycznie mapuje przesłany plik z żądania multipart. Metody zwracające pliki używają typu ResponseEntity<Resource> gdzie Resource jest interfejsem reprezentującym źródło danych, najczęściej implementowanym przez UrlResource lub ByteArrayResource.
-- Nagłówki HTTP ustawiane przez HttpHeaders obiekt dodawany do ResponseEntity. Nagłówek Content-Dispositionokreśla czy plik ma być wyświetlony inline czy pobrany jako attachment. Nagłówek Content-Type informuje przeglądarkę o typie MIME pliku, co jest kluczowe dla prawidłowego wyświetlania lub pobierania.
-- Zapis plików na dysku przez Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING) z obsługą IOException. Odczyt plików przez new UrlResource(filePath.toUri()) który tworzy zasób wskazujący na plik w systemie plików.
-- Testy używają MockMultipartFile do tworzenia symulowanych plików oraz metody multipart() zamiast post() w MockMvc do wykonywania żądań multipart. Przy testowaniu downloadów należy weryfikować zarówno status HTTP jak i zawartość oraz nagłówki odpowiedzi.
+- Kontrolery MVC używają adnotacji @Controller zamiast @RestController. Metody zwracają nazwy widoków jako String co powoduje renderowanie szablonu Thymeleaf zamiast zwracanie danych JSON. Parametr Model wstrzykiwany do metod służy do przekazywania danych do widoku przez model.addAttribute().
+- Formularze bindowane do obiektów używając th:object i th:field. Atrybuty th:field automatycznie generują name, id oraz bindują wartości w obie strony (wyświetlanie i przechwytywanie). Przekierowania po POST używają wzorca Post-Redirect-Get dla uniknięcia ponownego wysłania formularza przy refresh.
+- Flash messages przekazywane przez RedirectAttributes.addFlashAttribute() przetrwają jedno przekierowanie i będą dostępne w widoku docelowym. URL-e generowane przez @{/path} co automatycznie dodaje context path aplikacji.
+- Testy kontrolerów MVC używają @WebMvcTest i MockMvc analogicznie jak dla REST API, ale weryfikują zwracane nazwy widoków używając andExpect(view().name("employees/list")) oraz obecność atrybutów w modelu przez andExpect(model().attributeExists("employees")).
 
-## Przykłady testowania
+## Przykłady dostępu
 
-Upload pliku CSV:
-
-```
-curl -X POST http://localhost:8080/api/files/import/csv \
-  -F "file=@employees.csv"
-```
-
-Download raportu CSV:
+Po uruchomieniu aplikacji otwórz przeglądarkę i przejdź do:
 
 ```
-curl http://localhost:8080/api/files/export/csv \
-  --output employees_export.csv
-```
-
-Upload dokumentu pracownika:
-
-```
-curl -X POST http://localhost:8080/api/files/documents/jan@example.com \
-  -F "file=@contract.pdf" \
-  -F "type=CONTRACT"
-```
-
-Lista dokumentów pracownika:
-
-```
-curl http://localhost:8080/api/files/documents/jan@example.com
-```
-
-Upload zdjęcia:
-
-```
-curl -X POST http://localhost:8080/api/files/photos/jan@example.com \
-  -F "file=@photo.jpg"
-```
-
-Pobranie zdjęcia:
-
-```
-curl http://localhost:8080/api/files/photos/jan@example.com \
-  --output photo.jpg
+    http://localhost:8080/ - strona główna
+    http://localhost:8080/employees - lista pracowników
+    http://localhost:8080/employees/add - formularz dodawania
+    http://localhost:8080/departments - lista departamentów
+    http://localhost:8080/statistics - dashboard statystyk
+    http://localhost:8080/employees/import - formularz importu plików
 ```
 
 ## Oddanie
 
-Link do repozytorium z kodem, testami, przykładowymi plikami CSV i XML oraz README zawierającym listę endpointów do obsługi plików z przykładami curl, instrukcję konfiguracji katalogów oraz opis architektury przechowywania plików.
+- Link do repozytorium z kodem kontrolerów MVC, widoków Thymeleaf, pliku CSS oraz README zawierającym screenshoty głównych stron aplikacji, opis nawigacji między sekcjami oraz instrukcję uruchomienia i testowania przez przeglądarkę.
 
 ## Kryteria recenzji:
 
-- Upload plików CSV/XML i import danych (25%)
-Endpointy POST /api/files/import/csv i /api/files/import/xml przyjmują MultipartFile, zapisują plik, wywołują import i zwracają ImportSummary. Walidacja formatu i rozmiaru pliku. Obsługa błędów importu.
-- Generowanie i download raportów (25%)
-Endpointy generujące raporty CSV i PDF. Poprawne ustawienie nagłówków Content-Type i Content-Disposition. Zwracanie ResponseEntity. Parametryzacja raportów (filtrowanie po firmie).
-- Dokumenty pracownicze (20%)
-System uploadowania, przechowywania i pobierania dokumentów przypisanych do pracowników. Model EmployeeDocument z metadanymi. Endpointy CRUD dla dokumentów. Organizacja plików w katalogach per pracownik.
-- Zdjęcia pracowników i walidacja (15%)
-Upload zdjęć z walidacją formatu (JPG, PNG) i rozmiaru (max 2MB). Pole photoFileName w modelu Employee. Endpoint do pobierania zdjęć. Obsługa braku zdjęcia. Dedykowane wyjątki (FileStorageException, InvalidFileException) z odpowiednimi handlerami.
-- Testy z MockMultipartFile (15%)
-Testy używające MockMultipartFile do symulowania uploadów. Testy downloadu raportów z weryfikacją nagłówków i zawartości. Testy błędów (zbyt duży plik, nieprawidłowe rozszerzenie). Mockowanie serwisów.
+- **Kontrolery MVC i routing (25%)**
+Wszystkie kontrolery używają @Controller i zwracają nazwy widoków. Przekazywanie danych przez Model. Obsługa formularzy z @ModelAttribute. Poprawne przekierowania po POST z flash messages. Wzorzec Post-Redirect-Get.
+- **Widoki Thymeleaf (30%)**
+Wszystkie wymagane widoki utworzone z prawidłową składnią Thymeleaf. Używanie th:each, th:text, th:href, th:object, th:field. Wspólny layout z nawigacją. Dynamiczne generowanie URL przez @{...}. Wyświetlanie komunikatów i błędów.
+- **Formularze z bindowaniem (20%)**
+Formularze poprawnie bindowane do obiektów. Pola th:field generują atrybuty i wartości. Selecty dla enumów. Walidacja danych i wyświetlanie błędów. Upload plików przez formularz HTML z enctype="multipart/form-data".
+- **Departamenty jako nowa funkcjonalność (15%)**
+Model Department i serwis DepartmentService utworzone. Widoki CRUD dla departamentów. Select do wyboru managera z listy pracowników. Szczegóły departamentu z listą przypisanych pracowników. Pole departmentId w Employee.
+- **Style CSS i UX (10%)**
+Podstawowy plik CSS ze stylami dla tabel, formularzy, komunikatów. Efekt hover na tabelach. Wyraźne przyciski i pola. Nawigacja między sekcjami. Komunikaty sukcesu i błędów z odpowiednimi kolorami. Responsywny układ.
