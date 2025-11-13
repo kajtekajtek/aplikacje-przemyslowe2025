@@ -96,11 +96,7 @@ public class DocumentService {
 
         EmployeeDocument document = documentOpt.get();
         
-        try {
-            Files.deleteIfExists(Paths.get(document.getFilePath()));
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to delete file: " + e.getMessage(), e);
-        }
+        fileStorageService.deleteFile(document.getFileName());
 
         List<EmployeeDocument> documents = documentsStore.get(normalizedEmail);
         if (documents != null) {
